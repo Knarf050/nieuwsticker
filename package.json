@@ -1,6 +1,7 @@
 {
-  "name": "nederlandse-nieuwsticker",
+  "name": "woo-quest",
   "version": "1.0.0",
+  "description": "Gamified (Duolingo-stijl) tracker voor de status van Woo-verzoeken",
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js"
