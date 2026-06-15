@@ -2,8 +2,16 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Woo Quest — volg je Woo-verzoeken</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#58cc02">
+  <link rel="icon" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Woo Quest">
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -25,6 +33,35 @@
 </head>
 <body class="bg-[#f7f7f7]">
   <div id="root"></div>
+
+  <button id="installBtn" style="display:none"
+    class="fixed bottom-6 left-6 z-40 bg-white text-[#58cc02] font-extrabold text-sm px-4 py-3 rounded-2xl shadow-lg border-2 border-[#58cc02]">
+    ⬇️ Installeer app
+  </button>
+
+  <script>
+    // Installeren als echte app (Android/desktop Chrome/Edge)
+    let deferredPrompt = null;
+    const installBtn = document.getElementById('installBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'block';
+    });
+    installBtn.addEventListener('click', async () => {
+      installBtn.style.display = 'none';
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+    });
+    window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
+
+    // Service worker registreren (offline + installeerbaar)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+    }
+  </script>
 
   <script type="text/babel">
     const { useState, useEffect, useMemo, useRef } = React;
