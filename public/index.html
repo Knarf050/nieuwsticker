@@ -2,755 +2,197 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Woo Quest — volg je Woo-verzoeken</title>
-  <link rel="manifest" href="/manifest.webmanifest">
-  <meta name="theme-color" content="#58cc02">
-  <link rel="icon" href="/icon-192.png">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Woo Quest">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nederlandse Nieuwsticker</title>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/woo-data.js"></script>
   <style>
-    body { font-family: 'Nunito', system-ui, -apple-system, sans-serif; }
-    .node-pop { animation: pop .3s ease; }
-    @keyframes pop { 0% { transform: scale(.85); } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
-    .pulse-ring { animation: pulsering 1.8s ease-out infinite; }
-    @keyframes pulsering { 0% { box-shadow: 0 0 0 0 rgba(88,204,2,.5);} 70% { box-shadow: 0 0 0 14px rgba(88,204,2,0);} 100% { box-shadow: 0 0 0 0 rgba(88,204,2,0);} }
-    .toast-in { animation: toastin .3s ease; }
-    @keyframes toastin { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    .pieces span { position: absolute; font-size: 22px; animation: fall 1.2s ease-out forwards; }
-    @keyframes fall { 0% { transform: translateY(-10px) rotate(0); opacity: 1; } 100% { transform: translateY(120px) rotate(360deg); opacity: 0; } }
-    ::-webkit-scrollbar { width: 10px; height: 10px; }
-    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 6px; }
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-scroll {
+      animation: scroll 40s linear infinite;
+    }
   </style>
 </head>
-<body class="bg-[#f7f7f7]">
+<body>
   <div id="root"></div>
-
-  <button id="installBtn" style="display:none"
-    class="fixed bottom-6 left-6 z-40 bg-white text-[#58cc02] font-extrabold text-sm px-4 py-3 rounded-2xl shadow-lg border-2 border-[#58cc02]">
-    ⬇️ Installeer app
-  </button>
-
-  <script>
-    // Installeren als echte app (Android/desktop Chrome/Edge)
-    let deferredPrompt = null;
-    const installBtn = document.getElementById('installBtn');
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = 'block';
-    });
-    installBtn.addEventListener('click', async () => {
-      installBtn.style.display = 'none';
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-    });
-    window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
-
-    // Service worker registreren (offline + installeerbaar)
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
-    }
-  </script>
-
+  
   <script type="text/babel">
-    const { useState, useEffect, useMemo, useRef } = React;
+    const { useState, useEffect } = React;
 
-    const CONFIG = window.WOO_CONFIG;
-    const TEMPLATE = window.WOO_TEMPLATE;
-    const SEED = window.WOO_SEED;
-    const STORE_KEY = 'wooQuest.v1';
-    const DAY = 86400000;
+    const NewsTicker = () => {
+      const [articles, setArticles] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [currentIndex, setCurrentIndex] = useState(0);
+      const [error, setError] = useState(null);
 
-    const FASES = ['Intake & termijnen', 'Inventarisatie & beoordeling', 'Besluitvorming', 'Afronding'];
-    const FASE_KLEUR = {
-      'Intake & termijnen':            { bg: '#1cb0f6', soft: '#e1f4ff' },
-      'Inventarisatie & beoordeling':  { bg: '#ce82ff', soft: '#f5e9ff' },
-      'Besluitvorming':                { bg: '#ff9600', soft: '#fff1de' },
-      'Afronding':                     { bg: '#58cc02', soft: '#e8f9d6' },
-    };
-    const STAP = Object.fromEntries(TEMPLATE.map(s => [s.id, s]));
-
-    // ---------- helpers ----------
-    const todayStr = () => new Date().toISOString().slice(0, 10);
-    const parseDate = (s) => s ? new Date(s + 'T00:00:00') : null;
-    const fmtDate = (s) => s ? parseDate(s).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
-    const fmtKort = (s) => s ? parseDate(s).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : '';
-    const addDays = (d, n) => new Date(d.getTime() + n * DAY);
-    const daysBetween = (a, b) => Math.round((a.getTime() - b.getTime()) / DAY);
-    const lichteHash = (str) => { let h = 5381; for (let i = 0; i < str.length; i++) { h = ((h << 5) + h) + str.charCodeAt(i); h = h & 0xffffffff; } return (h >>> 0).toString(16); };
-
-    function deadlineInfo(v) {
-      const start = parseDate(v.datumOntvangst);
-      if (!start) return null;
-      const t = CONFIG.termijnen;
-      let dagen = t.beslistermijnDagen + (v.verdaging ? t.verdagingDagen : 0) + (Number(v.opschortingDagen) || 0);
-      const deadline = addDays(start, dagen);
-      const resterend = daysBetween(deadline, parseDate(todayStr()));
-      return { deadline, resterend, dagen };
-    }
-    function actieveStappen(v) { const nvt = new Set(v.nvt || []); return TEMPLATE.filter(s => !nvt.has(s.id)); }
-    function voortgang(v) {
-      const stappen = actieveStappen(v);
-      const klaar = new Set(v.klaar || []);
-      const done = stappen.filter(s => klaar.has(s.id)).length;
-      const xp = stappen.filter(s => klaar.has(s.id)).reduce((a, s) => a + s.xp, 0);
-      const volgende = stappen.find(s => !klaar.has(s.id)) || null;
-      return { done, totaal: stappen.length, pct: Math.round(done / stappen.length * 100), xp, volgende, afgerond: done === stappen.length };
-    }
-    function statusKleur(v) {
-      const vg = voortgang(v);
-      if (vg.afgerond) return { label: 'Afgerond', kleur: '#58cc02', soft: '#e8f9d6' };
-      const dl = deadlineInfo(v);
-      if (!dl) return { label: 'Geen datum', kleur: '#afafaf', soft: '#eee' };
-      if (dl.resterend < 0) return { label: `${Math.abs(dl.resterend)} dgn te laat`, kleur: '#ff4b4b', soft: '#ffe3e3' };
-      if (dl.resterend <= 7) return { label: `Nog ${dl.resterend} dgn`, kleur: '#ff9600', soft: '#fff1de' };
-      return { label: `Nog ${dl.resterend} dgn`, kleur: '#58cc02', soft: '#e8f9d6' };
-    }
-    function activiteitenLog(v) {
-      const data = v.klaarData || {};
-      return (v.klaar || [])
-        .filter(id => STAP[id])
-        .map(id => ({ id, datum: data[id] || null, stap: STAP[id] }))
-        .sort((a, b) => (b.datum || '').localeCompare(a.datum || ''));
-    }
-
-    // ---------- badges ----------
-    const BADGES = [
-      { id: 'eerste', icon: '🥉', titel: 'Eerste stap', uitleg: 'Eerste stap voltooid', test: (g) => g.totaalKlaar >= 1 },
-      { id: 'tien', icon: '🥈', titel: 'Op dreef', uitleg: '10 stappen voltooid', test: (g) => g.totaalKlaar >= 10 },
-      { id: 'lakmeester', icon: '🖌️', titel: 'Lakmeester', uitleg: 'Lakwerk gecontroleerd in een zaak', test: (g) => g.verzoeken.some(v => (v.klaar||[]).includes('lakcontrole')) },
-      { id: 'handtekening', icon: '✍️', titel: 'Getekend', uitleg: 'Manager heeft getekend', test: (g) => g.verzoeken.some(v => (v.klaar||[]).includes('handtekening')) },
-      { id: 'optijd', icon: '⚡', titel: 'Op tijd', uitleg: 'Een verzoek vóór de deadline afgerond', test: (g) => g.verzoeken.some(v => { const vg=voortgang(v); const dl=deadlineInfo(v); return vg.afgerond && dl && dl.resterend >= 0; }) },
-      { id: 'afgerond', icon: '🏆', titel: 'Dossier dicht', uitleg: 'Een verzoek volledig afgerond', test: (g) => g.verzoeken.some(v => voortgang(v).afgerond) },
-      { id: 'streak3', icon: '🔥', titel: 'Streak 3', uitleg: '3 dagen op rij actief', test: (g) => (g.streak||0) >= 3 },
-      { id: 'streak7', icon: '🌟', titel: 'Week-streak', uitleg: '7 dagen op rij actief', test: (g) => (g.streak||0) >= 7 },
-    ];
-
-    // ---------- storage ----------
-    function laadState() {
-      let opgeslagen = null;
-      try { opgeslagen = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) {}
-      let verzoeken;
-      if (opgeslagen && opgeslagen.verzoeken) {
-        const map = Object.fromEntries(opgeslagen.verzoeken.map(v => [v.id, v]));
-        if (!opgeslagen.seedGeladen) for (const v of SEED) if (!map[v.id]) map[v.id] = { ...v };
-        verzoeken = Object.values(map);
-      } else {
-        verzoeken = SEED.map(v => ({ ...v }));
-      }
-      const game = (opgeslagen && opgeslagen.game) || { streak: 0, lastActive: null, dagDoel: 3 };
-      if (!game.dagDoel) game.dagDoel = 3;
-      const security = (opgeslagen && opgeslagen.security) || { pinHash: null };
-      return { verzoeken, game, security, seedGeladen: true };
-    }
-    function bewaarState(state) { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
-
-    // ---------- kleine UI bouwstenen ----------
-    function StatChip({ icon, waarde, label, kleur }) {
-      return (
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white shadow-sm">
-          <span className="text-xl" style={{ color: kleur }}>{icon}</span>
-          <div className="leading-tight">
-            <div className="font-extrabold text-gray-800 text-sm">{waarde}</div>
-            <div className="text-[10px] uppercase tracking-wide text-gray-400 font-bold">{label}</div>
-          </div>
-        </div>
-      );
-    }
-    function ProgressBar({ pct, kleur }) {
-      return (
-        <div className="w-full h-3 rounded-full bg-gray-200 overflow-hidden">
-          <div className="h-full rounded-full transition-all duration-500" style={{ width: pct + '%', background: kleur }} />
-        </div>
-      );
-    }
-    function Veld({ label, children }) {
-      return (
-        <label className="block">
-          <span className="text-[11px] uppercase font-bold text-gray-400">{label}</span>
-          {children}
-        </label>
-      );
-    }
-    const inputCls = "w-full mt-1 px-3 py-2 rounded-xl border-2 border-gray-200 focus:border-[#58cc02] outline-none font-semibold text-gray-700 text-sm";
-
-    // ---------- het Duolingo-pad ----------
-    function PadNode({ stap, status, datum, deadlineLabel, onClick }) {
-      const fk = FASE_KLEUR[stap.fase];
-      let bg = '#e5e5e5', ring = '#cfcfcf', tekstKleur = '#9ca3af', schaduw = '#bdbdbd';
-      if (status === 'done') { bg = fk.bg; ring = fk.bg; tekstKleur = '#fff'; schaduw = 'rgba(0,0,0,.18)'; }
-      if (status === 'next') { bg = '#fff'; ring = fk.bg; tekstKleur = fk.bg; }
-      return (
-        <button onClick={onClick}
-          className={"relative flex flex-col items-center group focus:outline-none " + (status === 'next' ? 'pulse-ring rounded-full' : '')}
-          title={stap.uitleg}>
-          <div className={"w-16 h-16 rounded-full flex items-center justify-center text-2xl border-4 transition " + (status !== 'nvt' ? 'node-pop' : '')}
-            style={{ background: bg, borderColor: ring, color: tekstKleur, boxShadow: status === 'done' ? `0 5px 0 ${schaduw}` : 'none', opacity: status === 'nvt' ? .45 : 1 }}>
-            {status === 'done' ? '✓' : stap.icon}
-          </div>
-          <div className="mt-2 text-center max-w-[150px]">
-            <div className="text-xs font-extrabold text-gray-700 leading-tight">{stap.label}</div>
-            {status === 'done' && datum && <div className="text-[10px] text-gray-400 font-bold">✓ {fmtKort(datum)}</div>}
-            {status !== 'done' && stap.deadline && deadlineLabel && (
-              <div className="text-[11px] font-bold mt-0.5" style={{ color: deadlineLabel.kleur }}>⏱️ {deadlineLabel.tekst}</div>
-            )}
-            {stap.optioneel && status !== 'done' && <div className="text-[10px] text-gray-400 font-bold">optioneel</div>}
-          </div>
-        </button>
-      );
-    }
-
-    function Pad({ v, onToggle, onNvt }) {
-      const klaar = new Set(v.klaar || []);
-      const nvt = new Set(v.nvt || []);
-      const data = v.klaarData || {};
-      const vg = voortgang(v);
-      const dl = deadlineInfo(v);
-      let deadlineLabel = null;
-      if (dl) {
-        const sk = statusKleur(v);
-        deadlineLabel = { kleur: sk.kleur, tekst: vg.afgerond ? 'beslist' : (dl.resterend < 0 ? `${Math.abs(dl.resterend)} dgn te laat` : `nog ${dl.resterend} dgn`) };
-      }
-      return (
-        <div className="space-y-8">
-          {FASES.map((fase) => {
-            const stappenInFase = TEMPLATE.filter(s => s.fase === fase);
-            const fk = FASE_KLEUR[fase];
-            return (
-              <div key={fase}>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="px-3 py-1 rounded-full text-white text-xs font-extrabold uppercase tracking-wide" style={{ background: fk.bg }}>{fase}</span>
-                  <div className="flex-1 h-px" style={{ background: fk.soft }} />
-                </div>
-                <div className="flex flex-wrap gap-x-6 gap-y-7 justify-center sm:justify-start">
-                  {stappenInFase.map((stap) => {
-                    let status = 'todo';
-                    if (nvt.has(stap.id)) status = 'nvt';
-                    else if (klaar.has(stap.id)) status = 'done';
-                    else if (vg.volgende && vg.volgende.id === stap.id) status = 'next';
-                    return (
-                      <div key={stap.id} className="flex flex-col items-center">
-                        <PadNode stap={stap} status={status} datum={data[stap.id]} deadlineLabel={deadlineLabel} onClick={() => onToggle(stap.id)} />
-                        {stap.optioneel && (
-                          <button onClick={() => onNvt(stap.id)} className="mt-1 text-[10px] font-bold text-gray-400 hover:text-gray-600 underline">
-                            {nvt.has(stap.id) ? 'wél van toepassing' : 'n.v.t.'}
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      );
-    }
-
-    // ---------- detail ----------
-    function Detail({ v, onClose, onToggle, onNvt, onUpdate, onDelete }) {
-      const [bewerk, setBewerk] = useState(false);
-      const vg = voortgang(v);
-      const sk = statusKleur(v);
-      const dl = deadlineInfo(v);
-      const log = activiteitenLog(v);
-      return (
-        <div className="fixed inset-0 z-40 bg-black/40 flex items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
-          <div className="bg-white w-full sm:max-w-4xl sm:rounded-3xl shadow-2xl min-h-screen sm:min-h-0">
-            <div className="sticky top-0 bg-white z-10 px-5 sm:px-8 pt-5 pb-4 border-b border-gray-100 sm:rounded-t-3xl">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="text-xs font-bold text-gray-400">{v.kenmerk} · {v.bestuursorgaan}</div>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-gray-800 leading-tight">{v.titel}</h2>
-                  <div className="text-sm text-gray-500">Verzoeker: {v.verzoeker || '—'}</div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button onClick={() => setBewerk(b => !b)} className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500" title="Gegevens bewerken">✏️</button>
-                  <button onClick={onClose} className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 font-bold text-lg">✕</button>
-                </div>
-              </div>
-
-              {bewerk && (
-                <div className="mt-4 grid sm:grid-cols-2 gap-3 bg-gray-50 rounded-2xl p-4">
-                  <Veld label="Titel"><input className={inputCls} value={v.titel} onChange={e => onUpdate({ titel: e.target.value })} /></Veld>
-                  <Veld label="Kenmerk"><input className={inputCls} value={v.kenmerk || ''} onChange={e => onUpdate({ kenmerk: e.target.value })} /></Veld>
-                  <Veld label="Bestuursorgaan"><input className={inputCls} value={v.bestuursorgaan || ''} onChange={e => onUpdate({ bestuursorgaan: e.target.value })} /></Veld>
-                  <Veld label="Verzoeker"><input className={inputCls} value={v.verzoeker || ''} onChange={e => onUpdate({ verzoeker: e.target.value })} /></Veld>
-                  <div className="sm:col-span-2">
-                    <Veld label="Notitie"><textarea className={inputCls} rows="2" value={v.notitie || ''} onChange={e => onUpdate({ notitie: e.target.value })} /></Veld>
-                  </div>
-                  <div className="sm:col-span-2 flex justify-end">
-                    <button onClick={onDelete} className="px-4 py-2 rounded-xl bg-red-50 text-red-600 font-bold text-sm hover:bg-red-100">🗑️ Verzoek verwijderen</button>
-                  </div>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-                <div className="bg-gray-50 rounded-2xl p-3">
-                  <div className="text-[10px] uppercase font-bold text-gray-400">Ontvangen</div>
-                  <input type="date" value={v.datumOntvangst || ''} onChange={(e) => onUpdate({ datumOntvangst: e.target.value })} className="w-full bg-transparent font-bold text-gray-700 text-sm outline-none" />
-                </div>
-                <div className="bg-gray-50 rounded-2xl p-3">
-                  <div className="text-[10px] uppercase font-bold text-gray-400">Wettelijke deadline</div>
-                  <div className="font-bold text-sm" style={{ color: sk.kleur }}>{dl ? fmtDate(dl.deadline.toISOString().slice(0,10)) : '—'}</div>
-                </div>
-                <label className="bg-gray-50 rounded-2xl p-3 flex flex-col cursor-pointer">
-                  <div className="text-[10px] uppercase font-bold text-gray-400">Verdaging (+2 wk)</div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <input type="checkbox" checked={!!v.verdaging} onChange={(e) => onUpdate({ verdaging: e.target.checked })} className="w-4 h-4 accent-orange-500" />
-                    <span className="font-bold text-gray-700 text-sm">{v.verdaging ? 'Ja' : 'Nee'}</span>
-                  </div>
-                </label>
-                <div className="bg-gray-50 rounded-2xl p-3">
-                  <div className="text-[10px] uppercase font-bold text-gray-400">Opschorting (dagen)</div>
-                  <input type="number" min="0" value={v.opschortingDagen || 0} onChange={(e) => onUpdate({ opschortingDagen: Math.max(0, parseInt(e.target.value || '0')) })} className="w-full bg-transparent font-bold text-gray-700 text-sm outline-none" />
-                </div>
-              </div>
-
-              <div className="mt-4 flex items-center gap-3">
-                <span className="font-extrabold text-gray-700 text-sm whitespace-nowrap">{vg.done}/{vg.totaal} · {vg.pct}%</span>
-                <ProgressBar pct={vg.pct} kleur={sk.kleur} />
-                <span className="text-xs font-bold whitespace-nowrap" style={{ color: sk.kleur }}>{vg.xp} XP</span>
-              </div>
-              {vg.volgende
-                ? <div className="mt-2 text-sm"><span className="text-gray-400 font-bold">Volgende:</span> <span className="font-bold text-gray-700">{vg.volgende.icon} {vg.volgende.label}</span></div>
-                : <div className="mt-2 text-sm font-bold text-green-600">🏆 Volledig afgerond — besluit openbaar gemaakt</div>}
-            </div>
-
-            <div className="px-5 sm:px-8 py-6 grid lg:grid-cols-[1fr,260px] gap-8">
-              <Pad v={v} onToggle={onToggle} onNvt={onNvt} />
-              <div>
-                <div className="font-extrabold text-gray-800 mb-3">🕘 Activiteit</div>
-                {log.length === 0
-                  ? <div className="text-sm text-gray-400">Nog geen stappen voltooid. Tik op een bolletje in het pad.</div>
-                  : <ol className="relative border-l-2 border-gray-100 ml-2 space-y-3">
-                      {log.map(e => (
-                        <li key={e.id} className="ml-4">
-                          <span className="absolute -left-[9px] w-4 h-4 rounded-full" style={{ background: FASE_KLEUR[e.stap.fase].bg }}></span>
-                          <div className="text-sm font-bold text-gray-700 leading-tight">{e.stap.icon} {e.stap.label}</div>
-                          <div className="text-[11px] text-gray-400 font-bold">{e.datum ? fmtDate(e.datum) : 'datum onbekend'}</div>
-                        </li>
-                      ))}
-                    </ol>}
-                {v.notitie && (
-                  <div className="mt-5 bg-yellow-50 rounded-2xl p-3 text-sm text-gray-700">
-                    <div className="text-[10px] uppercase font-bold text-yellow-600 mb-1">Notitie</div>{v.notitie}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // ---------- verzoek-kaart ----------
-    function VerzoekKaart({ v, onOpen }) {
-      const vg = voortgang(v);
-      const sk = statusKleur(v);
-      const laatste = activiteitenLog(v)[0];
-      return (
-        <button onClick={onOpen} className="text-left bg-white rounded-3xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition border-2 border-transparent hover:border-gray-100 w-full">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="text-[11px] font-bold text-gray-400">{v.kenmerk} · {v.bestuursorgaan}</div>
-              <h3 className="font-extrabold text-gray-800 leading-tight">{v.titel}</h3>
-            </div>
-            <span className="shrink-0 px-2.5 py-1 rounded-full text-xs font-extrabold" style={{ background: sk.soft, color: sk.kleur }}>{sk.label}</span>
-          </div>
-          <div className="mt-4 flex items-center gap-3">
-            <span className="font-extrabold text-gray-600 text-xs whitespace-nowrap">{vg.pct}%</span>
-            <ProgressBar pct={vg.pct} kleur={sk.kleur} />
-          </div>
-          <div className="mt-3 text-xs text-gray-500">
-            {vg.afgerond
-              ? <span className="font-bold text-green-600">🏆 Afgerond — {vg.xp} XP</span>
-              : <span><span className="text-gray-400">Nu:</span> <span className="font-bold text-gray-700">{vg.volgende ? vg.volgende.icon + ' ' + vg.volgende.label : '—'}</span></span>}
-          </div>
-          {laatste && laatste.datum && <div className="mt-1 text-[11px] text-gray-400">laatst: {laatste.stap.label.toLowerCase()} · {fmtKort(laatste.datum)}</div>}
-        </button>
-      );
-    }
-
-    // ---------- nieuw verzoek ----------
-    function NieuwVerzoek({ onSluit, onMaak }) {
-      const [f, setF] = useState({ titel: '', kenmerk: '', bestuursorgaan: '', verzoeker: '', datumOntvangst: todayStr() });
-      const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
-      return (
-        <div className="fixed inset-0 z-40 bg-black/40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-extrabold text-gray-800">➕ Nieuw Woo-verzoek</h2>
-              <button onClick={onSluit} className="w-9 h-9 rounded-full bg-gray-100 text-gray-500 font-bold">✕</button>
-            </div>
-            <div className="space-y-3">
-              <Veld label="Titel *"><input className={inputCls} value={f.titel} onChange={set('titel')} placeholder="Waar gaat het verzoek over?" /></Veld>
-              <div className="grid grid-cols-2 gap-3">
-                <Veld label="Kenmerk"><input className={inputCls} value={f.kenmerk} onChange={set('kenmerk')} placeholder="WOO/2026/…" /></Veld>
-                <Veld label="Ontvangen op"><input type="date" className={inputCls} value={f.datumOntvangst} onChange={set('datumOntvangst')} /></Veld>
-              </div>
-              <Veld label="Bestuursorgaan"><input className={inputCls} value={f.bestuursorgaan} onChange={set('bestuursorgaan')} /></Veld>
-              <Veld label="Verzoeker"><input className={inputCls} value={f.verzoeker} onChange={set('verzoeker')} /></Veld>
-            </div>
-            <button disabled={!f.titel.trim()} onClick={() => onMaak(f)}
-              className="mt-5 w-full py-3 rounded-2xl bg-[#58cc02] text-white font-extrabold shadow-[0_4px_0_#46a302] disabled:opacity-40 disabled:shadow-none">
-              Verzoek toevoegen
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    // ---------- instellingen ----------
-    function Instellingen({ state, onSluit, onZetPin, onZetDoel, onImport, onReset }) {
-      const fileRef = useRef();
-      const exporteer = () => {
-        const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'woo-quest-backup-' + todayStr() + '.json';
-        a.click();
-      };
-      const importeer = (e) => {
-        const file = e.target.files[0]; if (!file) return;
-        const r = new FileReader();
-        r.onload = () => { try { onImport(JSON.parse(r.result)); } catch (err) { alert('Ongeldig back-upbestand.'); } };
-        r.readAsText(file);
-      };
-      const wijzigPin = () => {
-        if (state.security.pinHash) {
-          const huidig = prompt('Huidige pincode:');
-          if (huidig === null) return;
-          if (lichteHash(huidig) !== state.security.pinHash) return alert('Onjuiste pincode.');
+      const fetchNews = async () => {
+        try {
+          const response = await fetch('/api/news');
+          const data = await response.json();
+          setArticles(data);
+          setLoading(false);
+          setError(null);
+        } catch (err) {
+          setError('Fout bij laden nieuws');
+          setLoading(false);
         }
-        const nieuw = prompt('Nieuwe pincode (laat leeg om het slot uit te zetten):');
-        if (nieuw === null) return;
-        onZetPin(nieuw.trim() ? lichteHash(nieuw.trim()) : null);
       };
+
+      useEffect(() => {
+        fetchNews();
+        const interval = setInterval(fetchNews, 300000);
+        return () => clearInterval(interval);
+      }, []);
+
+      useEffect(() => {
+        if (articles.length === 0) return;
+        const interval = setInterval(() => {
+          setCurrentIndex((prev) => (prev + 1) % articles.length);
+        }, 5000);
+        return () => clearInterval(interval);
+      }, [articles.length]);
+
+      const formatTime = (dateStr) => {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diff = Math.floor((now - date) / 1000);
+        
+        if (diff < 60) return 'Zojuist';
+        if (diff < 3600) return `${Math.floor(diff / 60)} min geleden`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)} uur geleden`;
+        return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+      };
+
+      if (loading) {
+        return (
+          <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
+            <div className="text-xl">Nieuws laden...</div>
+          </div>
+        );
+      }
+
+      if (error) {
+        return (
+          <div className="flex items-center justify-center h-screen bg-gray-900 text-red-500">
+            <div className="text-xl">{error}</div>
+          </div>
+        );
+      }
+
+      const currentArticle = articles[currentIndex];
+
       return (
-        <div className="fixed inset-0 z-40 bg-black/40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-extrabold text-gray-800">⚙️ Instellingen</h2>
-              <button onClick={onSluit} className="w-9 h-9 rounded-full bg-gray-100 text-gray-500 font-bold">✕</button>
-            </div>
-
-            <div>
-              <div className="font-extrabold text-gray-700 text-sm mb-1">🎯 Dagdoel</div>
-              <div className="flex items-center gap-2">
-                <input type="number" min="1" max="20" value={state.game.dagDoel} onChange={e => onZetDoel(Math.max(1, parseInt(e.target.value || '1')))} className={inputCls + ' w-20'} />
-                <span className="text-sm text-gray-500">stappen per dag</span>
+        <div className="min-h-screen bg-gray-900 text-white">
+          <div className="bg-gradient-to-r from-blue-900 to-blue-700 p-4 shadow-lg">
+            <div className="max-w-7xl mx-auto flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+                <h1 className="text-2xl font-bold">Nederlandse Nieuwsticker</h1>
               </div>
-            </div>
-
-            <div>
-              <div className="font-extrabold text-gray-700 text-sm mb-1">🔒 Privacy / PIN-slot</div>
-              <p className="text-xs text-gray-500 mb-2">Beveiligt de app met een pincode op dit apparaat. Let op: dit is een <b>lichte drempel</b> in de browser, geen echte beveiliging — de data staat onversleuteld lokaal opgeslagen.</p>
-              <button onClick={wijzigPin} className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 font-bold text-sm text-gray-700">
-                {state.security.pinHash ? 'Pincode wijzigen / uitzetten' : 'Pincode instellen'}
-              </button>
-            </div>
-
-            <div>
-              <div className="font-extrabold text-gray-700 text-sm mb-1">💾 Back-up</div>
-              <p className="text-xs text-gray-500 mb-2">Je data staat alleen in deze browser. Maak af en toe een back-up.</p>
-              <div className="flex gap-2">
-                <button onClick={exporteer} className="px-4 py-2 rounded-xl bg-[#1cb0f6] text-white font-bold text-sm">Exporteren</button>
-                <button onClick={() => fileRef.current.click()} className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 font-bold text-sm text-gray-700">Importeren</button>
-                <input ref={fileRef} type="file" accept="application/json" className="hidden" onChange={importeer} />
+              <div className="text-sm">
+                {new Date().toLocaleTimeString('nl-NL')}
               </div>
-            </div>
-
-            <div className="pt-2 border-t border-gray-100">
-              <button onClick={onReset} className="text-sm font-bold text-red-500 hover:text-red-600">↺ Alles terugzetten naar voorbeelddata</button>
             </div>
           </div>
-        </div>
-      );
-    }
 
-    // ---------- wettelijk kader ----------
-    function Kader() {
-      const [open, setOpen] = useState(false);
-      const Section = ({ titel, items }) => (
-        <div>
-          <div className="font-extrabold text-gray-700 text-sm mb-1">{titel}</div>
-          <ul className="space-y-1">
-            {items.map((i, idx) => (
-              <li key={idx} className="text-sm text-gray-600 flex gap-2">
-                <span className="font-mono text-[11px] text-gray-400 shrink-0 mt-0.5 w-24">{i.grond}</span>
-                <span>{i.tekst}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      );
-      return (
-        <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
-          <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-5 py-4">
-            <span className="font-extrabold text-gray-800">📚 Wettelijk kader — Wet open overheid</span>
-            <span className="text-gray-400 font-bold">{open ? '▲' : '▼'}</span>
-          </button>
-          {open && (
-            <div className="px-5 pb-6 space-y-5">
-              <Section titel="Termijnen" items={CONFIG.termijnUitleg.map(t => ({ grond: t.grond, tekst: t.titel + ' — ' + t.tekst }))} />
-              <Section titel="Absolute uitzonderingsgronden (art. 5.1 lid 1)" items={CONFIG.absoluteGronden} />
-              <Section titel="Relatieve uitzonderingsgronden (art. 5.1 lid 2)" items={CONFIG.relatieveGronden} />
-              <Section titel="Intern beraad & belangenafweging" items={CONFIG.bijzondereGronden} />
+          <div className="bg-red-600 text-white py-2 overflow-hidden">
+            <div className="flex animate-scroll">
+              <div className="flex whitespace-nowrap">
+                <span className="text-sm font-semibold mx-4">● BREAKING NEWS</span>
+                {articles.slice(0, 8).map((article, idx) => (
+                  <span key={idx} className="mx-8 text-sm">
+                    <span className="font-bold">{article.source}:</span> {article.title}
+                  </span>
+                ))}
+              </div>
+              <div className="flex whitespace-nowrap">
+                <span className="text-sm font-semibold mx-4">● BREAKING NEWS</span>
+                {articles.slice(0, 8).map((article, idx) => (
+                  <span key={`dup-${idx}`} className="mx-8 text-sm">
+                    <span className="font-bold">{article.source}:</span> {article.title}
+                  </span>
+                ))}
+              </div>
             </div>
-          )}
-        </div>
-      );
-    }
-
-    // ---------- lockscreen ----------
-    function LockScreen({ pinHash, onUnlock }) {
-      const [pin, setPin] = useState('');
-      const [fout, setFout] = useState(false);
-      const probeer = () => { if (lichteHash(pin) === pinHash) onUnlock(); else { setFout(true); setPin(''); } };
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-[#58cc02] p-4">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-xs text-center">
-            <div className="text-5xl mb-2">🦉🔒</div>
-            <div className="font-extrabold text-gray-800 text-lg">Woo Quest</div>
-            <p className="text-sm text-gray-500 mb-4">Voer je pincode in</p>
-            <input autoFocus type="password" inputMode="numeric" value={pin}
-              onChange={e => { setPin(e.target.value); setFout(false); }}
-              onKeyDown={e => e.key === 'Enter' && probeer()}
-              className={"w-full text-center tracking-[.5em] text-xl px-3 py-3 rounded-2xl border-2 outline-none " + (fout ? 'border-red-400' : 'border-gray-200 focus:border-[#58cc02]')} />
-            {fout && <div className="text-red-500 text-sm font-bold mt-2">Onjuiste pincode</div>}
-            <button onClick={probeer} className="mt-4 w-full py-3 rounded-2xl bg-[#58cc02] text-white font-extrabold shadow-[0_4px_0_#46a302]">Ontgrendelen</button>
           </div>
-        </div>
-      );
-    }
 
-    // ---------- toasts + confetti ----------
-    function Toasts({ items }) {
-      return (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 space-y-2 w-[90%] max-w-sm">
-          {items.map(t => (
-            <div key={t.id} className="toast-in bg-gray-900 text-white rounded-2xl px-4 py-3 shadow-lg font-bold text-sm text-center">{t.text}</div>
-          ))}
-        </div>
-      );
-    }
-    function Confetti() {
-      const emojis = ['🎉','🎊','⭐','🏆','✨','🟢'];
-      return (
-        <div className="pieces fixed inset-0 z-50 pointer-events-none">
-          {Array.from({ length: 24 }).map((_, i) => (
-            <span key={i} style={{ left: (Math.random()*100)+'%', top: (Math.random()*30)+'%', animationDelay: (Math.random()*.3)+'s' }}>{emojis[i % emojis.length]}</span>
-          ))}
-        </div>
-      );
-    }
-
-    // ---------- hoofd-app ----------
-    function App() {
-      const [state, setState] = useState(laadState);
-      const [ontgrendeld, setOntgrendeld] = useState(!laadState().security.pinHash);
-      const [openId, setOpenId] = useState(null);
-      const [sort, setSort] = useState('deadline');
-      const [zoek, setZoek] = useState('');
-      const [nieuwOpen, setNieuwOpen] = useState(false);
-      const [instOpen, setInstOpen] = useState(false);
-      const [toasts, setToasts] = useState([]);
-      const [feest, setFeest] = useState(false);
-
-      useEffect(() => { bewaarState(state); }, [state]);
-
-      const toast = (text) => { const id = Math.random(); setToasts(t => [...t, { id, text }]); setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 2600); };
-
-      const setVerzoek = (id, patch) => setState(s => ({ ...s, verzoeken: s.verzoeken.map(v => v.id === id ? { ...v, ...patch, laatstBijgewerkt: Date.now() } : v) }));
-
-      const registreerActiviteit = (g) => {
-        const t = todayStr();
-        if (g.lastActive === t) return g;
-        let streak = 1;
-        if (g.lastActive) { const diff = daysBetween(parseDate(t), parseDate(g.lastActive)); if (diff === 1) streak = (g.streak || 0) + 1; else if (diff === 0) streak = g.streak || 1; }
-        return { ...g, streak, lastActive: t };
-      };
-
-      const toggleStap = (id, stapId) => {
-        setState(s => {
-          let afgerondNu = false, voltooidNu = false;
-          const verzoeken = s.verzoeken.map(v => {
-            if (v.id !== id) return v;
-            const klaar = new Set(v.klaar || []);
-            const data = { ...(v.klaarData || {}) };
-            if (klaar.has(stapId)) { klaar.delete(stapId); delete data[stapId]; }
-            else { klaar.add(stapId); data[stapId] = todayStr(); voltooidNu = true; }
-            const nvt = new Set(v.nvt || []); nvt.delete(stapId);
-            const nieuw = { ...v, klaar: [...klaar], nvt: [...nvt], klaarData: data, laatstBijgewerkt: Date.now() };
-            if (voltooidNu && voortgang(nieuw).afgerond) afgerondNu = true;
-            return nieuw;
-          });
-          if (afgerondNu) { setFeest(true); setTimeout(() => setFeest(false), 1300); setTimeout(() => toast('🏆 Verzoek volledig afgerond!'), 50); }
-          else if (voltooidNu) { const xp = STAP[stapId] ? STAP[stapId].xp : 0; setTimeout(() => toast(`✓ ${STAP[stapId].label} · +${xp} XP`), 30); }
-          return { ...s, verzoeken, game: voltooidNu ? registreerActiviteit(s.game) : s.game };
-        });
-      };
-
-      const toggleNvt = (id, stapId) => setState(s => ({ ...s, verzoeken: s.verzoeken.map(v => {
-        if (v.id !== id) return v;
-        const nvt = new Set(v.nvt || []); const klaar = new Set(v.klaar || []); const data = { ...(v.klaarData || {}) };
-        if (nvt.has(stapId)) nvt.delete(stapId); else { nvt.add(stapId); klaar.delete(stapId); delete data[stapId]; }
-        return { ...v, nvt: [...nvt], klaar: [...klaar], klaarData: data };
-      }) }));
-
-      const maakVerzoek = (f) => {
-        const v = { id: 'woo-' + Date.now(), titel: f.titel.trim(), kenmerk: f.kenmerk.trim(), bestuursorgaan: f.bestuursorgaan.trim(), verzoeker: f.verzoeker.trim(), datumOntvangst: f.datumOntvangst, verdaging: false, opschortingDagen: 0, klaar: ['ontvangst'], nvt: [], klaarData: { ontvangst: f.datumOntvangst || todayStr() } };
-        setState(s => ({ ...s, verzoeken: [v, ...s.verzoeken] }));
-        setNieuwOpen(false); toast('➕ Verzoek toegevoegd'); setOpenId(v.id);
-      };
-      const verwijderVerzoek = (id) => { if (!confirm('Dit verzoek definitief verwijderen?')) return; setState(s => ({ ...s, verzoeken: s.verzoeken.filter(v => v.id !== id) })); setOpenId(null); toast('🗑️ Verzoek verwijderd'); };
-
-      const zetPin = (hash) => { setState(s => ({ ...s, security: { pinHash: hash } })); toast(hash ? '🔒 Pincode ingesteld' : '🔓 Slot uitgezet'); };
-      const zetDoel = (n) => setState(s => ({ ...s, game: { ...s.game, dagDoel: n } }));
-      const importData = (data) => { if (!data.verzoeken) return alert('Geen geldige Woo Quest data.'); if (!confirm('Huidige data vervangen door de back-up?')) return; setState({ ...data, seedGeladen: true, security: data.security || { pinHash: null }, game: data.game || { streak: 0, dagDoel: 3 } }); setInstOpen(false); toast('💾 Back-up geladen'); };
-      const reset = () => { if (!confirm('Alles terugzetten naar de voorbeelddata? Je eigen wijzigingen gaan verloren.')) return; localStorage.removeItem(STORE_KEY); const s = laadState(); s.verzoeken = SEED.map(v => ({ ...v })); setState(s); setInstOpen(false); toast('↺ Teruggezet'); };
-
-      const stats = useMemo(() => {
-        const totaalXp = state.verzoeken.reduce((a, v) => a + voortgang(v).xp, 0);
-        const totaalKlaar = state.verzoeken.reduce((a, v) => a + (v.klaar || []).filter(id => !(v.nvt||[]).includes(id)).length, 0);
-        const level = Math.floor(totaalXp / 100) + 1;
-        const naarVolgend = 100 - (totaalXp % 100);
-        const afgerond = state.verzoeken.filter(v => voortgang(v).afgerond).length;
-        const teLaat = state.verzoeken.filter(v => { const dl = deadlineInfo(v); return dl && dl.resterend < 0 && !voortgang(v).afgerond; }).length;
-        const vandaag = state.verzoeken.reduce((a, v) => a + Object.values(v.klaarData || {}).filter(d => d === todayStr()).length, 0);
-        const gctx = { ...state.game, verzoeken: state.verzoeken, totaalKlaar };
-        const badges = BADGES.filter(b => b.test(gctx));
-        return { totaalXp, totaalKlaar, level, naarVolgend, afgerond, teLaat, vandaag, badges };
-      }, [state]);
-
-      const gesorteerd = useMemo(() => {
-        let arr = state.verzoeken.filter(v => {
-          const q = zoek.toLowerCase();
-          return !q || [v.titel, v.kenmerk, v.bestuursorgaan, v.verzoeker].some(x => (x || '').toLowerCase().includes(q));
-        });
-        arr = [...arr];
-        if (sort === 'deadline') arr.sort((a, b) => { const av = voortgang(a).afgerond?1:0, bv = voortgang(b).afgerond?1:0; if (av!==bv) return av-bv; const ad=deadlineInfo(a), bd=deadlineInfo(b); return (ad?ad.resterend:9e9)-(bd?bd.resterend:9e9); });
-        else if (sort === 'voortgang') arr.sort((a, b) => voortgang(b).pct - voortgang(a).pct);
-        else if (sort === 'nieuw') arr.sort((a, b) => (b.laatstBijgewerkt||0) - (a.laatstBijgewerkt||0));
-        return arr;
-      }, [state.verzoeken, sort, zoek]);
-
-      const openVerzoek = state.verzoeken.find(v => v.id === openId);
-
-      if (state.security.pinHash && !ontgrendeld) return <LockScreen pinHash={state.security.pinHash} onUnlock={() => setOntgrendeld(true)} />;
-
-      const doelPct = Math.min(100, Math.round(stats.vandaag / state.game.dagDoel * 100));
-
-      return (
-        <div className="min-h-screen pb-24">
-          <header className="sticky top-0 z-30 bg-[#58cc02] text-white shadow-md">
-            <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🦉</span>
-                <div>
-                  <div className="font-extrabold text-lg leading-none">Woo Quest</div>
-                  <div className="text-[11px] text-green-100 font-bold">Volg je Woo-verzoeken</div>
+          <div className="max-w-7xl mx-auto p-6">
+            {currentArticle && (
+              <div 
+                className="bg-gray-800 rounded-lg p-6 mb-6 shadow-xl border-l-4 transition-all duration-500"
+                style={{ borderColor: currentArticle.color }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span 
+                    className="px-3 py-1 rounded-full text-xs font-bold text-white"
+                    style={{ backgroundColor: currentArticle.color }}
+                  >
+                    {currentArticle.source}
+                  </span>
+                  <span className="text-gray-400 text-sm">
+                    {formatTime(currentArticle.pubDate)}
+                  </span>
                 </div>
+                <h2 className="text-3xl font-bold mb-4">{currentArticle.title}</h2>
+                <a 
+                  href={currentArticle.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300"
+                >
+                  Lees meer →
+                </a>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 bg-white/15 rounded-2xl px-2.5 py-1.5" title="Dagen op rij actief"><span>🔥</span><span className="font-extrabold text-sm">{state.game.streak || 0}</span></div>
-                <div className="flex items-center gap-1 bg-white/15 rounded-2xl px-2.5 py-1.5" title="Totaal XP"><span>⭐</span><span className="font-extrabold text-sm">{stats.totaalXp}</span></div>
-                <div className="hidden sm:flex items-center gap-1 bg-white/15 rounded-2xl px-2.5 py-1.5"><span>🎖️</span><span className="font-extrabold text-sm">Lv {stats.level}</span></div>
-                <button onClick={() => setInstOpen(true)} className="w-9 h-9 rounded-2xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-lg" title="Instellingen">⚙️</button>
-              </div>
-            </div>
-          </header>
+            )}
 
-          <main className="max-w-5xl mx-auto px-4 mt-5 space-y-6">
-            <div className="bg-white rounded-3xl p-5 shadow-sm">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-extrabold text-gray-800">🎖️ Niveau {stats.level}</span>
-                    <span className="text-xs font-bold text-gray-400">nog {stats.naarVolgend} XP tot Lv {stats.level + 1}</span>
-                  </div>
-                  <ProgressBar pct={100 - stats.naarVolgend} kleur="#ffc800" />
-                </div>
-                <div className="sm:w-52">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-extrabold text-gray-800 text-sm">🎯 Dagdoel</span>
-                    <span className="text-xs font-bold" style={{ color: doelPct >= 100 ? '#58cc02' : '#9ca3af' }}>{stats.vandaag}/{state.game.dagDoel}</span>
-                  </div>
-                  <ProgressBar pct={doelPct} kleur={doelPct >= 100 ? '#58cc02' : '#1cb0f6'} />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-                <StatChip icon="📂" waarde={state.verzoeken.length} label="Verzoeken" kleur="#1cb0f6" />
-                <StatChip icon="✅" waarde={stats.afgerond} label="Afgerond" kleur="#58cc02" />
-                <StatChip icon="⏱️" waarde={stats.totaalKlaar} label="Stappen" kleur="#ce82ff" />
-                <StatChip icon="⚠️" waarde={stats.teLaat} label="Te laat" kleur={stats.teLaat ? '#ff4b4b' : '#afafaf'} />
-              </div>
-            </div>
-
-            <div className="bg-white rounded-3xl p-5 shadow-sm">
-              <div className="font-extrabold text-gray-800 mb-3">🏅 Badges</div>
-              <div className="flex flex-wrap gap-3">
-                {BADGES.map(b => {
-                  const verdiend = stats.badges.some(x => x.id === b.id);
-                  return (
-                    <div key={b.id} title={b.uitleg} className="flex flex-col items-center w-20 text-center" style={{ opacity: verdiend ? 1 : .35, filter: verdiend ? 'none' : 'grayscale(1)' }}>
-                      <div className="text-3xl">{b.icon}</div>
-                      <div className="text-[10px] font-bold text-gray-600 leading-tight mt-0.5">{b.titel}</div>
+            <div className="grid gap-4">
+              <h3 className="text-xl font-bold mb-2">
+                Alle Berichten ({articles.length})
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {articles.map((article, idx) => (
+                  <div 
+                    key={idx}
+                    className="bg-gray-800 rounded-lg p-4 hover:bg-gray-750 transition-colors border-l-2"
+                    style={{ borderColor: article.color }}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span 
+                        className="px-2 py-1 rounded text-xs font-bold text-white"
+                        style={{ backgroundColor: article.color }}
+                      >
+                        {article.source}
+                      </span>
+                      <span className="text-gray-400 text-xs">
+                        {formatTime(article.pubDate)}
+                      </span>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-                <h2 className="font-extrabold text-gray-800 text-lg">📋 Mijn Woo-verzoeken</h2>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <input value={zoek} onChange={e => setZoek(e.target.value)} placeholder="🔎 Zoeken…" className="px-3 py-1.5 rounded-full border-2 border-gray-200 focus:border-[#58cc02] outline-none text-sm font-semibold text-gray-700 w-40" />
-                  <div className="flex items-center gap-1 text-xs font-bold">
-                    <button onClick={() => setSort('deadline')} className={"px-2.5 py-1 rounded-full " + (sort==='deadline'?'bg-[#58cc02] text-white':'bg-white text-gray-500')}>Deadline</button>
-                    <button onClick={() => setSort('voortgang')} className={"px-2.5 py-1 rounded-full " + (sort==='voortgang'?'bg-[#58cc02] text-white':'bg-white text-gray-500')}>Voortgang</button>
-                    <button onClick={() => setSort('nieuw')} className={"px-2.5 py-1 rounded-full " + (sort==='nieuw'?'bg-[#58cc02] text-white':'bg-white text-gray-500')}>Recent</button>
+                    <a 
+                      href={article.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white hover:text-blue-400"
+                    >
+                      <h4 className="font-semibold">{article.title}</h4>
+                    </a>
                   </div>
-                </div>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {gesorteerd.map(v => <VerzoekKaart key={v.id} v={v} onOpen={() => setOpenId(v.id)} />)}
-                {gesorteerd.length === 0 && <div className="text-sm text-gray-400 col-span-full py-6 text-center">Geen verzoeken gevonden.</div>}
+                ))}
               </div>
             </div>
-
-            <Kader />
-
-            <div className="text-center text-xs text-gray-400 pt-2">
-              Privé · data alleen in deze browser · <a href="/nieuws.html" className="text-blue-400 hover:underline">Nieuwsticker →</a>
-            </div>
-          </main>
-
-          <button onClick={() => setNieuwOpen(true)} className="fixed bottom-6 right-6 z-30 bg-[#58cc02] text-white w-14 h-14 rounded-2xl shadow-[0_5px_0_#46a302] hover:translate-y-0.5 hover:shadow-[0_3px_0_#46a302] transition flex items-center justify-center text-3xl font-bold" title="Nieuw verzoek">+</button>
-
-          {openVerzoek && <Detail v={openVerzoek} onClose={() => setOpenId(null)} onToggle={(s) => toggleStap(openVerzoek.id, s)} onNvt={(s) => toggleNvt(openVerzoek.id, s)} onUpdate={(p) => setVerzoek(openVerzoek.id, p)} onDelete={() => verwijderVerzoek(openVerzoek.id)} />}
-          {nieuwOpen && <NieuwVerzoek onSluit={() => setNieuwOpen(false)} onMaak={maakVerzoek} />}
-          {instOpen && <Instellingen state={state} onSluit={() => setInstOpen(false)} onZetPin={zetPin} onZetDoel={zetDoel} onImport={importData} onReset={reset} />}
-          <Toasts items={toasts} />
-          {feest && <Confetti />}
+          </div>
         </div>
       );
-    }
+    };
 
-    ReactDOM.render(<App />, document.getElementById('root'));
+    ReactDOM.render(<NewsTicker />, document.getElementById('root'));
   </script>
 </body>
 </html>
