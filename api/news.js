@@ -11,6 +11,8 @@ export default async function handler(req, res) {
     { name: 'NU.nl', url: 'https://www.nu.nl/rss/Binnenland', color: '#00A0DC' },
     { name: 'NU.nl', url: 'https://www.nu.nl/rss/Buitenland', color: '#00A0DC' },
     { name: 'NU.nl', url: 'https://www.nu.nl/rss/Economie', color: '#00A0DC' },
+    { name: 'NU.nl', url: 'https://www.nu.nl/rss/Politiek', color: '#00A0DC' },
+    { name: 'NU.nl', url: 'https://www.nu.nl/rss/Tech', color: '#00A0DC' },
     { name: 'NRC', url: 'https://www.nrc.nl/rss/', color: '#000000' },
   ];
 
