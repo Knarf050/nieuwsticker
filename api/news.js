@@ -1,4 +1,29 @@
 // Vercel Serverless Function - geen require() nodig
+
+// Strip HTML-tags, decodeer veelvoorkomende entities en normaliseer witruimte.
+function cleanText(s) {
+  if (!s) return '';
+  return s
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&#x27;|&apos;/g, "'")
+    .replace(/&hellip;/g, '…')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Kort tekst af op een woordgrens met een beletselteken.
+function truncate(s, max) {
+  if (!s || s.length <= max) return s;
+  const cut = s.slice(0, max);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim() + '…';
+}
+
 export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -38,18 +63,22 @@ export default async function handler(req, res) {
         
         // Parse XML manually
         const items = text.match(/<item>[\s\S]*?<\/item>/g) || [];
-        
+
         return items.slice(0, 10).map(item => {
-          const title = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || 
-                       item.match(/<title>(.*?)<\/title>/);
+          const title = item.match(/<title><!\[CDATA\[([\s\S]*?)\]\]><\/title>/) ||
+                       item.match(/<title>([\s\S]*?)<\/title>/);
           const link = item.match(/<link>(.*?)<\/link>/);
           const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/) ||
                          item.match(/<dc:date>(.*?)<\/dc:date>/);
-          
+          // Korte samenvatting uit de RSS-description (NOS/NU.nl/NRC leveren die mee)
+          const desc = item.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/) ||
+                       item.match(/<description>([\s\S]*?)<\/description>/);
+
           return {
-            title: title ? title[1] : 'Geen titel',
-            link: link ? link[1] : '#',
+            title: title ? cleanText(title[1]) : 'Geen titel',
+            link: link ? link[1].trim() : '#',
             pubDate: pubDate ? pubDate[1] : new Date().toISOString(),
+            summary: desc ? truncate(cleanText(desc[1]), 280) : '',
             source: source.name,
             color: source.color
           };
