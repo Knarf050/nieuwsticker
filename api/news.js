@@ -7,7 +7,10 @@ export default async function handler(req, res) {
   
   const SOURCES = [
     { name: 'NOS', url: 'https://feeds.nos.nl/nosnieuwsalgemeen', color: '#FF6B00' },
-    { name: 'NU.nl', url: 'https://www.nu.nl/rss/Algemeen', color: '#00A0DC' },
+    // NU.nl: alleen hard nieuws (categoriefeeds), dus zonder sport en entertainment
+    { name: 'NU.nl', url: 'https://www.nu.nl/rss/Binnenland', color: '#00A0DC' },
+    { name: 'NU.nl', url: 'https://www.nu.nl/rss/Buitenland', color: '#00A0DC' },
+    { name: 'NU.nl', url: 'https://www.nu.nl/rss/Economie', color: '#00A0DC' },
     { name: 'NRC', url: 'https://www.nrc.nl/rss/', color: '#000000' },
   ];
 
