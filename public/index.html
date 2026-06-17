@@ -6,47 +6,68 @@
   <title>Nederlandse Nieuwsticker</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --serif: Georgia, "Times New Roman", Times, serif;
+      --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --ink: #121212;
+      --grey: #363636;
+      --light: #666;
+      --hair: #dcdcdc;
+    }
     body {
-      background: #111827;
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      min-height: 100vh;
+      background: #fff;
+      color: var(--ink);
+      font-family: var(--serif);
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
     }
     a { color: inherit; text-decoration: none; }
-    .center { display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 24px; flex-direction: column; gap: 16px; }
-    .muted { color: #9ca3af; }
-    .btn { padding: 10px 18px; border: 0; border-radius: 8px; background: #1d4ed8; color: #fff; font-size: 15px; cursor: pointer; }
-    .btn:hover { background: #2563eb; }
+    a:hover { text-decoration: underline; }
+    .sans { font-family: var(--sans); }
 
-    .topbar { background: linear-gradient(to right, #1e3a8a, #1d4ed8); padding: 16px; box-shadow: 0 4px 6px rgba(0,0,0,.3); }
-    .topbar-inner { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .topbar h1 { font-size: 22px; font-weight: 700; }
-    .clock { font-size: 13px; opacity: .9; }
+    .center { display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 24px; flex-direction: column; gap: 16px; font-family: var(--sans); }
+    .btn { font-family: var(--sans); padding: 10px 18px; border: 1px solid var(--ink); border-radius: 0; background: var(--ink); color: #fff; font-size: 14px; cursor: pointer; }
+    .btn:hover { background: #fff; color: var(--ink); }
 
-    .ticker { background: #dc2626; color: #fff; padding: 8px 0; overflow: hidden; white-space: nowrap; }
-    .ticker-track { display: inline-flex; animation: scroll 40s linear infinite; }
-    .ticker-group { display: inline-flex; white-space: nowrap; }
-    .ticker-label { font-size: 13px; font-weight: 600; margin: 0 16px; }
-    .ticker-item { margin: 0 32px; font-size: 13px; }
+    /* Masthead */
+    .masthead { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+    .dateline { font-family: var(--sans); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--light);
+      display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--hair); }
+    .nameplate { text-align: center; padding: 14px 0 12px; border-bottom: 2px solid var(--ink); }
+    .nameplate h1 { font-family: var(--serif); font-weight: 700; font-size: clamp(30px, 7vw, 52px); letter-spacing: -.5px; line-height: 1; }
+    .nameplate .tag { font-family: var(--sans); text-transform: uppercase; letter-spacing: .22em; font-size: 10px; color: var(--light); margin-top: 8px; }
+
+    /* Ticker — ingetogen zwarte balk */
+    .ticker { background: var(--ink); color: #fff; overflow: hidden; white-space: nowrap; padding: 8px 0; }
+    .ticker-track { display: inline-flex; animation: scroll 80s linear infinite; }
+    .ticker-group { display: inline-flex; white-space: nowrap; align-items: center; }
+    .ticker-label { font-family: var(--sans); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; margin: 0 18px; color: #f4c33b; }
+    .ticker-item { font-family: var(--sans); margin: 0 22px; font-size: 13px; }
     .ticker-item b { font-weight: 700; }
     @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-    .container { max-width: 1120px; margin: 0 auto; padding: 24px 16px; }
-    .featured { background: #1f2937; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 10px 20px rgba(0,0,0,.3); border-left: 4px solid #888; }
-    .featured h2 { font-size: 26px; font-weight: 700; margin: 12px 0 16px; }
-    .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #fff; }
-    .meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
-    .link { color: #60a5fa; }
-    .link:hover { color: #93c5fd; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 28px 16px 48px; }
+    .kicker { font-family: var(--sans); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+    .time { font-family: var(--sans); font-size: 12px; color: var(--light); }
 
-    .section-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
-    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-    @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
-    .card { background: #1f2937; border-radius: 10px; padding: 16px; border-left: 2px solid #888; }
-    .card:hover { background: #243041; }
-    .card h4 { font-weight: 600; font-size: 15px; }
-    .badge-sm { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; color: #fff; }
-    .meta-sm { color: #9ca3af; font-size: 11px; }
+    /* Lead-verhaal */
+    .lead { padding-bottom: 28px; margin-bottom: 8px; border-bottom: 1px solid var(--hair); }
+    .lead h2 { font-family: var(--serif); font-weight: 700; font-size: clamp(26px, 5vw, 38px); line-height: 1.08; margin-bottom: 14px; letter-spacing: -.3px; }
+    .lead .summary { font-family: var(--serif); font-size: 18px; line-height: 1.55; color: var(--grey); margin-bottom: 14px; }
+    .lead .more { font-family: var(--sans); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
+
+    /* Sectiekop */
+    .section-head { font-family: var(--sans); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+      border-top: 1px solid var(--ink); padding-top: 8px; margin: 32px 0 4px; }
+
+    /* Berichtenraster */
+    .grid { display: grid; grid-template-columns: 1fr; }
+    @media (min-width: 640px) { .grid { grid-template-columns: 1fr 1fr; column-gap: 28px; } }
+    @media (min-width: 960px) { .grid { grid-template-columns: 1fr 1fr 1fr; } }
+    .card { padding: 18px 0; border-top: 1px solid var(--hair); }
+    .card h4 { font-family: var(--serif); font-weight: 700; font-size: 18px; line-height: 1.2; margin-bottom: 6px; }
+    .card .summary { font-family: var(--serif); font-size: 14px; line-height: 1.45; color: var(--grey); margin-bottom: 8px;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   </style>
   <script>
     // Opruimen: een vorige versie draaide als PWA (Woo Quest) op de root en kon
@@ -72,7 +93,7 @@
 </head>
 <body>
   <div id="root">
-    <div class="center"><div style="font-size:20px">Nieuws laden...</div></div>
+    <div class="center"><div style="font-size:18px">Nieuws laden…</div></div>
   </div>
 
   <script>
@@ -81,13 +102,14 @@
       var articles = [];
       var currentIndex = 0;
       var rotateTimer = null;
-      var clockTimer = null;
 
       function esc(s) {
         var d = document.createElement('div');
         d.textContent = (s == null ? '' : String(s));
         return d.innerHTML;
       }
+
+      function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
 
       function formatTime(dateStr) {
         var date = new Date(dateStr);
@@ -99,14 +121,18 @@
         return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
       }
 
+      function longDate() {
+        return capitalize(new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+      }
+
       function showLoading() {
-        root.innerHTML = '<div class="center"><div style="font-size:20px">Nieuws laden...</div></div>';
+        root.innerHTML = '<div class="center"><div style="font-size:18px">Nieuws laden…</div></div>';
       }
 
       function showError(msg) {
         root.innerHTML =
           '<div class="center">' +
-            '<div style="font-size:20px;color:#f87171">' + esc(msg) + '</div>' +
+            '<div style="font-size:18px">' + esc(msg) + '</div>' +
             '<button class="btn" id="retry">Opnieuw proberen</button>' +
           '</div>';
         var b = document.getElementById('retry');
@@ -114,66 +140,49 @@
       }
 
       function tickerItem(a) {
-        return '<span class="ticker-item"><b>' + esc(a.source) + ':</b> ' + esc(a.title) + '</span>';
+        return '<span class="ticker-item"><b>' + esc(a.source) + '</b> &nbsp;' + esc(a.title) + '</span>';
       }
 
-      function featuredHTML(a) {
+      function leadHTML(a) {
         if (!a) return '';
-        var color = esc(a.color || '#888');
+        var color = esc(a.color || '#121212');
         return '' +
-          '<div class="meta">' +
-            '<span class="badge" style="background:' + color + '">' + esc(a.source) + '</span>' +
-            '<span class="muted" style="font-size:13px">' + esc(formatTime(a.pubDate)) + '</span>' +
-          '</div>' +
-          '<h2>' + esc(a.title) + '</h2>' +
-          '<a class="link" href="' + esc(a.link) + '" target="_blank" rel="noopener noreferrer">Lees meer &rarr;</a>';
+          '<div class="kicker" style="color:' + color + '">' + esc(a.source) + '</div>' +
+          '<a href="' + esc(a.link) + '" target="_blank" rel="noopener noreferrer"><h2>' + esc(a.title) + '</h2></a>' +
+          (a.summary ? '<p class="summary">' + esc(a.summary) + '</p>' : '') +
+          '<span class="time">' + esc(formatTime(a.pubDate)) + '</span>&nbsp;&nbsp;' +
+          '<a class="more" href="' + esc(a.link) + '" target="_blank" rel="noopener noreferrer">Lees verder</a>';
       }
 
       function render() {
         var top = articles.slice(0, 8);
-        var tickerGroup = '<span class="ticker-group"><span class="ticker-label">&#9679; BREAKING NEWS</span>' +
+        var tickerGroup = '<span class="ticker-group"><span class="ticker-label">Laatste nieuws</span>' +
           top.map(tickerItem).join('') + '</span>';
 
         var cards = articles.map(function (a) {
-          var color = esc(a.color || '#888');
+          var color = esc(a.color || '#121212');
           return '' +
-            '<div class="card" style="border-left-color:' + color + '">' +
-              '<div class="meta">' +
-                '<span class="badge-sm" style="background:' + color + '">' + esc(a.source) + '</span>' +
-                '<span class="meta-sm">' + esc(formatTime(a.pubDate)) + '</span>' +
-              '</div>' +
+            '<div class="card">' +
+              '<div class="kicker" style="color:' + color + '">' + esc(a.source) + '</div>' +
               '<a href="' + esc(a.link) + '" target="_blank" rel="noopener noreferrer"><h4>' + esc(a.title) + '</h4></a>' +
+              (a.summary ? '<p class="summary">' + esc(a.summary) + '</p>' : '') +
+              '<span class="time">' + esc(formatTime(a.pubDate)) + '</span>' +
             '</div>';
         }).join('');
 
-        var firstColor = esc((articles[0] && articles[0].color) || '#888');
-
         root.innerHTML = '' +
-          '<div class="topbar"><div class="topbar-inner">' +
-            '<h1>Nederlandse Nieuwsticker</h1>' +
-            '<div class="clock" id="clock"></div>' +
-          '</div></div>' +
+          '<header class="masthead">' +
+            '<div class="dateline"><span>' + esc(longDate()) + '</span><span>Nederlandse editie</span></div>' +
+            '<div class="nameplate"><h1>Nederlandse Nieuwsticker</h1><div class="tag">Het laatste nieuws, feitelijk gebracht</div></div>' +
+          '</header>' +
           '<div class="ticker"><div class="ticker-track">' + tickerGroup + tickerGroup + '</div></div>' +
           '<div class="container">' +
-            '<div class="featured" id="featured" style="border-left-color:' + firstColor + '">' +
-              featuredHTML(articles[0]) +
-            '</div>' +
-            '<h3 class="section-title">Alle Berichten (' + articles.length + ')</h3>' +
+            '<div class="lead" id="featured">' + leadHTML(articles[0]) + '</div>' +
+            '<div class="section-head">Meer berichten</div>' +
             '<div class="grid">' + cards + '</div>' +
           '</div>';
 
-        startClock();
         startRotation();
-      }
-
-      function startClock() {
-        if (clockTimer) clearInterval(clockTimer);
-        var update = function () {
-          var c = document.getElementById('clock');
-          if (c) c.textContent = new Date().toLocaleTimeString('nl-NL');
-        };
-        update();
-        clockTimer = setInterval(update, 1000);
       }
 
       function startRotation() {
@@ -182,12 +191,8 @@
         rotateTimer = setInterval(function () {
           currentIndex = (currentIndex + 1) % articles.length;
           var f = document.getElementById('featured');
-          if (f) {
-            var a = articles[currentIndex];
-            f.style.borderLeftColor = (a && a.color) || '#888';
-            f.innerHTML = featuredHTML(a);
-          }
-        }, 5000);
+          if (f) f.innerHTML = leadHTML(articles[currentIndex]);
+        }, 6000);
       }
 
       function load() {
