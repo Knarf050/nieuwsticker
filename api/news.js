@@ -7,8 +7,12 @@ export default async function handler(req, res) {
   
   const SOURCES = [
     { name: 'NOS', url: 'https://feeds.nos.nl/nosnieuwsalgemeen', color: '#FF6B00' },
-    { name: 'Telegraaf', url: 'https://www.telegraaf.nl/rss', color: '#003DA5' },
-    { name: 'NU.nl', url: 'https://www.nu.nl/rss/Algemeen', color: '#00A0DC' },
+    // NU.nl: alleen hard nieuws (categoriefeeds), dus zonder sport en entertainment
+    { name: 'NU.nl', url: 'https://www.nu.nl/rss/Binnenland', color: '#00A0DC' },
+    { name: 'NU.nl', url: 'https://www.nu.nl/rss/Buitenland', color: '#00A0DC' },
+    { name: 'NU.nl', url: 'https://www.nu.nl/rss/Economie', color: '#00A0DC' },
+    { name: 'NU.nl', url: 'https://www.nu.nl/rss/Politiek', color: '#00A0DC' },
+    { name: 'NU.nl', url: 'https://www.nu.nl/rss/Tech', color: '#00A0DC' },
     { name: 'NRC', url: 'https://www.nrc.nl/rss/', color: '#000000' },
   ];
 
@@ -18,8 +22,19 @@ export default async function handler(req, res) {
     // Fetch RSS feeds zonder externe library
     const feedPromises = SOURCES.map(async (source) => {
       try {
-        const response = await fetch(source.url);
-        const text = await response.text();
+        // Time-out per feed: één trage bron mag de hele response niet laten hangen
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 6000);
+        let text;
+        try {
+          const response = await fetch(source.url, {
+            signal: controller.signal,
+            headers: { 'User-Agent': 'NieuwstickerBot/1.0 (+https://nieuwsticker.vercel.app)' },
+          });
+          text = await response.text();
+        } finally {
+          clearTimeout(timer);
+        }
         
         // Parse XML manually
         const items = text.match(/<item>[\s\S]*?<\/item>/g) || [];
