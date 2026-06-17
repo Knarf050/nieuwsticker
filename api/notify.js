@@ -30,6 +30,21 @@ export default async function handler(req, res) {
   const extra = (process.env.NOTIFY_KEYWORDS || '')
     .split(',').map(s => s.trim()).filter(Boolean);
 
+  // Testmodus: stuur één testmelding om de ntfy/Pushover-koppeling te verifiëren.
+  if (req.query && (req.query.test === '1' || req.query.test === 'true')) {
+    try {
+      await sendNotification({
+        source: 'Nieuwsticker',
+        title: 'Testmelding — meldingen werken',
+        summary: 'Als je dit op je telefoon ziet, is de koppeling met ntfy/Pushover in orde.',
+        link: 'https://nieuwsticker.vercel.app/',
+      });
+      return res.status(200).json({ test: true, sent: 1 });
+    } catch (e) {
+      return res.status(500).json({ test: true, error: e.message });
+    }
+  }
+
   let articles;
   try {
     articles = await fetchArticles();
