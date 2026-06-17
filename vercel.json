@@ -3,6 +3,16 @@
     "api/news.js": {
       "memory": 1024,
       "maxDuration": 10
+    },
+    "api/notify.js": {
+      "memory": 1024,
+      "maxDuration": 30
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/notify",
+      "schedule": "*/15 * * * *"
+    }
+  ]
 }
