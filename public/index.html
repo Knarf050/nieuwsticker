@@ -4,35 +4,61 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nederlandse Nieuwsticker</title>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @keyframes scroll {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #111827;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
     }
-    .animate-scroll {
-      animation: scroll 40s linear infinite;
-    }
+    a { color: inherit; text-decoration: none; }
+    .center { display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 24px; flex-direction: column; gap: 16px; }
+    .muted { color: #9ca3af; }
+    .btn { padding: 10px 18px; border: 0; border-radius: 8px; background: #1d4ed8; color: #fff; font-size: 15px; cursor: pointer; }
+    .btn:hover { background: #2563eb; }
+
+    .topbar { background: linear-gradient(to right, #1e3a8a, #1d4ed8); padding: 16px; box-shadow: 0 4px 6px rgba(0,0,0,.3); }
+    .topbar-inner { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .topbar h1 { font-size: 22px; font-weight: 700; }
+    .clock { font-size: 13px; opacity: .9; }
+
+    .ticker { background: #dc2626; color: #fff; padding: 8px 0; overflow: hidden; white-space: nowrap; }
+    .ticker-track { display: inline-flex; animation: scroll 40s linear infinite; }
+    .ticker-group { display: inline-flex; white-space: nowrap; }
+    .ticker-label { font-size: 13px; font-weight: 600; margin: 0 16px; }
+    .ticker-item { margin: 0 32px; font-size: 13px; }
+    .ticker-item b { font-weight: 700; }
+    @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    .container { max-width: 1120px; margin: 0 auto; padding: 24px 16px; }
+    .featured { background: #1f2937; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 10px 20px rgba(0,0,0,.3); border-left: 4px solid #888; }
+    .featured h2 { font-size: 26px; font-weight: 700; margin: 12px 0 16px; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #fff; }
+    .meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+    .link { color: #60a5fa; }
+    .link:hover { color: #93c5fd; }
+
+    .section-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
+    .card { background: #1f2937; border-radius: 10px; padding: 16px; border-left: 2px solid #888; }
+    .card:hover { background: #243041; }
+    .card h4 { font-weight: 600; font-size: 15px; }
+    .badge-sm { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; color: #fff; }
+    .meta-sm { color: #9ca3af; font-size: 11px; }
   </style>
   <script>
     // Opruimen: een vorige versie draaide als PWA (Woo Quest) op de root en kon
-    // via een service worker een verouderde/kapotte pagina blijven serveren —
-    // wat zich uit als een wit of eindeloos ladend scherm. Verwijder eenmalig
-    // alle achtergebleven service workers + caches en herlaad één keer.
+    // via een service worker een verouderde/kapotte pagina blijven serveren.
+    // Verwijder eenmalig alle achtergebleven service workers + caches.
     (function () {
       if (!('serviceWorker' in navigator)) return;
       navigator.serviceWorker.getRegistrations().then(function (regs) {
         if (!regs.length) return;
         Promise.all(regs.map(function (r) { return r.unregister(); }))
-          .then(function () {
-            return (self.caches && caches.keys) ? caches.keys() : [];
-          })
-          .then(function (keys) {
-            return Promise.all((keys || []).map(function (k) { return caches.delete(k); }));
-          })
+          .then(function () { return (self.caches && caches.keys) ? caches.keys() : []; })
+          .then(function (keys) { return Promise.all((keys || []).map(function (k) { return caches.delete(k); })); })
           .then(function () {
             if (!sessionStorage.getItem('sw-cleaned')) {
               sessionStorage.setItem('sw-cleaned', '1');
@@ -45,212 +71,157 @@
   </script>
 </head>
 <body>
-  <div id="root"></div>
-  <!-- Zichtbare fallback als de CDN-scripts (React/Babel/Tailwind) niet laden,
-       zodat je nooit een leeg wit scherm krijgt. Wordt verwijderd zodra de app rendert. -->
-  <div id="fallback" style="display:none;font-family:sans-serif;padding:24px;color:#111;line-height:1.5">
-    <h1 style="font-size:20px;margin:0 0 8px">Nieuwsticker kon niet laden</h1>
-    <p style="margin:0 0 12px">De pagina kon de benodigde onderdelen niet ophalen. Controleer je internetverbinding en probeer het opnieuw.</p>
-    <button onclick="location.reload()" style="padding:10px 16px;border:0;border-radius:8px;background:#1d4ed8;color:#fff;font-size:15px">Opnieuw proberen</button>
+  <div id="root">
+    <div class="center"><div style="font-size:20px">Nieuws laden...</div></div>
   </div>
+
   <script>
-    // Als React na 8s niets in #root heeft gerenderd, tonen we de fallback i.p.v.
-    // een leeg scherm (bijv. wanneer een CDN geblokkeerd is).
-    setTimeout(function () {
+    (function () {
       var root = document.getElementById('root');
-      if (root && root.childElementCount === 0) {
-        var fb = document.getElementById('fallback');
-        if (fb) fb.style.display = 'block';
+      var articles = [];
+      var currentIndex = 0;
+      var rotateTimer = null;
+      var clockTimer = null;
+
+      function esc(s) {
+        var d = document.createElement('div');
+        d.textContent = (s == null ? '' : String(s));
+        return d.innerHTML;
       }
-    }, 8000);
-  </script>
-  
-  <script type="text/babel">
-    const { useState, useEffect } = React;
 
-    const NewsTicker = () => {
-      const [articles, setArticles] = useState([]);
-      const [loading, setLoading] = useState(true);
-      const [currentIndex, setCurrentIndex] = useState(0);
-      const [error, setError] = useState(null);
-
-      const fetchNews = async () => {
-        // Time-out zodat de pagina nooit eindeloos op "Nieuws laden..." blijft hangen
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 12000);
-        try {
-          const response = await fetch('/api/news', { signal: controller.signal });
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          const data = await response.json();
-          if (!Array.isArray(data)) throw new Error('Onverwacht antwoord');
-          setArticles(data);
-          setError(null);
-        } catch (err) {
-          setError(err.name === 'AbortError'
-            ? 'Het laden duurde te lang'
-            : 'Fout bij laden nieuws');
-        } finally {
-          clearTimeout(timer);
-          setLoading(false);
-        }
-      };
-
-      useEffect(() => {
-        fetchNews();
-        const interval = setInterval(fetchNews, 300000);
-        return () => clearInterval(interval);
-      }, []);
-
-      useEffect(() => {
-        if (articles.length === 0) return;
-        const interval = setInterval(() => {
-          setCurrentIndex((prev) => (prev + 1) % articles.length);
-        }, 5000);
-        return () => clearInterval(interval);
-      }, [articles.length]);
-
-      const formatTime = (dateStr) => {
-        const date = new Date(dateStr);
-        const now = new Date();
-        const diff = Math.floor((now - date) / 1000);
-        
+      function formatTime(dateStr) {
+        var date = new Date(dateStr);
+        var diff = Math.floor((Date.now() - date.getTime()) / 1000);
+        if (isNaN(diff)) return '';
         if (diff < 60) return 'Zojuist';
-        if (diff < 3600) return `${Math.floor(diff / 60)} min geleden`;
-        if (diff < 86400) return `${Math.floor(diff / 3600)} uur geleden`;
+        if (diff < 3600) return Math.floor(diff / 60) + ' min geleden';
+        if (diff < 86400) return Math.floor(diff / 3600) + ' uur geleden';
         return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-      };
-
-      if (loading) {
-        return (
-          <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
-            <div className="text-xl">Nieuws laden...</div>
-          </div>
-        );
       }
 
-      if (error) {
-        return (
-          <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white gap-4 px-6 text-center">
-            <div className="text-xl text-red-400">{error}</div>
-            <button
-              onClick={() => { setLoading(true); setError(null); fetchNews(); }}
-              className="px-5 py-2 rounded-lg bg-blue-700 hover:bg-blue-600 text-white"
-            >
-              Opnieuw proberen
-            </button>
-          </div>
-        );
+      function showLoading() {
+        root.innerHTML = '<div class="center"><div style="font-size:20px">Nieuws laden...</div></div>';
       }
 
-      const currentArticle = articles[currentIndex];
+      function showError(msg) {
+        root.innerHTML =
+          '<div class="center">' +
+            '<div style="font-size:20px;color:#f87171">' + esc(msg) + '</div>' +
+            '<button class="btn" id="retry">Opnieuw proberen</button>' +
+          '</div>';
+        var b = document.getElementById('retry');
+        if (b) b.addEventListener('click', load);
+      }
 
-      return (
-        <div className="min-h-screen bg-gray-900 text-white">
-          <div className="bg-gradient-to-r from-blue-900 to-blue-700 p-4 shadow-lg">
-            <div className="max-w-7xl mx-auto flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                </svg>
-                <h1 className="text-2xl font-bold">Nederlandse Nieuwsticker</h1>
-              </div>
-              <div className="text-sm">
-                {new Date().toLocaleTimeString('nl-NL')}
-              </div>
-            </div>
-          </div>
+      function tickerItem(a) {
+        return '<span class="ticker-item"><b>' + esc(a.source) + ':</b> ' + esc(a.title) + '</span>';
+      }
 
-          <div className="bg-red-600 text-white py-2 overflow-hidden">
-            <div className="flex animate-scroll">
-              <div className="flex whitespace-nowrap">
-                <span className="text-sm font-semibold mx-4">● BREAKING NEWS</span>
-                {articles.slice(0, 8).map((article, idx) => (
-                  <span key={idx} className="mx-8 text-sm">
-                    <span className="font-bold">{article.source}:</span> {article.title}
-                  </span>
-                ))}
-              </div>
-              <div className="flex whitespace-nowrap">
-                <span className="text-sm font-semibold mx-4">● BREAKING NEWS</span>
-                {articles.slice(0, 8).map((article, idx) => (
-                  <span key={`dup-${idx}`} className="mx-8 text-sm">
-                    <span className="font-bold">{article.source}:</span> {article.title}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
+      function featuredHTML(a) {
+        if (!a) return '';
+        var color = esc(a.color || '#888');
+        return '' +
+          '<div class="meta">' +
+            '<span class="badge" style="background:' + color + '">' + esc(a.source) + '</span>' +
+            '<span class="muted" style="font-size:13px">' + esc(formatTime(a.pubDate)) + '</span>' +
+          '</div>' +
+          '<h2>' + esc(a.title) + '</h2>' +
+          '<a class="link" href="' + esc(a.link) + '" target="_blank" rel="noopener noreferrer">Lees meer &rarr;</a>';
+      }
 
-          <div className="max-w-7xl mx-auto p-6">
-            {currentArticle && (
-              <div 
-                className="bg-gray-800 rounded-lg p-6 mb-6 shadow-xl border-l-4 transition-all duration-500"
-                style={{ borderColor: currentArticle.color }}
-              >
-                <div className="flex items-center gap-2 mb-3">
-                  <span 
-                    className="px-3 py-1 rounded-full text-xs font-bold text-white"
-                    style={{ backgroundColor: currentArticle.color }}
-                  >
-                    {currentArticle.source}
-                  </span>
-                  <span className="text-gray-400 text-sm">
-                    {formatTime(currentArticle.pubDate)}
-                  </span>
-                </div>
-                <h2 className="text-3xl font-bold mb-4">{currentArticle.title}</h2>
-                <a 
-                  href={currentArticle.link} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300"
-                >
-                  Lees meer →
-                </a>
-              </div>
-            )}
+      function render() {
+        var top = articles.slice(0, 8);
+        var tickerGroup = '<span class="ticker-group"><span class="ticker-label">&#9679; BREAKING NEWS</span>' +
+          top.map(tickerItem).join('') + '</span>';
 
-            <div className="grid gap-4">
-              <h3 className="text-xl font-bold mb-2">
-                Alle Berichten ({articles.length})
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {articles.map((article, idx) => (
-                  <div 
-                    key={idx}
-                    className="bg-gray-800 rounded-lg p-4 hover:bg-gray-750 transition-colors border-l-2"
-                    style={{ borderColor: article.color }}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span 
-                        className="px-2 py-1 rounded text-xs font-bold text-white"
-                        style={{ backgroundColor: article.color }}
-                      >
-                        {article.source}
-                      </span>
-                      <span className="text-gray-400 text-xs">
-                        {formatTime(article.pubDate)}
-                      </span>
-                    </div>
-                    <a 
-                      href={article.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-white hover:text-blue-400"
-                    >
-                      <h4 className="font-semibold">{article.title}</h4>
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    };
+        var cards = articles.map(function (a) {
+          var color = esc(a.color || '#888');
+          return '' +
+            '<div class="card" style="border-left-color:' + color + '">' +
+              '<div class="meta">' +
+                '<span class="badge-sm" style="background:' + color + '">' + esc(a.source) + '</span>' +
+                '<span class="meta-sm">' + esc(formatTime(a.pubDate)) + '</span>' +
+              '</div>' +
+              '<a href="' + esc(a.link) + '" target="_blank" rel="noopener noreferrer"><h4>' + esc(a.title) + '</h4></a>' +
+            '</div>';
+        }).join('');
 
-    ReactDOM.render(<NewsTicker />, document.getElementById('root'));
+        var firstColor = esc((articles[0] && articles[0].color) || '#888');
+
+        root.innerHTML = '' +
+          '<div class="topbar"><div class="topbar-inner">' +
+            '<h1>Nederlandse Nieuwsticker</h1>' +
+            '<div class="clock" id="clock"></div>' +
+          '</div></div>' +
+          '<div class="ticker"><div class="ticker-track">' + tickerGroup + tickerGroup + '</div></div>' +
+          '<div class="container">' +
+            '<div class="featured" id="featured" style="border-left-color:' + firstColor + '">' +
+              featuredHTML(articles[0]) +
+            '</div>' +
+            '<h3 class="section-title">Alle Berichten (' + articles.length + ')</h3>' +
+            '<div class="grid">' + cards + '</div>' +
+          '</div>';
+
+        startClock();
+        startRotation();
+      }
+
+      function startClock() {
+        if (clockTimer) clearInterval(clockTimer);
+        var update = function () {
+          var c = document.getElementById('clock');
+          if (c) c.textContent = new Date().toLocaleTimeString('nl-NL');
+        };
+        update();
+        clockTimer = setInterval(update, 1000);
+      }
+
+      function startRotation() {
+        if (rotateTimer) clearInterval(rotateTimer);
+        if (articles.length === 0) return;
+        rotateTimer = setInterval(function () {
+          currentIndex = (currentIndex + 1) % articles.length;
+          var f = document.getElementById('featured');
+          if (f) {
+            var a = articles[currentIndex];
+            f.style.borderLeftColor = (a && a.color) || '#888';
+            f.innerHTML = featuredHTML(a);
+          }
+        }, 5000);
+      }
+
+      function load() {
+        showLoading();
+        var controller = new AbortController();
+        var timer = setTimeout(function () { controller.abort(); }, 12000);
+        fetch('/api/news', { signal: controller.signal })
+          .then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+          .then(function (data) {
+            if (!Array.isArray(data)) throw new Error('Onverwacht antwoord');
+            articles = data;
+            currentIndex = 0;
+            if (articles.length === 0) {
+              showError('Geen nieuws beschikbaar op dit moment');
+            } else {
+              render();
+            }
+          })
+          .catch(function (err) {
+            showError(err && err.name === 'AbortError' ? 'Het laden duurde te lang' : 'Fout bij laden nieuws');
+          })
+          .then(function () { clearTimeout(timer); });
+      }
+
+      // Ververs elke 5 minuten
+      setInterval(function () {
+        if (document.getElementById('featured')) load();
+      }, 300000);
+
+      load();
+    })();
   </script>
 </body>
 </html>
