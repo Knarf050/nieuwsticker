@@ -52,11 +52,41 @@ function factualHeadline(s) {
   return t.length >= 3 ? t : s; // te agressief resultaat? origineel terug
 }
 
+// Normaliseer een titel voor dedup: kleine letters, diacrieten en leestekens weg.
+function normTitle(s) {
+  return (s || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '') // diacrieten verwijderen
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Verwijder dubbele berichten (zelfde verhaal bij meerdere bronnen/feeds).
+// Verwacht een op datum gesorteerde lijst, zodat de nieuwste versie behouden blijft.
+function dedupe(list) {
+  const seen = new Set();
+  const out = [];
+  for (const a of list) {
+    const key = normTitle(a.title);
+    const linkKey = (a.link || '').trim();
+    if (!key) { out.push(a); continue; }
+    if (seen.has(key) || (linkKey && seen.has(linkKey))) continue;
+    seen.add(key);
+    if (linkKey) seen.add(linkKey);
+    out.push(a);
+  }
+  return out;
+}
+
 export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
   res.setHeader('Content-Type', 'application/json');
+  // Edge-cache: 5 min vers serveren, daarna max 10 min verouderd tonen terwijl
+  // op de achtergrond ververst wordt. Scheelt bij elke bezoeker een feed-fetch.
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
   
   const SOURCES = [
     { name: 'NOS', url: 'https://feeds.nos.nl/nosnieuwsalgemeen', color: '#FF6B00' },
@@ -120,10 +150,22 @@ export default async function handler(req, res) {
     const results = await Promise.all(feedPromises);
     results.forEach(items => allArticles.push(...items));
 
-    // Sort by date
+    // Sorteer op datum (nieuwste eerst)
     allArticles.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
-    res.status(200).json(allArticles);
+    // Ontdubbelen: zelfde verhaal bij meerdere bronnen/feeds maar één keer tonen
+    let articles = dedupe(allArticles);
+
+    // Versheidsfilter: alleen berichten van de laatste 24 uur. Veiligheidsklep:
+    // als dat te weinig oplevert (trage/oude feeds), tonen we toch de hele lijst.
+    const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+    const fresh = articles.filter(a => {
+      const t = new Date(a.pubDate).getTime();
+      return isNaN(t) || t >= cutoff;
+    });
+    if (fresh.length >= 8) articles = fresh;
+
+    res.status(200).json(articles);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'Failed to fetch news', details: error.message });
