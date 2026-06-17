@@ -22,8 +22,19 @@ export default async function handler(req, res) {
     // Fetch RSS feeds zonder externe library
     const feedPromises = SOURCES.map(async (source) => {
       try {
-        const response = await fetch(source.url);
-        const text = await response.text();
+        // Time-out per feed: één trage bron mag de hele response niet laten hangen
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 6000);
+        let text;
+        try {
+          const response = await fetch(source.url, {
+            signal: controller.signal,
+            headers: { 'User-Agent': 'NieuwstickerBot/1.0 (+https://nieuwsticker.vercel.app)' },
+          });
+          text = await response.text();
+        } finally {
+          clearTimeout(timer);
+        }
         
         // Parse XML manually
         const items = text.match(/<item>[\s\S]*?<\/item>/g) || [];

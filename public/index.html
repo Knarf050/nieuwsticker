@@ -17,9 +17,53 @@
       animation: scroll 40s linear infinite;
     }
   </style>
+  <script>
+    // Opruimen: een vorige versie draaide als PWA (Woo Quest) op de root en kon
+    // via een service worker een verouderde/kapotte pagina blijven serveren —
+    // wat zich uit als een wit of eindeloos ladend scherm. Verwijder eenmalig
+    // alle achtergebleven service workers + caches en herlaad één keer.
+    (function () {
+      if (!('serviceWorker' in navigator)) return;
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        if (!regs.length) return;
+        Promise.all(regs.map(function (r) { return r.unregister(); }))
+          .then(function () {
+            return (self.caches && caches.keys) ? caches.keys() : [];
+          })
+          .then(function (keys) {
+            return Promise.all((keys || []).map(function (k) { return caches.delete(k); }));
+          })
+          .then(function () {
+            if (!sessionStorage.getItem('sw-cleaned')) {
+              sessionStorage.setItem('sw-cleaned', '1');
+              location.reload();
+            }
+          })
+          .catch(function () {});
+      }).catch(function () {});
+    })();
+  </script>
 </head>
 <body>
   <div id="root"></div>
+  <!-- Zichtbare fallback als de CDN-scripts (React/Babel/Tailwind) niet laden,
+       zodat je nooit een leeg wit scherm krijgt. Wordt verwijderd zodra de app rendert. -->
+  <div id="fallback" style="display:none;font-family:sans-serif;padding:24px;color:#111;line-height:1.5">
+    <h1 style="font-size:20px;margin:0 0 8px">Nieuwsticker kon niet laden</h1>
+    <p style="margin:0 0 12px">De pagina kon de benodigde onderdelen niet ophalen. Controleer je internetverbinding en probeer het opnieuw.</p>
+    <button onclick="location.reload()" style="padding:10px 16px;border:0;border-radius:8px;background:#1d4ed8;color:#fff;font-size:15px">Opnieuw proberen</button>
+  </div>
+  <script>
+    // Als React na 8s niets in #root heeft gerenderd, tonen we de fallback i.p.v.
+    // een leeg scherm (bijv. wanneer een CDN geblokkeerd is).
+    setTimeout(function () {
+      var root = document.getElementById('root');
+      if (root && root.childElementCount === 0) {
+        var fb = document.getElementById('fallback');
+        if (fb) fb.style.display = 'block';
+      }
+    }, 8000);
+  </script>
   
   <script type="text/babel">
     const { useState, useEffect } = React;
@@ -31,14 +75,22 @@
       const [error, setError] = useState(null);
 
       const fetchNews = async () => {
+        // Time-out zodat de pagina nooit eindeloos op "Nieuws laden..." blijft hangen
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 12000);
         try {
-          const response = await fetch('/api/news');
+          const response = await fetch('/api/news', { signal: controller.signal });
+          if (!response.ok) throw new Error('HTTP ' + response.status);
           const data = await response.json();
+          if (!Array.isArray(data)) throw new Error('Onverwacht antwoord');
           setArticles(data);
-          setLoading(false);
           setError(null);
         } catch (err) {
-          setError('Fout bij laden nieuws');
+          setError(err.name === 'AbortError'
+            ? 'Het laden duurde te lang'
+            : 'Fout bij laden nieuws');
+        } finally {
+          clearTimeout(timer);
           setLoading(false);
         }
       };
@@ -78,8 +130,14 @@
 
       if (error) {
         return (
-          <div className="flex items-center justify-center h-screen bg-gray-900 text-red-500">
-            <div className="text-xl">{error}</div>
+          <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white gap-4 px-6 text-center">
+            <div className="text-xl text-red-400">{error}</div>
+            <button
+              onClick={() => { setLoading(true); setError(null); fetchNews(); }}
+              className="px-5 py-2 rounded-lg bg-blue-700 hover:bg-blue-600 text-white"
+            >
+              Opnieuw proberen
+            </button>
           </div>
         );
       }
