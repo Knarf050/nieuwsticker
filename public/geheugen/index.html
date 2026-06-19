@@ -142,6 +142,8 @@
       return { ease: round2(ease), interval, reps, due, lapses, last: todayStr() };
     }
     const isDue = (c) => c.srs.due <= todayStr();
+    const isGeleerd = (c) => (c.srs.interval || 0) >= 21; // zit stevig in het langetermijngeheugen
+    const normVraag = (s) => (s || '').toLowerCase().replace(/[^a-z0-9à-ÿ ]/gi, '').replace(/\s+/g, ' ').trim();
 
     // ---------- gamification ----------
     const XP = { kaart: 10, weer: 2, lastig: 4, goed: 6, makkelijk: 8, synthese: 5, quizGoed: 2, quizBonus: 10 };
@@ -183,8 +185,8 @@
       if (opg && opg.cards) {
         return {
           cards: opg.cards, notes: opg.notes || [], journal: opg.journal || {},
-          themas: opg.themas || CONFIG.themas,
-          game: opg.game || { xp: 0, streak: 0, lastActive: null, dagDoel: 10, reviews: { date: todayStr(), count: 0 }, herhalingenTotaal: 0, quizPerfect: false },
+          themas: opg.themas || CONFIG.themas, history: opg.history || {},
+          game: opg.game || { xp: 0, streak: 0, lastActive: null, dagDoel: 10, reviews: { date: todayStr(), count: 0 }, herhalingenTotaal: 0, quizPerfect: false, laatsteImport: null },
           seedGeladen: true,
         };
       }
@@ -194,8 +196,8 @@
         tags: [], aangemaakt: todayStr(), srs: nieuweSrs(),
       }));
       return {
-        cards, notes: [], journal: {}, themas: CONFIG.themas,
-        game: { xp: 0, streak: 0, lastActive: null, dagDoel: 10, reviews: { date: todayStr(), count: 0 }, herhalingenTotaal: 0, quizPerfect: false },
+        cards, notes: [], journal: {}, themas: CONFIG.themas, history: {},
+        game: { xp: 0, streak: 0, lastActive: null, dagDoel: 10, reviews: { date: todayStr(), count: 0 }, herhalingenTotaal: 0, quizPerfect: false, laatsteImport: null },
         seedGeladen: true,
       };
     }
@@ -233,6 +235,7 @@
       const [toast, setToast] = useState(null);
       const [confetti, setConfetti] = useState(false);
       const toastTimer = useRef(null);
+      const prevNiveau = useRef(null);
 
       useEffect(() => { bewaarState(state); }, [state]);
 
@@ -263,19 +266,33 @@
       }
       function voegKaartenToe(lijst) {
         if (!lijst.length) return;
+        let toegevoegd = 0, dubbel = 0;
         update(s => {
+          const bestaand = new Set(s.cards.map(c => normVraag(c.vraag)));
           for (const k of lijst) {
+            const sleutel = normVraag(k.vraag);
+            if (sleutel && bestaand.has(sleutel)) { dubbel++; continue; }
+            bestaand.add(sleutel);
             s.cards.push({ id: uid(), vraag: k.vraag, antwoord: k.antwoord, thema: k.thema, bron: k.bron || '', tags: [], aangemaakt: todayStr(), srs: nieuweSrs() });
+            toegevoegd++;
           }
           s.game = markActief(resetDagteller(s.game));
-          s.game.xp += XP.kaart * lijst.length;
+          s.game.xp += XP.kaart * toegevoegd;
+          s.game.laatsteImport = todayStr();
           return s;
         });
-        melding(lijst.length + ' kaarten toegevoegd · +' + (XP.kaart * lijst.length) + ' XP 📰');
-        vier();
+        melding(toegevoegd + ' kaarten toegevoegd' + (dubbel ? ` · ${dubbel} dubbel overgeslagen` : '') + ' 📰');
+        if (toegevoegd) vier();
       }
       function verwijderKaart(id) {
         update(s => { s.cards = s.cards.filter(c => c.id !== id); return s; });
+      }
+      function bewerkKaart(id, patch) {
+        update(s => {
+          const c = s.cards.find(x => x.id === id);
+          if (c) Object.assign(c, patch);
+          return s;
+        });
       }
       function beoordeelKaart(id, grade) {
         update(s => {
@@ -286,6 +303,8 @@
           s.game.xp += XP[grade];
           s.game.reviews.count += 1;
           s.game.herhalingenTotaal = (s.game.herhalingenTotaal || 0) + 1;
+          s.history = s.history || {};
+          s.history[todayStr()] = (s.history[todayStr()] || 0) + 1;
           return s;
         });
       }
@@ -329,7 +348,8 @@
         if (!data || !Array.isArray(data.cards)) { melding('Ongeldig back-upbestand'); return; }
         update(() => ({
           cards: data.cards, notes: data.notes || [], journal: data.journal || {},
-          themas: data.themas || CONFIG.themas, game: data.game || laadState().game, seedGeladen: true,
+          themas: data.themas || CONFIG.themas, history: data.history || {},
+          game: data.game || laadState().game, seedGeladen: true,
         }));
         melding('Back-up hersteld ✅');
       }
@@ -341,6 +361,17 @@
 
       const dueKaarten = useMemo(() => state.cards.filter(isDue), [state.cards]);
       const game = resetDagteller(state.game);
+
+      // Tab-titel toont hoeveel kaarten je nog te herhalen hebt.
+      useEffect(() => {
+        document.title = dueKaarten.length ? `(${dueKaarten.length}) Nieuwsgeheugen` : 'Nieuwsgeheugen';
+      }, [dueKaarten.length]);
+      // Vier het wanneer je een niveau stijgt.
+      useEffect(() => {
+        const n = niveauVan(game.xp);
+        if (prevNiveau.current !== null && n > prevNiveau.current) { melding('Niveau ' + n + ' bereikt! 🎉'); vier(); }
+        prevNiveau.current = n;
+      }, [game.xp]);
 
       return (
         <div className="max-w-xl mx-auto min-h-screen pb-24 bg-[#f7f7f7]">
@@ -362,7 +393,7 @@
             )}
             {tab === 'themas' && (
               <ThemaView state={state} onNotitie={voegNotitieToe} onVerwijderNotitie={verwijderNotitie}
-                onVerwijderKaart={verwijderKaart} onThemaToe={voegThemaToe} />
+                onVerwijderKaart={verwijderKaart} onBewerkKaart={bewerkKaart} onThemaToe={voegThemaToe} />
             )}
             {tab === 'ik' && (
               <ProfielView state={state} game={game} onDagDoel={(n) => update(s => { s.game.dagDoel = n; return s; })}
@@ -418,18 +449,27 @@
           <div className="text-gray-500 text-sm font-bold">{groet} · {fmtLang(todayStr())}</div>
 
           {/* Krant importeren — automatische kaartjes */}
-          <button onClick={onImport}
-            className="w-full text-left rounded-3xl p-5 shadow-sm text-white active:translate-y-px"
-            style={{ background: 'linear-gradient(135deg,#1cb0f6,#2b70c9)' }}>
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">📰</div>
-              <div className="flex-1">
-                <div className="font-extrabold text-lg leading-tight">Krant van vandaag importeren</div>
-                <div className="text-sm text-white/90">Kies de NRC-PDF → automatisch kaartjes voorgesteld</div>
-              </div>
-              <span className="text-2xl">›</span>
-            </div>
-          </button>
+          {(() => {
+            const alGedaan = game.laatsteImport === todayStr();
+            return (
+              <button onClick={onImport}
+                className="w-full text-left rounded-3xl p-5 shadow-sm text-white active:translate-y-px"
+                style={{ background: alGedaan ? 'linear-gradient(135deg,#58cc02,#3a9e00)' : 'linear-gradient(135deg,#1cb0f6,#2b70c9)' }}>
+                <div className="flex items-center gap-3">
+                  <div className="text-3xl">{alGedaan ? '✅' : '📰'}</div>
+                  <div className="flex-1">
+                    <div className="font-extrabold text-lg leading-tight">
+                      {alGedaan ? 'Krant van vandaag verwerkt' : 'Krant van vandaag importeren'}
+                    </div>
+                    <div className="text-sm text-white/90">
+                      {alGedaan ? 'Nog een editie of artikel toevoegen? Tik hier.' : 'Kies de NRC-PDF → automatisch kaartjes voorgesteld'}
+                    </div>
+                  </div>
+                  <span className="text-2xl">›</span>
+                </div>
+              </button>
+            );
+          })()}
 
           {/* Dagdoel */}
           <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
@@ -496,6 +536,7 @@
       const kaart = huidigeId ? snapshot[huidigeId] : null;
 
       function beoordeel(grade) {
+        if (navigator.vibrate) navigator.vibrate(grade === 'weer' ? [12, 30, 12] : 10);
         onBeoordeel(huidigeId, grade);
         setToon(false);
         setQueue(q => {
@@ -505,6 +546,20 @@
           return nieuw;
         });
       }
+
+      // Toetsenbord: spatie/enter toont het antwoord, 1–4 beoordelen.
+      useEffect(() => {
+        function onKey(e) {
+          if (klaar || !huidigeId) return;
+          if (!toon && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); setToon(true); return; }
+          if (toon) {
+            const map = { '1': 'weer', '2': 'lastig', '3': 'goed', '4': 'makkelijk' };
+            if (map[e.key]) { e.preventDefault(); beoordeel(map[e.key]); }
+          }
+        }
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, [toon, huidigeId, klaar]);
 
       if (klaar || !kaart) {
         return (
@@ -552,12 +607,15 @@
             </button>
           ) : (
             <div className="mt-4 grid grid-cols-4 gap-2">
-              <GradeKnop label="Weer" sub="<10 min" kleur="#ff4b4b" onClick={() => beoordeel('weer')} />
-              <GradeKnop label="Lastig" sub={voorbeeldInterval(kaart.srs, 'lastig')} kleur="#ff9600" onClick={() => beoordeel('lastig')} />
-              <GradeKnop label="Goed" sub={voorbeeldInterval(kaart.srs, 'goed')} kleur="#1cb0f6" onClick={() => beoordeel('goed')} />
-              <GradeKnop label="Makkelijk" sub={voorbeeldInterval(kaart.srs, 'makkelijk')} kleur="#58cc02" onClick={() => beoordeel('makkelijk')} />
+              <GradeKnop label="Weer" toets="1" sub="<10 min" kleur="#ff4b4b" onClick={() => beoordeel('weer')} />
+              <GradeKnop label="Lastig" toets="2" sub={voorbeeldInterval(kaart.srs, 'lastig')} kleur="#ff9600" onClick={() => beoordeel('lastig')} />
+              <GradeKnop label="Goed" toets="3" sub={voorbeeldInterval(kaart.srs, 'goed')} kleur="#1cb0f6" onClick={() => beoordeel('goed')} />
+              <GradeKnop label="Makkelijk" toets="4" sub={voorbeeldInterval(kaart.srs, 'makkelijk')} kleur="#58cc02" onClick={() => beoordeel('makkelijk')} />
             </div>
           )}
+          <div className="mt-2 text-center text-[11px] text-gray-300 hidden sm:block">
+            Sneltoetsen: spatie = antwoord · 1–4 = beoordelen
+          </div>
         </div>
       );
     }
@@ -566,9 +624,10 @@
       if (grade === 'weer') return 'nu';
       return p.interval === 1 ? '1 dag' : p.interval + ' dgn';
     }
-    function GradeKnop({ label, sub, kleur, onClick }) {
+    function GradeKnop({ label, sub, kleur, toets, onClick }) {
       return (
-        <button onClick={onClick} className="rounded-2xl py-2.5 text-white font-extrabold text-sm active:translate-y-px flex flex-col items-center" style={{ background: kleur }}>
+        <button onClick={onClick} className="relative rounded-2xl py-2.5 text-white font-extrabold text-sm active:translate-y-px flex flex-col items-center" style={{ background: kleur }}>
+          {toets && <span className="absolute top-1 right-1.5 text-[9px] font-bold opacity-60 hidden sm:block">{toets}</span>}
           <span>{label}</span>
           <span className="text-[10px] font-bold opacity-80">{sub}</span>
         </button>
@@ -656,44 +715,105 @@
       return <div><div className="text-xs font-extrabold text-gray-500 mb-1 uppercase tracking-wide">{label}</div>{children}</div>;
     }
 
+    // ---------- herbruikbare kaart met inline bewerken ----------
+    function KaartBewerker({ kaart, themas, onBewerk, onVerwijder }) {
+      const [edit, setEdit] = useState(false);
+      const [v, setV] = useState(kaart.vraag);
+      const [a, setA] = useState(kaart.antwoord);
+      const [th, setTh] = useState(kaart.thema);
+      const t = themaById(themas, kaart.thema);
+      const geleerd = isGeleerd(kaart);
+      if (edit) {
+        return (
+          <div className="space-y-2">
+            <textarea value={v} onChange={e => setV(e.target.value)} rows={2} className="w-full text-sm font-bold border border-gray-200 rounded-xl p-2" />
+            <textarea value={a} onChange={e => setA(e.target.value)} rows={2} className="w-full text-sm border border-gray-200 rounded-xl p-2" />
+            <select value={th} onChange={e => setTh(e.target.value)} className="text-xs border border-gray-200 rounded-lg p-1.5 bg-white">
+              {themas.map(x => <option key={x.id} value={x.id}>{x.naam}</option>)}
+            </select>
+            <div className="flex gap-2">
+              <button onClick={() => { onBewerk(kaart.id, { vraag: v.trim() || kaart.vraag, antwoord: a.trim() || kaart.antwoord, thema: th }); setEdit(false); }}
+                className="rounded-xl px-3 py-1.5 text-white font-extrabold text-xs" style={{ background: '#58cc02' }}>Opslaan</button>
+              <button onClick={() => { setEdit(false); setV(kaart.vraag); setA(kaart.antwoord); setTh(kaart.thema); }}
+                className="rounded-xl px-3 py-1.5 font-extrabold text-xs text-gray-500 border border-gray-200">Annuleer</button>
+            </div>
+          </div>
+        );
+      }
+      return (
+        <div>
+          <div className="font-bold text-sm">{kaart.vraag}</div>
+          <div className="text-sm text-gray-600 mt-0.5">{kaart.antwoord}</div>
+          <div className="flex items-center gap-3 mt-1.5 text-[11px] font-bold">
+            <span className="px-2 py-0.5 rounded-full" style={{ background: t.kleur + '22', color: t.kleur }}>{t.naam}</span>
+            {geleerd && <span className="text-[#58cc02]" title="Zit in je langetermijngeheugen">🌱 geleerd</span>}
+            <button onClick={() => setEdit(true)} className="text-[#1cb0f6]">✎ bewerken</button>
+            <button onClick={() => onVerwijder(kaart.id)} className="text-gray-300">✕</button>
+          </div>
+        </div>
+      );
+    }
+
     // ---------- Thema's & tijdlijn ----------
-    function ThemaView({ state, onNotitie, onVerwijderNotitie, onVerwijderKaart, onThemaToe }) {
+    function ThemaView({ state, onNotitie, onVerwijderNotitie, onVerwijderKaart, onBewerkKaart, onThemaToe }) {
       const [open, setOpen] = useState(null);
-      const tellingen = useMemo(() => {
-        const m = {};
-        for (const c of state.cards) m[c.thema] = (m[c.thema] || 0) + 1;
-        for (const n of state.notes) m[n.thema] = (m[n.thema] || 0);
-        return m;
-      }, [state.cards, state.notes]);
+      const [zoek, setZoek] = useState('');
+
+      const treffers = useMemo(() => {
+        const q = zoek.trim().toLowerCase();
+        if (!q) return null;
+        return state.cards.filter(c => (c.vraag + ' ' + c.antwoord + ' ' + (c.bron || '')).toLowerCase().includes(q));
+      }, [zoek, state.cards]);
 
       if (open) {
         return <ThemaDetail thema={open} state={state} onTerug={() => setOpen(null)}
-          onNotitie={onNotitie} onVerwijderNotitie={onVerwijderNotitie} onVerwijderKaart={onVerwijderKaart} />;
+          onNotitie={onNotitie} onVerwijderNotitie={onVerwijderNotitie} onVerwijderKaart={onVerwijderKaart} onBewerkKaart={onBewerkKaart} />;
       }
 
       return (
         <div className="py-4 space-y-3">
           <div className="font-extrabold text-xl">🧵 Thema's</div>
-          <div className="text-xs text-gray-500 -mt-1">Volg verhaallijnen over weken. Klik een thema voor de tijdlijn.</div>
-          {state.themas.map(t => {
-            const aantalK = state.cards.filter(c => c.thema === t.id).length;
-            const aantalN = state.notes.filter(n => n.thema === t.id).length;
-            return (
-              <button key={t.id} onClick={() => setOpen(t)}
-                className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-3 text-left active:translate-y-px">
-                <div className="w-3 h-10 rounded-full" style={{ background: t.kleur }} />
-                <div className="flex-1">
-                  <div className="font-extrabold">{t.naam}</div>
-                  <div className="text-xs text-gray-500">{aantalK} kaart{aantalK === 1 ? '' : 'en'} · {aantalN} notitie{aantalN === 1 ? '' : 's'}</div>
+          <input value={zoek} onChange={e => setZoek(e.target.value)} placeholder="🔍 Zoek in al je kaarten…"
+            className="w-full border border-gray-200 rounded-2xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1cb0f6]/40" />
+
+          {treffers !== null ? (
+            <div className="space-y-2">
+              <div className="text-xs text-gray-500">{treffers.length} kaart{treffers.length === 1 ? '' : 'en'} gevonden</div>
+              {treffers.map(c => (
+                <div key={c.id} className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
+                  <KaartBewerker kaart={c} themas={state.themas} onBewerk={onBewerkKaart} onVerwijder={onVerwijderKaart} />
                 </div>
-                <span className="text-gray-300 text-xl">›</span>
-              </button>
-            );
-          })}
+              ))}
+              {treffers.length === 0 && <div className="text-center text-gray-400 text-sm py-8">Niets gevonden.</div>}
+            </div>
+          ) : (
+            <>
+              <div className="text-xs text-gray-500 -mt-1">Volg verhaallijnen over weken. Klik een thema voor de tijdlijn.</div>
+              {state.themas.map(t => {
+                const kaarten = state.cards.filter(c => c.thema === t.id);
+                const aantalN = state.notes.filter(n => n.thema === t.id).length;
+                const geleerd = kaarten.filter(isGeleerd).length;
+                return (
+                  <button key={t.id} onClick={() => setOpen(t)}
+                    className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-3 text-left active:translate-y-px">
+                    <div className="w-3 h-10 rounded-full" style={{ background: t.kleur }} />
+                    <div className="flex-1">
+                      <div className="font-extrabold">{t.naam}</div>
+                      <div className="text-xs text-gray-500">
+                        {kaarten.length} kaart{kaarten.length === 1 ? '' : 'en'} · {aantalN} notitie{aantalN === 1 ? '' : 's'}
+                        {geleerd > 0 && <span className="text-[#58cc02]"> · 🌱 {geleerd} geleerd</span>}
+                      </div>
+                    </div>
+                    <span className="text-gray-300 text-xl">›</span>
+                  </button>
+                );
+              })}
+            </>
+          )}
         </div>
       );
     }
-    function ThemaDetail({ thema, state, onTerug, onNotitie, onVerwijderNotitie, onVerwijderKaart }) {
+    function ThemaDetail({ thema, state, onTerug, onNotitie, onVerwijderNotitie, onVerwijderKaart, onBewerkKaart }) {
       const [notitie, setNotitie] = useState('');
       // Tijdlijn = kaarten + notities samen, nieuw bovenaan.
       const items = useMemo(() => {
@@ -726,15 +846,16 @@
                 <div className="absolute left-0 top-2 w-2.5 h-2.5 rounded-full" style={{ background: thema.kleur }} />
                 <div className="absolute left-[4px] top-4 bottom-0 w-px bg-gray-200" />
                 <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
-                  <div className="flex justify-between items-start gap-2">
+                  <div className="flex justify-between items-start gap-2 mb-1">
                     <div className="text-[11px] font-bold text-gray-400">{fmtKort(it.datum)} · {it.type === 'kaart' ? '🃏 kaart' : '🧵 notitie'}</div>
-                    <button onClick={() => it.type === 'kaart' ? onVerwijderKaart(it.data.id) : onVerwijderNotitie(it.data.id)}
-                      className="text-gray-300 text-xs">✕</button>
+                    {it.type === 'notitie' && (
+                      <button onClick={() => onVerwijderNotitie(it.data.id)} className="text-gray-300 text-xs">✕</button>
+                    )}
                   </div>
                   {it.type === 'kaart' ? (
-                    <div className="mt-1"><div className="font-bold text-sm">{it.data.vraag}</div><div className="text-sm text-gray-600 mt-0.5">{it.data.antwoord}</div></div>
+                    <KaartBewerker kaart={it.data} themas={state.themas} onBewerk={onBewerkKaart} onVerwijder={onVerwijderKaart} />
                   ) : (
-                    <div className="mt-1 text-sm text-gray-700">{it.data.tekst}</div>
+                    <div className="text-sm text-gray-700">{it.data.tekst}</div>
                   )}
                 </div>
               </div>
@@ -974,8 +1095,21 @@
           syntheseDagen: Object.values(state.journal).filter(v => v && v.trim()).length,
           maxThema: Math.max(0, ...Object.values(perThema)),
           quizPerfect: !!game.quizPerfect,
+          geleerd: state.cards.filter(isGeleerd).length,
         };
       }, [state, game]);
+
+      // Laatste 14 dagen herhaal-activiteit, voor de heatmap.
+      const heatmap = useMemo(() => {
+        const h = state.history || {};
+        const dagen = [];
+        for (let i = 13; i >= 0; i--) {
+          const d = addDaysStr(todayStr(), -i);
+          dagen.push({ d, n: h[d] || 0 });
+        }
+        return dagen;
+      }, [state.history]);
+      const retentiePct = stats.kaarten ? Math.round(stats.geleerd / stats.kaarten * 100) : 0;
       const fileRef = useRef(null);
 
       function exporteer() {
@@ -1010,6 +1144,40 @@
             <Stat icon="🃏" waarde={stats.kaarten} label="kaarten" />
             <Stat icon="🔁" waarde={stats.herhalingen} label="herhalingen" />
             <Stat icon="✍️" waarde={stats.syntheseDagen} label="syntheses" />
+          </div>
+
+          {/* Langetermijngeheugen */}
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-2">
+              <div className="font-extrabold">🌱 Langetermijngeheugen</div>
+              <div className="text-sm font-extrabold text-[#58cc02]">{stats.geleerd}/{stats.kaarten}</div>
+            </div>
+            <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-full rounded-full transition-all" style={{ width: retentiePct + '%', background: '#58cc02' }} />
+            </div>
+            <div className="text-xs text-gray-500 mt-2">
+              Kaarten met een herhaalinterval van 3 weken of meer tellen als &lsquo;geleerd&rsquo; — die zitten stevig in je geheugen.
+            </div>
+          </div>
+
+          {/* Activiteit-heatmap (14 dagen) */}
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="font-extrabold mb-3">🔥 Laatste 14 dagen</div>
+            <div className="flex gap-1.5 justify-between">
+              {heatmap.map(({ d, n }) => {
+                const niveau = n === 0 ? 0 : n < 5 ? 1 : n < 10 ? 2 : n < 20 ? 3 : 4;
+                const kleuren = ['#eef0f2', '#cdeafd', '#86cdfb', '#39aef6', '#1c7fd6'];
+                const vandaag = d === todayStr();
+                return (
+                  <div key={d} className="flex-1 flex flex-col items-center gap-1">
+                    <div title={`${fmtKort(d)}: ${n} herhaling${n === 1 ? '' : 'en'}`}
+                      className={'w-full aspect-square rounded-md ' + (vandaag ? 'ring-2 ring-[#1cb0f6]' : '')}
+                      style={{ background: kleuren[niveau] }} />
+                  </div>
+                );
+              })}
+            </div>
+            <div className="text-[10px] text-gray-400 mt-2 text-center">elke kolom is een dag · donkerder = meer herhaald</div>
           </div>
 
           <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
