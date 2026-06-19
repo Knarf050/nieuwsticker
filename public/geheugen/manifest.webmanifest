@@ -1,0 +1,18 @@
+{
+  "id": "/geheugen/",
+  "name": "Nieuwsgeheugen",
+  "short_name": "Geheugen",
+  "description": "Onthoud wat je in de krant leest: flashcards met spaced repetition, thema-tijdlijnen en gamification.",
+  "lang": "nl",
+  "start_url": "/geheugen/",
+  "scope": "/geheugen/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1cb0f6",
+  "theme_color": "#1cb0f6",
+  "icons": [
+    { "src": "/geheugen/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/geheugen/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/geheugen/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

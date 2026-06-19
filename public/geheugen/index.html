@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Nieuwsgeheugen — onthoud wat je leest</title>
+  <link rel="manifest" href="/geheugen/manifest.webmanifest">
+  <meta name="theme-color" content="#1cb0f6">
+  <link rel="icon" href="/geheugen/icon-192.png">
+  <link rel="apple-touch-icon" href="/geheugen/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nieuwsgeheugen">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/geheugen/geheugen-data.js"></script>
+  <style>
+    body { font-family: 'Nunito', system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+    .pop { animation: pop .3s ease; }
+    @keyframes pop { 0% { transform: scale(.9); } 60% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    .flip { animation: flip .35s ease; }
+    @keyframes flip { from { transform: rotateX(90deg); opacity: 0; } to { transform: rotateX(0); opacity: 1; } }
+    .toast-in { animation: toastin .3s ease; }
+    @keyframes toastin { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .pieces span { position: absolute; font-size: 22px; animation: fall 1.2s ease-out forwards; }
+    @keyframes fall { 0% { transform: translateY(-10px) rotate(0); opacity: 1; } 100% { transform: translateY(160px) rotate(360deg); opacity: 0; } }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 6px; }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  </style>
+</head>
+<body class="bg-[#f7f7f7]">
+  <div id="root"></div>
+
+  <button id="installBtn" style="display:none"
+    class="fixed bottom-24 left-5 z-40 bg-white text-[#1cb0f6] font-extrabold text-sm px-4 py-3 rounded-2xl shadow-lg border-2 border-[#1cb0f6]">
+    ⬇️ Installeer app
+  </button>
+
+  <script>
+    // Installeren als echte app (Android/desktop Chrome/Edge)
+    let deferredPrompt = null;
+    const installBtn = document.getElementById('installBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block';
+    });
+    installBtn.addEventListener('click', async () => {
+      installBtn.style.display = 'none';
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null;
+    });
+    window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/geheugen/sw.js').catch(() => {}));
+    }
+  </script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    const CONFIG = window.GEHEUGEN_CONFIG;
+    const STORE_KEY = 'nieuwsgeheugen.v1';
+    const DAY = 86400000;
+    const ACCENT = '#1cb0f6';
+
+    // ---------- datum-helpers ----------
+    const todayStr = () => new Date().toISOString().slice(0, 10);
+    const parseDate = (s) => new Date(s + 'T00:00:00');
+    const addDaysStr = (s, n) => new Date(parseDate(s).getTime() + n * DAY).toISOString().slice(0, 10);
+    const daysBetween = (a, b) => Math.round((parseDate(a).getTime() - parseDate(b).getTime()) / DAY);
+    const fmtKort = (s) => s ? parseDate(s).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : '';
+    const fmtLang = (s) => s ? parseDate(s).toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'long' }) : '';
+    const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    const round2 = (x) => Math.round(x * 100) / 100;
+
+    const themaById = (themas, id) => themas.find(t => t.id === id) || { naam: 'Overig', kleur: '#9aa0a6' };
+
+    // ---------- PDF → tekst (pdf.js via CDN) ----------
+    const PDFJS_VERSIE = '4.7.76';
+    const MAX_PDF_TEKST = 240000; // tekens; gelijk aan de servergrens
+    let pdfjsLib = null;
+    async function laadPdfjs() {
+      if (pdfjsLib) return pdfjsLib;
+      const base = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_VERSIE}/build/`;
+      pdfjsLib = await import(base + 'pdf.min.mjs');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = base + 'pdf.worker.min.mjs';
+      return pdfjsLib;
+    }
+    async function pdfNaarTekst(file, onVoortgang) {
+      const lib = await laadPdfjs();
+      const buf = await file.arrayBuffer();
+      const pdf = await lib.getDocument({ data: buf }).promise;
+      let tekst = '';
+      for (let p = 1; p <= pdf.numPages; p++) {
+        const page = await pdf.getPage(p);
+        const content = await page.getTextContent();
+        tekst += content.items.map(it => it.str).join(' ') + '\n\n';
+        onVoortgang && onVoortgang(p, pdf.numPages);
+        if (tekst.length > MAX_PDF_TEKST) break;
+      }
+      return tekst.slice(0, MAX_PDF_TEKST);
+    }
+    // ---------- kaarten laten genereren door de server (Claude) ----------
+    async function genereerKaarten(tekst, aantal, themas) {
+      const res = await fetch('/api/kaarten', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tekst, aantal, themas }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || ('Serverfout ' + res.status));
+      return data.kaarten || [];
+    }
+
+    // ---------- spaced repetition (eigen SM-2-variant, geen externe app) ----------
+    // 4 knoppen vertalen naar een interval in dagen. 'Weer' laat de kaart binnen
+    // dezelfde sessie terugkomen; de rest plant 'm vooruit op basis van 'ease'.
+    function nieuweSrs() {
+      return { ease: 2.5, interval: 0, reps: 0, due: todayStr(), lapses: 0, last: null };
+    }
+    function plan(srs, grade) {
+      let { ease, interval, reps, lapses } = srs;
+      if (grade === 'weer') {
+        ease = Math.max(1.3, ease - 0.2); reps = 0; interval = 0; lapses += 1;
+      } else if (grade === 'lastig') {
+        ease = Math.max(1.3, ease - 0.15);
+        interval = reps === 0 ? 1 : Math.max(1, Math.round(interval * 1.2)); reps += 1;
+      } else if (grade === 'goed') {
+        if (reps === 0) interval = 1; else if (reps === 1) interval = 3;
+        else interval = Math.round(interval * ease); reps += 1;
+      } else { // makkelijk
+        ease += 0.15;
+        if (reps === 0) interval = 2; else if (reps === 1) interval = 5;
+        else interval = Math.round(interval * ease * 1.3); reps += 1;
+      }
+      interval = Math.min(interval, 365);
+      const due = grade === 'weer' ? todayStr() : addDaysStr(todayStr(), interval);
+      return { ease: round2(ease), interval, reps, due, lapses, last: todayStr() };
+    }
+    const isDue = (c) => c.srs.due <= todayStr();
+    const isGeleerd = (c) => (c.srs.interval || 0) >= 21; // zit stevig in het langetermijngeheugen
+    const normVraag = (s) => (s || '').toLowerCase().replace(/[^a-z0-9à-ÿ ]/gi, '').replace(/\s+/g, ' ').trim();
+
+    // ---------- gamification ----------
+    const XP = { kaart: 10, weer: 2, lastig: 4, goed: 6, makkelijk: 8, synthese: 5, quizGoed: 2, quizBonus: 10 };
+    const niveauVan = (xp) => Math.floor(xp / 100) + 1;
+    const xpInNiveau = (xp) => xp % 100;
+
+    function markActief(game) {
+      const t = todayStr();
+      if (game.lastActive === t) return game;
+      const gisteren = addDaysStr(t, -1);
+      const streak = game.lastActive === gisteren ? (game.streak || 0) + 1 : 1;
+      return { ...game, streak, lastActive: t };
+    }
+    function resetDagteller(game) {
+      if (!game.reviews || game.reviews.date !== todayStr()) {
+        return { ...game, reviews: { date: todayStr(), count: 0 } };
+      }
+      return game;
+    }
+
+    const BADGES = [
+      { id: 'k1',   icon: '🃏', titel: 'Eerste kaart',  uitleg: 'Je eerste kaartje gemaakt',     test: (s) => s.kaarten >= 1 },
+      { id: 'k10',  icon: '📚', titel: 'Verzamelaar',   uitleg: '10 kaartjes gemaakt',           test: (s) => s.kaarten >= 10 },
+      { id: 'k50',  icon: '🗂️', titel: 'Archivaris',    uitleg: '50 kaartjes gemaakt',           test: (s) => s.kaarten >= 50 },
+      { id: 'r1',   icon: '🔁', titel: 'Eerste herhaling', uitleg: 'Een kaart herhaald',         test: (s) => s.herhalingen >= 1 },
+      { id: 'r100', icon: '🧠', titel: 'Geheugentraining', uitleg: '100 herhalingen gedaan',     test: (s) => s.herhalingen >= 100 },
+      { id: 's3',   icon: '🔥', titel: 'Streak 3',       uitleg: '3 dagen op rij actief',         test: (s) => s.streak >= 3 },
+      { id: 's7',   icon: '🌟', titel: 'Week-streak',    uitleg: '7 dagen op rij actief',         test: (s) => s.streak >= 7 },
+      { id: 's30',  icon: '👑', titel: 'Maand-streak',   uitleg: '30 dagen op rij actief',        test: (s) => s.streak >= 30 },
+      { id: 'thema',icon: '🧵', titel: 'Verhaallijn',    uitleg: '10 kaarten in één thema',       test: (s) => s.maxThema >= 10 },
+      { id: 'syn7', icon: '✍️', titel: 'Dagboekschrijver', uitleg: '7 dagen een synthese',        test: (s) => s.syntheseDagen >= 7 },
+      { id: 'quiz', icon: '🏆', titel: 'Quizmeester',    uitleg: 'Een weekquiz foutloos',         test: (s) => s.quizPerfect },
+    ];
+
+    // ---------- opslag ----------
+    function laadState() {
+      let opg = null;
+      try { opg = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) {}
+      if (opg && opg.cards) {
+        return {
+          cards: opg.cards, notes: opg.notes || [], journal: opg.journal || {},
+          themas: opg.themas || CONFIG.themas, history: opg.history || {},
+          game: opg.game || { xp: 0, streak: 0, lastActive: null, dagDoel: 10, reviews: { date: todayStr(), count: 0 }, herhalingenTotaal: 0, quizPerfect: false, laatsteImport: null },
+          seedGeladen: true,
+        };
+      }
+      // Eerste keer: voorbeeldkaarten laden zodat de app meteen iets toont.
+      const cards = (CONFIG.seedKaarten || []).map(s => ({
+        id: uid(), vraag: s.vraag, antwoord: s.antwoord, thema: s.thema, bron: s.bron || '',
+        tags: [], aangemaakt: todayStr(), srs: nieuweSrs(),
+      }));
+      return {
+        cards, notes: [], journal: {}, themas: CONFIG.themas, history: {},
+        game: { xp: 0, streak: 0, lastActive: null, dagDoel: 10, reviews: { date: todayStr(), count: 0 }, herhalingenTotaal: 0, quizPerfect: false, laatsteImport: null },
+        seedGeladen: true,
+      };
+    }
+    function bewaarState(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+
+    // ---------- kleine UI-bouwstenen ----------
+    function Ring({ pct, kleur, groot }) {
+      const r = groot ? 34 : 16, c = 2 * Math.PI * r, off = c * (1 - Math.min(1, pct) / 100);
+      const size = (r + 6) * 2;
+      return (
+        <svg width={size} height={size} className="-rotate-90">
+          <circle cx={size/2} cy={size/2} r={r} stroke="#e5e7eb" strokeWidth="6" fill="none" />
+          <circle cx={size/2} cy={size/2} r={r} stroke={kleur} strokeWidth="6" fill="none"
+            strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" style={{ transition: 'stroke-dashoffset .5s ease' }} />
+        </svg>
+      );
+    }
+    function Confetti() {
+      const emojis = ['🎉','✨','🟦','⭐','🟩','🎊','💪'];
+      return (
+        <div className="pieces fixed inset-0 z-[60] pointer-events-none">
+          {Array.from({ length: 26 }).map((_, i) => (
+            <span key={i} style={{ left: Math.random()*100+'%', top: '-5%', animationDelay: (Math.random()*.4)+'s' }}>
+              {emojis[i % emojis.length]}
+            </span>
+          ))}
+        </div>
+      );
+    }
+
+    // ---------- hoofd-app ----------
+    function App() {
+      const [state, setState] = useState(laadState);
+      const [tab, setTab] = useState('vandaag');
+      const [toast, setToast] = useState(null);
+      const [confetti, setConfetti] = useState(false);
+      const toastTimer = useRef(null);
+      const prevNiveau = useRef(null);
+
+      useEffect(() => { bewaarState(state); }, [state]);
+
+      function melding(tekst) {
+        setToast(tekst);
+        clearTimeout(toastTimer.current);
+        toastTimer.current = setTimeout(() => setToast(null), 2200);
+      }
+      function vier() { setConfetti(true); setTimeout(() => setConfetti(false), 1300); }
+
+      // Centrale update-helper: kopieert state, past 'm aan, bewaart.
+      function update(fn) {
+        setState(prev => {
+          const next = fn(structuredClone(prev));
+          return next;
+        });
+      }
+
+      // --- acties ---
+      function voegKaartToe({ vraag, antwoord, thema, bron, tags }) {
+        update(s => {
+          s.cards.push({ id: uid(), vraag, antwoord, thema, bron, tags, aangemaakt: todayStr(), srs: nieuweSrs() });
+          s.game = markActief(resetDagteller(s.game));
+          s.game.xp += XP.kaart;
+          return s;
+        });
+        melding('Kaart toegevoegd · +' + XP.kaart + ' XP 🃏');
+      }
+      function voegKaartenToe(lijst) {
+        if (!lijst.length) return;
+        let toegevoegd = 0, dubbel = 0;
+        update(s => {
+          const bestaand = new Set(s.cards.map(c => normVraag(c.vraag)));
+          for (const k of lijst) {
+            const sleutel = normVraag(k.vraag);
+            if (sleutel && bestaand.has(sleutel)) { dubbel++; continue; }
+            bestaand.add(sleutel);
+            s.cards.push({ id: uid(), vraag: k.vraag, antwoord: k.antwoord, thema: k.thema, bron: k.bron || '', tags: [], aangemaakt: todayStr(), srs: nieuweSrs() });
+            toegevoegd++;
+          }
+          s.game = markActief(resetDagteller(s.game));
+          s.game.xp += XP.kaart * toegevoegd;
+          s.game.laatsteImport = todayStr();
+          return s;
+        });
+        melding(toegevoegd + ' kaarten toegevoegd' + (dubbel ? ` · ${dubbel} dubbel overgeslagen` : '') + ' 📰');
+        if (toegevoegd) vier();
+      }
+      function verwijderKaart(id) {
+        update(s => { s.cards = s.cards.filter(c => c.id !== id); return s; });
+      }
+      function bewerkKaart(id, patch) {
+        update(s => {
+          const c = s.cards.find(x => x.id === id);
+          if (c) Object.assign(c, patch);
+          return s;
+        });
+      }
+      function beoordeelKaart(id, grade) {
+        update(s => {
+          const c = s.cards.find(x => x.id === id);
+          if (!c) return s;
+          c.srs = plan(c.srs, grade);
+          s.game = markActief(resetDagteller(s.game));
+          s.game.xp += XP[grade];
+          s.game.reviews.count += 1;
+          s.game.herhalingenTotaal = (s.game.herhalingenTotaal || 0) + 1;
+          s.history = s.history || {};
+          s.history[todayStr()] = (s.history[todayStr()] || 0) + 1;
+          return s;
+        });
+      }
+      function voegNotitieToe(thema, tekst) {
+        update(s => {
+          s.notes.push({ id: uid(), thema, tekst, datum: todayStr() });
+          s.game = markActief(s.game);
+          return s;
+        });
+        melding('Notitie opgeslagen 🧵');
+      }
+      function verwijderNotitie(id) {
+        update(s => { s.notes = s.notes.filter(n => n.id !== id); return s; });
+      }
+      function bewaarSynthese(tekst) {
+        update(s => {
+          const bestond = !!(s.journal[todayStr()] && s.journal[todayStr()].trim());
+          s.journal[todayStr()] = tekst;
+          s.game = markActief(s.game);
+          if (!bestond && tekst.trim()) s.game.xp += XP.synthese;
+          return s;
+        });
+        melding('Synthese van vandaag bewaard ✍️');
+      }
+      function voegThemaToe(naam, kleur) {
+        update(s => {
+          const id = naam.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || uid();
+          if (!s.themas.some(t => t.id === id)) s.themas.push({ id, naam, kleur });
+          return s;
+        });
+      }
+      function quizKlaar(score, totaal) {
+        update(s => {
+          s.game = markActief(resetDagteller(s.game));
+          s.game.xp += score * XP.quizGoed + (totaal > 0 ? XP.quizBonus : 0);
+          if (totaal > 0 && score === totaal) s.game.quizPerfect = true;
+          return s;
+        });
+      }
+      function importeer(data) {
+        if (!data || !Array.isArray(data.cards)) { melding('Ongeldig back-upbestand'); return; }
+        update(() => ({
+          cards: data.cards, notes: data.notes || [], journal: data.journal || {},
+          themas: data.themas || CONFIG.themas, history: data.history || {},
+          game: data.game || laadState().game, seedGeladen: true,
+        }));
+        melding('Back-up hersteld ✅');
+      }
+      function resetAlles() {
+        localStorage.removeItem(STORE_KEY);
+        setState(laadState());
+        melding('Opnieuw begonnen');
+      }
+
+      const dueKaarten = useMemo(() => state.cards.filter(isDue), [state.cards]);
+      const game = resetDagteller(state.game);
+
+      // Tab-titel toont hoeveel kaarten je nog te herhalen hebt.
+      useEffect(() => {
+        document.title = dueKaarten.length ? `(${dueKaarten.length}) Nieuwsgeheugen` : 'Nieuwsgeheugen';
+      }, [dueKaarten.length]);
+      // Vier het wanneer je een niveau stijgt.
+      useEffect(() => {
+        const n = niveauVan(game.xp);
+        if (prevNiveau.current !== null && n > prevNiveau.current) { melding('Niveau ' + n + ' bereikt! 🎉'); vier(); }
+        prevNiveau.current = n;
+      }, [game.xp]);
+
+      return (
+        <div className="max-w-xl mx-auto min-h-screen pb-24 bg-[#f7f7f7]">
+          <TopBar game={game} />
+
+          <div className="px-4">
+            {tab === 'vandaag' && (
+              <VandaagView state={state} game={game} due={dueKaarten}
+                onStart={() => setTab('leren')} onQuiz={() => setTab('quiz')}
+                onSynthese={bewaarSynthese} onImport={() => setTab('import')} />
+            )}
+            {tab === 'leren' && (
+              <LeerView due={dueKaarten} onBeoordeel={beoordeelKaart} dagDoel={game.dagDoel}
+                gedaanVandaag={game.reviews.count} onKlaar={vier} themas={state.themas}
+                onNaarNieuw={() => setTab('nieuw')} />
+            )}
+            {tab === 'nieuw' && (
+              <NieuwView themas={state.themas} onToevoegen={voegKaartToe} onThemaToe={voegThemaToe} onImport={() => setTab('import')} />
+            )}
+            {tab === 'themas' && (
+              <ThemaView state={state} onNotitie={voegNotitieToe} onVerwijderNotitie={verwijderNotitie}
+                onVerwijderKaart={verwijderKaart} onBewerkKaart={bewerkKaart} onThemaToe={voegThemaToe} />
+            )}
+            {tab === 'ik' && (
+              <ProfielView state={state} game={game} onDagDoel={(n) => update(s => { s.game.dagDoel = n; return s; })}
+                onImport={importeer} onReset={resetAlles} />
+            )}
+          </div>
+
+          {tab === 'quiz' && (
+            <QuizView cards={state.cards} themas={state.themas} onSluiten={() => setTab('vandaag')}
+              onKlaar={(score, totaal) => { quizKlaar(score, totaal); if (totaal && score === totaal) vier(); }} />
+          )}
+
+          {tab === 'import' && (
+            <ImportView themas={state.themas} onToevoegen={voegKaartenToe} onSluiten={() => setTab('vandaag')} />
+          )}
+
+          <NavBalk tab={tab} setTab={setTab} due={dueKaarten.length} />
+
+          {toast && (
+            <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-[#1f2937] text-white text-sm font-bold px-5 py-3 rounded-2xl shadow-xl toast-in">
+              {toast}
+            </div>
+          )}
+          {confetti && <Confetti />}
+        </div>
+      );
+    }
+
+    // ---------- bovenbalk ----------
+    function TopBar({ game }) {
+      return (
+        <div className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+          <div className="font-extrabold text-lg" style={{ color: ACCENT }}>📰 Nieuwsgeheugen</div>
+          <div className="flex items-center gap-3 text-sm font-extrabold">
+            <span title="Streak" className="flex items-center gap-1 text-orange-500">🔥 {game.streak || 0}</span>
+            <span title="Niveau" className="flex items-center gap-1 text-[#1cb0f6]">⭐ {niveauVan(game.xp)}</span>
+            <span title="XP" className="text-gray-500">{game.xp} XP</span>
+          </div>
+        </div>
+      );
+    }
+
+    // ---------- Vandaag ----------
+    function VandaagView({ state, game, due, onStart, onQuiz, onSynthese, onImport }) {
+      const [tekst, setTekst] = useState(state.journal[todayStr()] || '');
+      const pct = game.dagDoel ? (game.reviews.count / game.dagDoel) * 100 : 0;
+      const klaarMetDoel = game.reviews.count >= game.dagDoel;
+      const uur = new Date().getHours();
+      const groet = uur < 6 ? 'Goedenacht' : uur < 12 ? 'Goedemorgen' : uur < 18 ? 'Goedemiddag' : 'Goedenavond';
+
+      return (
+        <div className="py-4 space-y-4">
+          <div className="text-gray-500 text-sm font-bold">{groet} · {fmtLang(todayStr())}</div>
+
+          {/* Krant importeren — automatische kaartjes */}
+          {(() => {
+            const alGedaan = game.laatsteImport === todayStr();
+            return (
+              <button onClick={onImport}
+                className="w-full text-left rounded-3xl p-5 shadow-sm text-white active:translate-y-px"
+                style={{ background: alGedaan ? 'linear-gradient(135deg,#58cc02,#3a9e00)' : 'linear-gradient(135deg,#1cb0f6,#2b70c9)' }}>
+                <div className="flex items-center gap-3">
+                  <div className="text-3xl">{alGedaan ? '✅' : '📰'}</div>
+                  <div className="flex-1">
+                    <div className="font-extrabold text-lg leading-tight">
+                      {alGedaan ? 'Krant van vandaag verwerkt' : 'Krant van vandaag importeren'}
+                    </div>
+                    <div className="text-sm text-white/90">
+                      {alGedaan ? 'Nog een editie of artikel toevoegen? Tik hier.' : 'Kies de NRC-PDF → automatisch kaartjes voorgesteld'}
+                    </div>
+                  </div>
+                  <span className="text-2xl">›</span>
+                </div>
+              </button>
+            );
+          })()}
+
+          {/* Dagdoel */}
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="relative shrink-0">
+              <Ring pct={pct} kleur={klaarMetDoel ? '#58cc02' : ACCENT} groot />
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-xl font-extrabold">{game.reviews.count}</span>
+                <span className="text-[10px] text-gray-400 -mt-1">/ {game.dagDoel}</span>
+              </div>
+            </div>
+            <div className="flex-1">
+              <div className="font-extrabold text-lg">{klaarMetDoel ? 'Dagdoel gehaald! 🎉' : 'Dagdoel'}</div>
+              <div className="text-sm text-gray-500 mb-2">
+                {due.length > 0 ? `${due.length} kaart${due.length === 1 ? '' : 'jes'} te herhalen` : 'Niets meer te herhalen vandaag'}
+              </div>
+              <button onClick={onStart} disabled={due.length === 0}
+                className="w-full rounded-2xl py-2.5 font-extrabold text-white shadow disabled:opacity-40 active:translate-y-px"
+                style={{ background: ACCENT }}>
+                {due.length > 0 ? 'Start herhalen' : 'Klaar voor vandaag'}
+              </button>
+            </div>
+          </div>
+
+          {/* Synthese van de dag */}
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="font-extrabold mb-1">✍️ Synthese van vandaag</div>
+            <div className="text-xs text-gray-500 mb-2">In 3 zinnen: wat is het belangrijkste dat je vandaag las, en waarom?</div>
+            <textarea value={tekst} onChange={e => setTekst(e.target.value)} rows={3}
+              placeholder="1. …&#10;2. …&#10;3. …"
+              className="w-full border border-gray-200 rounded-2xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1cb0f6]/40" />
+            <button onClick={() => onSynthese(tekst)}
+              className="mt-2 rounded-2xl px-4 py-2 font-extrabold text-white text-sm active:translate-y-px" style={{ background: '#58cc02' }}>
+              Bewaren
+            </button>
+          </div>
+
+          {/* Snelacties */}
+          <div className="grid grid-cols-2 gap-3">
+            <button onClick={onQuiz} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 text-left active:translate-y-px">
+              <div className="text-2xl">🏆</div>
+              <div className="font-extrabold mt-1">Weekquiz</div>
+              <div className="text-xs text-gray-500">Test jezelf met 10 vragen</div>
+            </button>
+            <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+              <div className="text-2xl">📈</div>
+              <div className="font-extrabold mt-1">{state.cards.length} kaarten</div>
+              <div className="text-xs text-gray-500">{Object.keys(state.journal).length} dagen synthese</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ---------- Leren (herhaalsessie) ----------
+    function LeerView({ due, onBeoordeel, dagDoel, gedaanVandaag, onKlaar, themas, onNaarNieuw }) {
+      const [queue, setQueue] = useState(() => due.map(c => c.id));
+      const [snapshot] = useState(() => Object.fromEntries(due.map(c => [c.id, c])));
+      const [toon, setToon] = useState(false);
+      const [klaar, setKlaar] = useState(due.length === 0);
+      const startAantal = useRef(due.length);
+
+      // Als er nieuwe due-kaarten bijkomen terwijl je hier staat (zelden), niet herstarten.
+      const huidigeId = queue[0];
+      const kaart = huidigeId ? snapshot[huidigeId] : null;
+
+      function beoordeel(grade) {
+        if (navigator.vibrate) navigator.vibrate(grade === 'weer' ? [12, 30, 12] : 10);
+        onBeoordeel(huidigeId, grade);
+        setToon(false);
+        setQueue(q => {
+          const rest = q.slice(1);
+          const nieuw = grade === 'weer' ? [...rest, huidigeId] : rest;
+          if (nieuw.length === 0) { setKlaar(true); onKlaar && onKlaar(); }
+          return nieuw;
+        });
+      }
+
+      // Toetsenbord: spatie/enter toont het antwoord, 1–4 beoordelen.
+      useEffect(() => {
+        function onKey(e) {
+          if (klaar || !huidigeId) return;
+          if (!toon && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); setToon(true); return; }
+          if (toon) {
+            const map = { '1': 'weer', '2': 'lastig', '3': 'goed', '4': 'makkelijk' };
+            if (map[e.key]) { e.preventDefault(); beoordeel(map[e.key]); }
+          }
+        }
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, [toon, huidigeId, klaar]);
+
+      if (klaar || !kaart) {
+        return (
+          <div className="py-16 text-center space-y-4">
+            <div className="text-6xl">{startAantal.current > 0 ? '🎉' : '☕'}</div>
+            <div className="font-extrabold text-xl">{startAantal.current > 0 ? 'Sessie klaar!' : 'Niets te herhalen'}</div>
+            <div className="text-gray-500 text-sm">
+              {startAantal.current > 0
+                ? `Je herhaalde ${startAantal.current} kaart${startAantal.current === 1 ? '' : 'jes'}. Kom morgen terug — dan plant het algoritme de volgende.`
+                : 'Voeg kaartjes toe terwijl je de krant leest, dan verschijnen ze hier op het juiste moment.'}
+            </div>
+            <button onClick={onNaarNieuw} className="rounded-2xl px-5 py-3 font-extrabold text-white" style={{ background: ACCENT }}>
+              ➕ Nieuw kaartje
+            </button>
+          </div>
+        );
+      }
+
+      const t = themaById(themas, kaart.thema);
+      const over = queue.length;
+      return (
+        <div className="py-4">
+          <div className="flex items-center justify-between mb-3 text-xs font-bold text-gray-400">
+            <span>Nog {over} in deze sessie</span>
+            <span>{gedaanVandaag}/{dagDoel} dagdoel</span>
+          </div>
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-h-[260px] flex flex-col">
+            <span className="self-start text-xs font-extrabold px-2.5 py-1 rounded-full mb-4"
+              style={{ background: t.kleur + '22', color: t.kleur }}>{t.naam}</span>
+            <div className="flex-1 flex items-center justify-center text-center">
+              <div className="text-xl font-extrabold leading-snug">{kaart.vraag}</div>
+            </div>
+            {toon && (
+              <div className="flip border-t border-gray-100 pt-4 mt-4 text-center text-gray-700">
+                {kaart.antwoord}
+                {kaart.bron && <div className="text-xs text-gray-400 mt-2">Bron: {kaart.bron}</div>}
+              </div>
+            )}
+          </div>
+
+          {!toon ? (
+            <button onClick={() => setToon(true)}
+              className="mt-4 w-full rounded-2xl py-4 font-extrabold text-white text-lg active:translate-y-px" style={{ background: ACCENT }}>
+              Toon antwoord
+            </button>
+          ) : (
+            <div className="mt-4 grid grid-cols-4 gap-2">
+              <GradeKnop label="Weer" toets="1" sub="<10 min" kleur="#ff4b4b" onClick={() => beoordeel('weer')} />
+              <GradeKnop label="Lastig" toets="2" sub={voorbeeldInterval(kaart.srs, 'lastig')} kleur="#ff9600" onClick={() => beoordeel('lastig')} />
+              <GradeKnop label="Goed" toets="3" sub={voorbeeldInterval(kaart.srs, 'goed')} kleur="#1cb0f6" onClick={() => beoordeel('goed')} />
+              <GradeKnop label="Makkelijk" toets="4" sub={voorbeeldInterval(kaart.srs, 'makkelijk')} kleur="#58cc02" onClick={() => beoordeel('makkelijk')} />
+            </div>
+          )}
+          <div className="mt-2 text-center text-[11px] text-gray-300 hidden sm:block">
+            Sneltoetsen: spatie = antwoord · 1–4 = beoordelen
+          </div>
+        </div>
+      );
+    }
+    function voorbeeldInterval(srs, grade) {
+      const p = plan(srs, grade);
+      if (grade === 'weer') return 'nu';
+      return p.interval === 1 ? '1 dag' : p.interval + ' dgn';
+    }
+    function GradeKnop({ label, sub, kleur, toets, onClick }) {
+      return (
+        <button onClick={onClick} className="relative rounded-2xl py-2.5 text-white font-extrabold text-sm active:translate-y-px flex flex-col items-center" style={{ background: kleur }}>
+          {toets && <span className="absolute top-1 right-1.5 text-[9px] font-bold opacity-60 hidden sm:block">{toets}</span>}
+          <span>{label}</span>
+          <span className="text-[10px] font-bold opacity-80">{sub}</span>
+        </button>
+      );
+    }
+
+    // ---------- Nieuw kaartje ----------
+    function NieuwView({ themas, onToevoegen, onThemaToe, onImport }) {
+      const [vraag, setVraag] = useState('');
+      const [antwoord, setAntwoord] = useState('');
+      const [thema, setThema] = useState(themas[0]?.id || 'overig');
+      const [bron, setBron] = useState('NRC ' + fmtKort(todayStr()));
+      const [tags, setTags] = useState('');
+      const [nieuwThema, setNieuwThema] = useState(false);
+      const [themaNaam, setThemaNaam] = useState('');
+
+      function opslaan() {
+        if (!vraag.trim() || !antwoord.trim()) return;
+        onToevoegen({
+          vraag: vraag.trim(), antwoord: antwoord.trim(), thema, bron: bron.trim(),
+          tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+        });
+        setVraag(''); setAntwoord(''); setTags('');
+      }
+
+      return (
+        <div className="py-4 space-y-4">
+          <div className="font-extrabold text-xl">➕ Nieuw kaartje</div>
+          <div className="text-xs text-gray-500 -mt-2">Maak 3–5 kaartjes per editie. Eén goed onthouden feit is meer waard dan tien half vergeten.</div>
+
+          <button onClick={onImport}
+            className="w-full rounded-2xl border-2 border-dashed border-[#1cb0f6] text-[#1cb0f6] font-extrabold py-3 active:translate-y-px">
+            📰 Of: importeer de krant-PDF → kaartjes automatisch
+          </button>
+          <div className="text-center text-xs text-gray-400">— of maak er hieronder zelf één —</div>
+
+          <Veld label="Vraag / voorkant">
+            <textarea value={vraag} onChange={e => setVraag(e.target.value)} rows={2}
+              placeholder="Bijv. Welk besluit nam het kabinet over de stikstofaanpak?"
+              className="w-full border border-gray-200 rounded-2xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1cb0f6]/40" />
+          </Veld>
+          <Veld label="Antwoord / achterkant">
+            <textarea value={antwoord} onChange={e => setAntwoord(e.target.value)} rows={3}
+              placeholder="In je eigen woorden — dat onthoud je beter dan een citaat."
+              className="w-full border border-gray-200 rounded-2xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1cb0f6]/40" />
+          </Veld>
+
+          <Veld label="Thema">
+            {!nieuwThema ? (
+              <div className="flex gap-2">
+                <select value={thema} onChange={e => setThema(e.target.value)}
+                  className="flex-1 border border-gray-200 rounded-2xl p-3 text-sm bg-white">
+                  {themas.map(t => <option key={t.id} value={t.id}>{t.naam}</option>)}
+                </select>
+                <button onClick={() => setNieuwThema(true)} className="px-4 rounded-2xl border border-gray-200 font-bold text-gray-600">+ nieuw</button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input value={themaNaam} onChange={e => setThemaNaam(e.target.value)} placeholder="Naam nieuw thema"
+                  className="flex-1 border border-gray-200 rounded-2xl p-3 text-sm" />
+                <button onClick={() => {
+                  if (!themaNaam.trim()) return;
+                  const kleur = '#' + Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0');
+                  onThemaToe(themaNaam.trim(), kleur);
+                  const id = themaNaam.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+                  setThema(id); setNieuwThema(false); setThemaNaam('');
+                }} className="px-4 rounded-2xl text-white font-bold" style={{ background: '#58cc02' }}>ok</button>
+              </div>
+            )}
+          </Veld>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Veld label="Bron"><input value={bron} onChange={e => setBron(e.target.value)} className="w-full border border-gray-200 rounded-2xl p-3 text-sm" /></Veld>
+            <Veld label="Tags (komma)"><input value={tags} onChange={e => setTags(e.target.value)} placeholder="stikstof, kabinet" className="w-full border border-gray-200 rounded-2xl p-3 text-sm" /></Veld>
+          </div>
+
+          <button onClick={opslaan} disabled={!vraag.trim() || !antwoord.trim()}
+            className="w-full rounded-2xl py-4 font-extrabold text-white text-lg disabled:opacity-40 active:translate-y-px" style={{ background: ACCENT }}>
+            Kaartje opslaan · +{XP.kaart} XP
+          </button>
+        </div>
+      );
+    }
+    function Veld({ label, children }) {
+      return <div><div className="text-xs font-extrabold text-gray-500 mb-1 uppercase tracking-wide">{label}</div>{children}</div>;
+    }
+
+    // ---------- herbruikbare kaart met inline bewerken ----------
+    function KaartBewerker({ kaart, themas, onBewerk, onVerwijder }) {
+      const [edit, setEdit] = useState(false);
+      const [v, setV] = useState(kaart.vraag);
+      const [a, setA] = useState(kaart.antwoord);
+      const [th, setTh] = useState(kaart.thema);
+      const t = themaById(themas, kaart.thema);
+      const geleerd = isGeleerd(kaart);
+      if (edit) {
+        return (
+          <div className="space-y-2">
+            <textarea value={v} onChange={e => setV(e.target.value)} rows={2} className="w-full text-sm font-bold border border-gray-200 rounded-xl p-2" />
+            <textarea value={a} onChange={e => setA(e.target.value)} rows={2} className="w-full text-sm border border-gray-200 rounded-xl p-2" />
+            <select value={th} onChange={e => setTh(e.target.value)} className="text-xs border border-gray-200 rounded-lg p-1.5 bg-white">
+              {themas.map(x => <option key={x.id} value={x.id}>{x.naam}</option>)}
+            </select>
+            <div className="flex gap-2">
+              <button onClick={() => { onBewerk(kaart.id, { vraag: v.trim() || kaart.vraag, antwoord: a.trim() || kaart.antwoord, thema: th }); setEdit(false); }}
+                className="rounded-xl px-3 py-1.5 text-white font-extrabold text-xs" style={{ background: '#58cc02' }}>Opslaan</button>
+              <button onClick={() => { setEdit(false); setV(kaart.vraag); setA(kaart.antwoord); setTh(kaart.thema); }}
+                className="rounded-xl px-3 py-1.5 font-extrabold text-xs text-gray-500 border border-gray-200">Annuleer</button>
+            </div>
+          </div>
+        );
+      }
+      return (
+        <div>
+          <div className="font-bold text-sm">{kaart.vraag}</div>
+          <div className="text-sm text-gray-600 mt-0.5">{kaart.antwoord}</div>
+          <div className="flex items-center gap-3 mt-1.5 text-[11px] font-bold">
+            <span className="px-2 py-0.5 rounded-full" style={{ background: t.kleur + '22', color: t.kleur }}>{t.naam}</span>
+            {geleerd && <span className="text-[#58cc02]" title="Zit in je langetermijngeheugen">🌱 geleerd</span>}
+            <button onClick={() => setEdit(true)} className="text-[#1cb0f6]">✎ bewerken</button>
+            <button onClick={() => onVerwijder(kaart.id)} className="text-gray-300">✕</button>
+          </div>
+        </div>
+      );
+    }
+
+    // ---------- Thema's & tijdlijn ----------
+    function ThemaView({ state, onNotitie, onVerwijderNotitie, onVerwijderKaart, onBewerkKaart, onThemaToe }) {
+      const [open, setOpen] = useState(null);
+      const [zoek, setZoek] = useState('');
+
+      const treffers = useMemo(() => {
+        const q = zoek.trim().toLowerCase();
+        if (!q) return null;
+        return state.cards.filter(c => (c.vraag + ' ' + c.antwoord + ' ' + (c.bron || '')).toLowerCase().includes(q));
+      }, [zoek, state.cards]);
+
+      if (open) {
+        return <ThemaDetail thema={open} state={state} onTerug={() => setOpen(null)}
+          onNotitie={onNotitie} onVerwijderNotitie={onVerwijderNotitie} onVerwijderKaart={onVerwijderKaart} onBewerkKaart={onBewerkKaart} />;
+      }
+
+      return (
+        <div className="py-4 space-y-3">
+          <div className="font-extrabold text-xl">🧵 Thema's</div>
+          <input value={zoek} onChange={e => setZoek(e.target.value)} placeholder="🔍 Zoek in al je kaarten…"
+            className="w-full border border-gray-200 rounded-2xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1cb0f6]/40" />
+
+          {treffers !== null ? (
+            <div className="space-y-2">
+              <div className="text-xs text-gray-500">{treffers.length} kaart{treffers.length === 1 ? '' : 'en'} gevonden</div>
+              {treffers.map(c => (
+                <div key={c.id} className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
+                  <KaartBewerker kaart={c} themas={state.themas} onBewerk={onBewerkKaart} onVerwijder={onVerwijderKaart} />
+                </div>
+              ))}
+              {treffers.length === 0 && <div className="text-center text-gray-400 text-sm py-8">Niets gevonden.</div>}
+            </div>
+          ) : (
+            <>
+              <div className="text-xs text-gray-500 -mt-1">Volg verhaallijnen over weken. Klik een thema voor de tijdlijn.</div>
+              {state.themas.map(t => {
+                const kaarten = state.cards.filter(c => c.thema === t.id);
+                const aantalN = state.notes.filter(n => n.thema === t.id).length;
+                const geleerd = kaarten.filter(isGeleerd).length;
+                return (
+                  <button key={t.id} onClick={() => setOpen(t)}
+                    className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-3 text-left active:translate-y-px">
+                    <div className="w-3 h-10 rounded-full" style={{ background: t.kleur }} />
+                    <div className="flex-1">
+                      <div className="font-extrabold">{t.naam}</div>
+                      <div className="text-xs text-gray-500">
+                        {kaarten.length} kaart{kaarten.length === 1 ? '' : 'en'} · {aantalN} notitie{aantalN === 1 ? '' : 's'}
+                        {geleerd > 0 && <span className="text-[#58cc02]"> · 🌱 {geleerd} geleerd</span>}
+                      </div>
+                    </div>
+                    <span className="text-gray-300 text-xl">›</span>
+                  </button>
+                );
+              })}
+            </>
+          )}
+        </div>
+      );
+    }
+    function ThemaDetail({ thema, state, onTerug, onNotitie, onVerwijderNotitie, onVerwijderKaart, onBewerkKaart }) {
+      const [notitie, setNotitie] = useState('');
+      // Tijdlijn = kaarten + notities samen, nieuw bovenaan.
+      const items = useMemo(() => {
+        const k = state.cards.filter(c => c.thema === thema.id).map(c => ({ type: 'kaart', datum: c.aangemaakt, data: c }));
+        const n = state.notes.filter(x => x.thema === thema.id).map(x => ({ type: 'notitie', datum: x.datum, data: x }));
+        return [...k, ...n].sort((a, b) => (b.datum + b.data.id).localeCompare(a.datum + a.data.id));
+      }, [state.cards, state.notes, thema.id]);
+
+      return (
+        <div className="py-4 space-y-4">
+          <button onClick={onTerug} className="text-sm font-bold text-gray-500">‹ Terug</button>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-8 rounded-full" style={{ background: thema.kleur }} />
+            <div className="font-extrabold text-xl">{thema.naam}</div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div className="text-xs font-extrabold text-gray-500 mb-1 uppercase">Notitie toevoegen aan deze verhaallijn</div>
+            <textarea value={notitie} onChange={e => setNotitie(e.target.value)} rows={2}
+              placeholder="Bijv. nieuwe ontwikkeling in dit dossier…"
+              className="w-full border border-gray-200 rounded-2xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1cb0f6]/40" />
+            <button onClick={() => { if (notitie.trim()) { onNotitie(thema.id, notitie.trim()); setNotitie(''); } }}
+              className="mt-2 rounded-2xl px-4 py-2 font-extrabold text-white text-sm" style={{ background: thema.kleur }}>Opslaan</button>
+          </div>
+
+          <div className="space-y-3">
+            {items.length === 0 && <div className="text-center text-gray-400 text-sm py-8">Nog niets in deze verhaallijn.</div>}
+            {items.map(it => (
+              <div key={it.data.id} className="relative pl-5">
+                <div className="absolute left-0 top-2 w-2.5 h-2.5 rounded-full" style={{ background: thema.kleur }} />
+                <div className="absolute left-[4px] top-4 bottom-0 w-px bg-gray-200" />
+                <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
+                  <div className="flex justify-between items-start gap-2 mb-1">
+                    <div className="text-[11px] font-bold text-gray-400">{fmtKort(it.datum)} · {it.type === 'kaart' ? '🃏 kaart' : '🧵 notitie'}</div>
+                    {it.type === 'notitie' && (
+                      <button onClick={() => onVerwijderNotitie(it.data.id)} className="text-gray-300 text-xs">✕</button>
+                    )}
+                  </div>
+                  {it.type === 'kaart' ? (
+                    <KaartBewerker kaart={it.data} themas={state.themas} onBewerk={onBewerkKaart} onVerwijder={onVerwijderKaart} />
+                  ) : (
+                    <div className="text-sm text-gray-700">{it.data.tekst}</div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // ---------- Weekquiz ----------
+    function QuizView({ cards, themas, onSluiten, onKlaar }) {
+      // Kies tot 10 kaarten; meerkeuze met afleiders uit andere antwoorden.
+      const vragen = useMemo(() => {
+        const pool = [...cards].sort(() => Math.random() - 0.5).slice(0, 10);
+        return pool.map(c => {
+          const afleiders = cards.filter(x => x.id !== c.id).map(x => x.antwoord);
+          const opties = [c.antwoord, ...afleiders.sort(() => Math.random() - 0.5).slice(0, 3)].sort(() => Math.random() - 0.5);
+          return { kaart: c, opties, juist: c.antwoord };
+        });
+      }, []);
+      const [i, setI] = useState(0);
+      const [score, setScore] = useState(0);
+      const [gekozen, setGekozen] = useState(null);
+      const [klaar, setKlaar] = useState(false);
+      const gerapporteerd = useRef(false);
+
+      if (cards.length < 4) {
+        return <Overlay onSluiten={onSluiten} titel="Weekquiz">
+          <div className="text-center text-gray-500 py-8">Maak eerst minstens 4 kaartjes, dan kun je quizzen. 🃏</div>
+        </Overlay>;
+      }
+
+      if (klaar) {
+        if (!gerapporteerd.current) { gerapporteerd.current = true; onKlaar(score, vragen.length); }
+        const perfect = score === vragen.length;
+        return <Overlay onSluiten={onSluiten} titel="Weekquiz">
+          <div className="text-center py-6 space-y-3">
+            <div className="text-6xl">{perfect ? '🏆' : score >= vragen.length / 2 ? '👏' : '💪'}</div>
+            <div className="font-extrabold text-2xl">{score} / {vragen.length} goed</div>
+            <div className="text-gray-500 text-sm">{perfect ? 'Foutloos! Badge verdiend.' : 'Mooi — de fouten komen vanzelf terug in je herhalingen.'}</div>
+            <button onClick={onSluiten} className="rounded-2xl px-6 py-3 font-extrabold text-white" style={{ background: ACCENT }}>Klaar</button>
+          </div>
+        </Overlay>;
+      }
+
+      const v = vragen[i];
+      const t = themaById(themas, v.kaart.thema);
+      function kies(optie) {
+        if (gekozen) return;
+        setGekozen(optie);
+        if (optie === v.juist) setScore(s => s + 1);
+        setTimeout(() => {
+          if (i + 1 >= vragen.length) setKlaar(true);
+          else { setI(i + 1); setGekozen(null); }
+        }, 900);
+      }
+
+      return (
+        <Overlay onSluiten={onSluiten} titel={`Vraag ${i + 1}/${vragen.length}`}>
+          <div className="space-y-4">
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-full rounded-full transition-all" style={{ width: ((i) / vragen.length * 100) + '%', background: ACCENT }} />
+            </div>
+            <span className="inline-block text-xs font-extrabold px-2.5 py-1 rounded-full" style={{ background: t.kleur + '22', color: t.kleur }}>{t.naam}</span>
+            <div className="font-extrabold text-lg">{v.kaart.vraag}</div>
+            <div className="space-y-2">
+              {v.opties.map((o, idx) => {
+                let cls = 'bg-white border-gray-200';
+                if (gekozen) {
+                  if (o === v.juist) cls = 'bg-[#e8f9d6] border-[#58cc02]';
+                  else if (o === gekozen) cls = 'bg-[#ffe3e3] border-[#ff4b4b]';
+                }
+                return (
+                  <button key={idx} onClick={() => kies(o)} disabled={!!gekozen}
+                    className={'w-full text-left border-2 rounded-2xl p-3 text-sm font-medium active:translate-y-px ' + cls}>
+                    {o}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </Overlay>
+      );
+    }
+    function Overlay({ titel, onSluiten, children }) {
+      return (
+        <div className="fixed inset-0 z-50 bg-white max-w-xl mx-auto flex flex-col">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+            <div className="font-extrabold">{titel}</div>
+            <button onClick={onSluiten} className="text-gray-400 text-xl">✕</button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">{children}</div>
+        </div>
+      );
+    }
+
+    // ---------- Krant importeren (PDF → kaartjes) ----------
+    function ImportView({ themas, onToevoegen, onSluiten }) {
+      const [fase, setFase] = useState('kies'); // kies | lezen | genereren | review | fout
+      const [fout, setFout] = useState('');
+      const [voortgang, setVoortgang] = useState({ p: 0, n: 0 });
+      const [aantal, setAantal] = useState(8);
+      const [suggesties, setSuggesties] = useState([]);
+      const fileRef = useRef(null);
+
+      async function verwerk(file) {
+        if (!file) return;
+        setFout('');
+        try {
+          setFase('lezen');
+          const tekst = await pdfNaarTekst(file, (p, n) => setVoortgang({ p, n }));
+          if (tekst.trim().length < 200) {
+            setFout('Er kwam nauwelijks tekst uit deze PDF. Is het misschien een gescande (afbeelding-)PDF?');
+            setFase('fout'); return;
+          }
+          setFase('genereren');
+          const kaarten = await genereerKaarten(tekst, aantal, themas);
+          if (!kaarten.length) {
+            setFout('Geen kaarten teruggekregen. Probeer het opnieuw of met een andere editie.');
+            setFase('fout'); return;
+          }
+          setSuggesties(kaarten.map(k => ({ ...k, keep: true })));
+          setFase('review');
+        } catch (e) {
+          setFout(e.message || 'Er ging iets mis.');
+          setFase('fout');
+        }
+      }
+
+      function wijzig(i, veld, waarde) {
+        setSuggesties(s => s.map((k, idx) => idx === i ? { ...k, [veld]: waarde } : k));
+      }
+      const geselecteerd = suggesties.filter(k => k.keep && k.vraag.trim() && k.antwoord.trim());
+
+      return (
+        <Overlay titel="📰 Krant importeren" onSluiten={onSluiten}>
+          {fase === 'kies' && (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Kies de PDF van de NRC-editie van vandaag. De app leest de tekst en laat
+                er automatisch kaartjes van maken — die jij daarna goedkeurt.
+              </p>
+              <div>
+                <div className="text-xs font-extrabold text-gray-500 mb-2 uppercase">Aantal kaartjes</div>
+                <div className="flex gap-2">
+                  {[5, 8, 12, 15].map(n => (
+                    <button key={n} onClick={() => setAantal(n)}
+                      className={'flex-1 rounded-2xl py-2 font-extrabold border-2 ' + (aantal === n ? 'text-white' : 'text-gray-600 border-gray-200')}
+                      style={aantal === n ? { background: ACCENT, borderColor: ACCENT } : {}}>{n}</button>
+                  ))}
+                </div>
+              </div>
+              <input ref={fileRef} type="file" accept="application/pdf" className="hidden"
+                onChange={e => verwerk(e.target.files[0])} />
+              <button onClick={() => fileRef.current.click()}
+                className="w-full rounded-2xl py-4 font-extrabold text-white text-lg active:translate-y-px" style={{ background: ACCENT }}>
+                📄 Kies krant-PDF
+              </button>
+              <p className="text-[11px] text-gray-400 text-center">
+                De PDF-tekst wordt verstuurd naar je eigen server-functie die Claude aanroept.
+                Vereist een ingestelde API-sleutel (zie KAARTEN.md).
+              </p>
+            </div>
+          )}
+
+          {(fase === 'lezen' || fase === 'genereren') && (
+            <div className="py-16 text-center space-y-3">
+              <div className="text-5xl animate-pulse">{fase === 'lezen' ? '📖' : '🧠'}</div>
+              <div className="font-extrabold">
+                {fase === 'lezen'
+                  ? `PDF lezen…${voortgang.n ? ` (pagina ${voortgang.p}/${voortgang.n})` : ''}`
+                  : 'Claude maakt kaartjes…'}
+              </div>
+              <div className="text-sm text-gray-500">{fase === 'genereren' ? 'Dit duurt meestal 10–30 seconden.' : 'Even geduld.'}</div>
+            </div>
+          )}
+
+          {fase === 'fout' && (
+            <div className="py-12 text-center space-y-4">
+              <div className="text-5xl">😕</div>
+              <div className="font-extrabold">Het lukte niet</div>
+              <div className="text-sm text-gray-500">{fout}</div>
+              <button onClick={() => { setFase('kies'); setFout(''); }}
+                className="rounded-2xl px-5 py-3 font-extrabold text-white" style={{ background: ACCENT }}>Opnieuw</button>
+            </div>
+          )}
+
+          {fase === 'review' && (
+            <div className="space-y-3">
+              <div className="text-sm text-gray-600">
+                {suggesties.length} voorstellen. Vink uit wat je niet wilt, pas aan waar nodig, en voeg ze toe.
+              </div>
+              {suggesties.map((k, i) => {
+                const t = themaById(themas, k.thema);
+                return (
+                  <div key={i} className={'rounded-2xl border p-3 ' + (k.keep ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100 opacity-60')}>
+                    <div className="flex items-start gap-2">
+                      <input type="checkbox" checked={k.keep} onChange={e => wijzig(i, 'keep', e.target.checked)} className="mt-1 w-5 h-5 accent-[#1cb0f6]" />
+                      <div className="flex-1 space-y-2">
+                        <textarea value={k.vraag} onChange={e => wijzig(i, 'vraag', e.target.value)} rows={2}
+                          className="w-full text-sm font-bold border border-gray-200 rounded-xl p-2" />
+                        <textarea value={k.antwoord} onChange={e => wijzig(i, 'antwoord', e.target.value)} rows={2}
+                          className="w-full text-sm border border-gray-200 rounded-xl p-2" />
+                        <div className="flex items-center gap-2">
+                          <select value={k.thema} onChange={e => wijzig(i, 'thema', e.target.value)}
+                            className="text-xs border border-gray-200 rounded-lg p-1.5 bg-white" style={{ color: t.kleur }}>
+                            {themas.map(x => <option key={x.id} value={x.id}>{x.naam}</option>)}
+                          </select>
+                          <span className="text-[11px] text-gray-400 truncate">{k.bron}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="sticky bottom-0 bg-white pt-2 pb-1">
+                <button onClick={() => { onToevoegen(geselecteerd); onSluiten(); }} disabled={geselecteerd.length === 0}
+                  className="w-full rounded-2xl py-4 font-extrabold text-white text-lg disabled:opacity-40 active:translate-y-px" style={{ background: '#58cc02' }}>
+                  ✓ {geselecteerd.length} kaart{geselecteerd.length === 1 ? '' : 'en'} toevoegen
+                </button>
+              </div>
+            </div>
+          )}
+        </Overlay>
+      );
+    }
+
+    // ---------- Profiel / Ik ----------
+    function ProfielView({ state, game, onDagDoel, onImport, onReset }) {
+      const stats = useMemo(() => {
+        const perThema = {};
+        for (const c of state.cards) perThema[c.thema] = (perThema[c.thema] || 0) + 1;
+        return {
+          kaarten: state.cards.length,
+          herhalingen: game.herhalingenTotaal || 0,
+          streak: game.streak || 0,
+          syntheseDagen: Object.values(state.journal).filter(v => v && v.trim()).length,
+          maxThema: Math.max(0, ...Object.values(perThema)),
+          quizPerfect: !!game.quizPerfect,
+          geleerd: state.cards.filter(isGeleerd).length,
+        };
+      }, [state, game]);
+
+      // Laatste 14 dagen herhaal-activiteit, voor de heatmap.
+      const heatmap = useMemo(() => {
+        const h = state.history || {};
+        const dagen = [];
+        for (let i = 13; i >= 0; i--) {
+          const d = addDaysStr(todayStr(), -i);
+          dagen.push({ d, n: h[d] || 0 });
+        }
+        return dagen;
+      }, [state.history]);
+      const retentiePct = stats.kaarten ? Math.round(stats.geleerd / stats.kaarten * 100) : 0;
+      const fileRef = useRef(null);
+
+      function exporteer() {
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'nieuwsgeheugen-backup-' + todayStr() + '.json';
+        a.click(); URL.revokeObjectURL(url);
+      }
+      function kiesBestand(e) {
+        const f = e.target.files[0]; if (!f) return;
+        const r = new FileReader();
+        r.onload = () => { try { onImport(JSON.parse(r.result)); } catch { onImport(null); } };
+        r.readAsText(f);
+      }
+
+      return (
+        <div className="py-4 space-y-4">
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="relative shrink-0">
+              <Ring pct={xpInNiveau(game.xp)} kleur={ACCENT} groot />
+              <div className="absolute inset-0 flex items-center justify-center text-2xl font-extrabold">{niveauVan(game.xp)}</div>
+            </div>
+            <div>
+              <div className="font-extrabold text-lg">Niveau {niveauVan(game.xp)}</div>
+              <div className="text-sm text-gray-500">{game.xp} XP · nog {100 - xpInNiveau(game.xp)} tot volgend niveau</div>
+              <div className="text-sm text-orange-500 font-bold mt-1">🔥 {game.streak || 0} dagen streak</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <Stat icon="🃏" waarde={stats.kaarten} label="kaarten" />
+            <Stat icon="🔁" waarde={stats.herhalingen} label="herhalingen" />
+            <Stat icon="✍️" waarde={stats.syntheseDagen} label="syntheses" />
+          </div>
+
+          {/* Langetermijngeheugen */}
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-2">
+              <div className="font-extrabold">🌱 Langetermijngeheugen</div>
+              <div className="text-sm font-extrabold text-[#58cc02]">{stats.geleerd}/{stats.kaarten}</div>
+            </div>
+            <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-full rounded-full transition-all" style={{ width: retentiePct + '%', background: '#58cc02' }} />
+            </div>
+            <div className="text-xs text-gray-500 mt-2">
+              Kaarten met een herhaalinterval van 3 weken of meer tellen als &lsquo;geleerd&rsquo; — die zitten stevig in je geheugen.
+            </div>
+          </div>
+
+          {/* Activiteit-heatmap (14 dagen) */}
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="font-extrabold mb-3">🔥 Laatste 14 dagen</div>
+            <div className="flex gap-1.5 justify-between">
+              {heatmap.map(({ d, n }) => {
+                const niveau = n === 0 ? 0 : n < 5 ? 1 : n < 10 ? 2 : n < 20 ? 3 : 4;
+                const kleuren = ['#eef0f2', '#cdeafd', '#86cdfb', '#39aef6', '#1c7fd6'];
+                const vandaag = d === todayStr();
+                return (
+                  <div key={d} className="flex-1 flex flex-col items-center gap-1">
+                    <div title={`${fmtKort(d)}: ${n} herhaling${n === 1 ? '' : 'en'}`}
+                      className={'w-full aspect-square rounded-md ' + (vandaag ? 'ring-2 ring-[#1cb0f6]' : '')}
+                      style={{ background: kleuren[niveau] }} />
+                  </div>
+                );
+              })}
+            </div>
+            <div className="text-[10px] text-gray-400 mt-2 text-center">elke kolom is een dag · donkerder = meer herhaald</div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="font-extrabold mb-3">🏅 Badges</div>
+            <div className="grid grid-cols-4 gap-3">
+              {BADGES.map(b => {
+                const behaald = b.test(stats);
+                return (
+                  <div key={b.id} title={b.uitleg} className={'flex flex-col items-center text-center ' + (behaald ? '' : 'opacity-30 grayscale')}>
+                    <div className="text-3xl">{b.icon}</div>
+                    <div className="text-[10px] font-bold mt-1 leading-tight">{b.titel}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="font-extrabold mb-2">⚙️ Dagdoel</div>
+            <div className="flex items-center gap-2">
+              {[5, 10, 15, 20].map(n => (
+                <button key={n} onClick={() => onDagDoel(n)}
+                  className={'flex-1 rounded-2xl py-2 font-extrabold border-2 ' + (game.dagDoel === n ? 'text-white' : 'text-gray-600 border-gray-200')}
+                  style={game.dagDoel === n ? { background: ACCENT, borderColor: ACCENT } : {}}>{n}</button>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 space-y-2">
+            <div className="font-extrabold mb-1">💾 Jouw data (blijft van jou)</div>
+            <div className="text-xs text-gray-500 mb-2">Alles staat lokaal in deze browser. Maak een back-up of zet 'm op een ander apparaat.</div>
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={exporteer} className="rounded-2xl py-2.5 font-extrabold border-2 border-gray-200 text-gray-700">⬇️ Exporteren</button>
+              <button onClick={() => fileRef.current.click()} className="rounded-2xl py-2.5 font-extrabold border-2 border-gray-200 text-gray-700">⬆️ Importeren</button>
+              <input ref={fileRef} type="file" accept="application/json" className="hidden" onChange={kiesBestand} />
+            </div>
+            <button onClick={() => { if (confirm('Alles wissen en opnieuw beginnen?')) onReset(); }}
+              className="w-full rounded-2xl py-2.5 font-extrabold text-[#ff4b4b] border-2 border-[#ffd5d5] mt-1">Opnieuw beginnen</button>
+          </div>
+
+          <div className="text-center text-xs text-gray-400 pt-2">
+            <a href="/" className="underline">← Nieuwsticker</a> · <a href="/woo/" className="underline">Woo Quest</a>
+          </div>
+        </div>
+      );
+    }
+    function Stat({ icon, waarde, label }) {
+      return (
+        <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
+          <div className="text-xl">{icon}</div>
+          <div className="font-extrabold text-lg">{waarde}</div>
+          <div className="text-[11px] text-gray-400">{label}</div>
+        </div>
+      );
+    }
+
+    // ---------- onderbalk ----------
+    function NavBalk({ tab, setTab, due }) {
+      const items = [
+        { id: 'vandaag', icon: '🏠', label: 'Vandaag' },
+        { id: 'leren', icon: '🎴', label: 'Leren', badge: due },
+        { id: 'nieuw', icon: '➕', label: 'Nieuw' },
+        { id: 'themas', icon: '🧵', label: "Thema's" },
+        { id: 'ik', icon: '🏅', label: 'Ik' },
+      ];
+      return (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 safe-bottom">
+          <div className="max-w-xl mx-auto grid grid-cols-5">
+            {items.map(it => (
+              <button key={it.id} onClick={() => setTab(it.id)}
+                className={'relative py-2.5 flex flex-col items-center text-[11px] font-bold ' + (tab === it.id ? 'text-[#1cb0f6]' : 'text-gray-400')}>
+                <span className="text-xl">{it.icon}</span>
+                {it.label}
+                {it.badge > 0 && (
+                  <span className="absolute top-1.5 right-1/2 translate-x-4 bg-[#ff4b4b] text-white text-[9px] font-extrabold rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center">{it.badge}</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
