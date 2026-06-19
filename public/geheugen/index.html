@@ -79,6 +79,43 @@
 
     const themaById = (themas, id) => themas.find(t => t.id === id) || { naam: 'Overig', kleur: '#9aa0a6' };
 
+    // ---------- PDF → tekst (pdf.js via CDN) ----------
+    const PDFJS_VERSIE = '4.7.76';
+    const MAX_PDF_TEKST = 240000; // tekens; gelijk aan de servergrens
+    let pdfjsLib = null;
+    async function laadPdfjs() {
+      if (pdfjsLib) return pdfjsLib;
+      const base = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_VERSIE}/build/`;
+      pdfjsLib = await import(base + 'pdf.min.mjs');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = base + 'pdf.worker.min.mjs';
+      return pdfjsLib;
+    }
+    async function pdfNaarTekst(file, onVoortgang) {
+      const lib = await laadPdfjs();
+      const buf = await file.arrayBuffer();
+      const pdf = await lib.getDocument({ data: buf }).promise;
+      let tekst = '';
+      for (let p = 1; p <= pdf.numPages; p++) {
+        const page = await pdf.getPage(p);
+        const content = await page.getTextContent();
+        tekst += content.items.map(it => it.str).join(' ') + '\n\n';
+        onVoortgang && onVoortgang(p, pdf.numPages);
+        if (tekst.length > MAX_PDF_TEKST) break;
+      }
+      return tekst.slice(0, MAX_PDF_TEKST);
+    }
+    // ---------- kaarten laten genereren door de server (Claude) ----------
+    async function genereerKaarten(tekst, aantal, themas) {
+      const res = await fetch('/api/kaarten', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tekst, aantal, themas }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || ('Serverfout ' + res.status));
+      return data.kaarten || [];
+    }
+
     // ---------- spaced repetition (eigen SM-2-variant, geen externe app) ----------
     // 4 knoppen vertalen naar een interval in dagen. 'Weer' laat de kaart binnen
     // dezelfde sessie terugkomen; de rest plant 'm vooruit op basis van 'ease'.
@@ -224,6 +261,19 @@
         });
         melding('Kaart toegevoegd · +' + XP.kaart + ' XP 🃏');
       }
+      function voegKaartenToe(lijst) {
+        if (!lijst.length) return;
+        update(s => {
+          for (const k of lijst) {
+            s.cards.push({ id: uid(), vraag: k.vraag, antwoord: k.antwoord, thema: k.thema, bron: k.bron || '', tags: [], aangemaakt: todayStr(), srs: nieuweSrs() });
+          }
+          s.game = markActief(resetDagteller(s.game));
+          s.game.xp += XP.kaart * lijst.length;
+          return s;
+        });
+        melding(lijst.length + ' kaarten toegevoegd · +' + (XP.kaart * lijst.length) + ' XP 📰');
+        vier();
+      }
       function verwijderKaart(id) {
         update(s => { s.cards = s.cards.filter(c => c.id !== id); return s; });
       }
@@ -300,7 +350,7 @@
             {tab === 'vandaag' && (
               <VandaagView state={state} game={game} due={dueKaarten}
                 onStart={() => setTab('leren')} onQuiz={() => setTab('quiz')}
-                onSynthese={bewaarSynthese} />
+                onSynthese={bewaarSynthese} onImport={() => setTab('import')} />
             )}
             {tab === 'leren' && (
               <LeerView due={dueKaarten} onBeoordeel={beoordeelKaart} dagDoel={game.dagDoel}
@@ -308,7 +358,7 @@
                 onNaarNieuw={() => setTab('nieuw')} />
             )}
             {tab === 'nieuw' && (
-              <NieuwView themas={state.themas} onToevoegen={voegKaartToe} onThemaToe={voegThemaToe} />
+              <NieuwView themas={state.themas} onToevoegen={voegKaartToe} onThemaToe={voegThemaToe} onImport={() => setTab('import')} />
             )}
             {tab === 'themas' && (
               <ThemaView state={state} onNotitie={voegNotitieToe} onVerwijderNotitie={verwijderNotitie}
@@ -323,6 +373,10 @@
           {tab === 'quiz' && (
             <QuizView cards={state.cards} themas={state.themas} onSluiten={() => setTab('vandaag')}
               onKlaar={(score, totaal) => { quizKlaar(score, totaal); if (totaal && score === totaal) vier(); }} />
+          )}
+
+          {tab === 'import' && (
+            <ImportView themas={state.themas} onToevoegen={voegKaartenToe} onSluiten={() => setTab('vandaag')} />
           )}
 
           <NavBalk tab={tab} setTab={setTab} due={dueKaarten.length} />
@@ -352,7 +406,7 @@
     }
 
     // ---------- Vandaag ----------
-    function VandaagView({ state, game, due, onStart, onQuiz, onSynthese }) {
+    function VandaagView({ state, game, due, onStart, onQuiz, onSynthese, onImport }) {
       const [tekst, setTekst] = useState(state.journal[todayStr()] || '');
       const pct = game.dagDoel ? (game.reviews.count / game.dagDoel) * 100 : 0;
       const klaarMetDoel = game.reviews.count >= game.dagDoel;
@@ -362,6 +416,20 @@
       return (
         <div className="py-4 space-y-4">
           <div className="text-gray-500 text-sm font-bold">{groet} · {fmtLang(todayStr())}</div>
+
+          {/* Krant importeren — automatische kaartjes */}
+          <button onClick={onImport}
+            className="w-full text-left rounded-3xl p-5 shadow-sm text-white active:translate-y-px"
+            style={{ background: 'linear-gradient(135deg,#1cb0f6,#2b70c9)' }}>
+            <div className="flex items-center gap-3">
+              <div className="text-3xl">📰</div>
+              <div className="flex-1">
+                <div className="font-extrabold text-lg leading-tight">Krant van vandaag importeren</div>
+                <div className="text-sm text-white/90">Kies de NRC-PDF → automatisch kaartjes voorgesteld</div>
+              </div>
+              <span className="text-2xl">›</span>
+            </div>
+          </button>
 
           {/* Dagdoel */}
           <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
@@ -508,7 +576,7 @@
     }
 
     // ---------- Nieuw kaartje ----------
-    function NieuwView({ themas, onToevoegen, onThemaToe }) {
+    function NieuwView({ themas, onToevoegen, onThemaToe, onImport }) {
       const [vraag, setVraag] = useState('');
       const [antwoord, setAntwoord] = useState('');
       const [thema, setThema] = useState(themas[0]?.id || 'overig');
@@ -530,6 +598,12 @@
         <div className="py-4 space-y-4">
           <div className="font-extrabold text-xl">➕ Nieuw kaartje</div>
           <div className="text-xs text-gray-500 -mt-2">Maak 3–5 kaartjes per editie. Eén goed onthouden feit is meer waard dan tien half vergeten.</div>
+
+          <button onClick={onImport}
+            className="w-full rounded-2xl border-2 border-dashed border-[#1cb0f6] text-[#1cb0f6] font-extrabold py-3 active:translate-y-px">
+            📰 Of: importeer de krant-PDF → kaartjes automatisch
+          </button>
+          <div className="text-center text-xs text-gray-400">— of maak er hieronder zelf één —</div>
 
           <Veld label="Vraag / voorkant">
             <textarea value={vraag} onChange={e => setVraag(e.target.value)} rows={2}
@@ -754,6 +828,137 @@
           </div>
           <div className="flex-1 overflow-y-auto p-4">{children}</div>
         </div>
+      );
+    }
+
+    // ---------- Krant importeren (PDF → kaartjes) ----------
+    function ImportView({ themas, onToevoegen, onSluiten }) {
+      const [fase, setFase] = useState('kies'); // kies | lezen | genereren | review | fout
+      const [fout, setFout] = useState('');
+      const [voortgang, setVoortgang] = useState({ p: 0, n: 0 });
+      const [aantal, setAantal] = useState(8);
+      const [suggesties, setSuggesties] = useState([]);
+      const fileRef = useRef(null);
+
+      async function verwerk(file) {
+        if (!file) return;
+        setFout('');
+        try {
+          setFase('lezen');
+          const tekst = await pdfNaarTekst(file, (p, n) => setVoortgang({ p, n }));
+          if (tekst.trim().length < 200) {
+            setFout('Er kwam nauwelijks tekst uit deze PDF. Is het misschien een gescande (afbeelding-)PDF?');
+            setFase('fout'); return;
+          }
+          setFase('genereren');
+          const kaarten = await genereerKaarten(tekst, aantal, themas);
+          if (!kaarten.length) {
+            setFout('Geen kaarten teruggekregen. Probeer het opnieuw of met een andere editie.');
+            setFase('fout'); return;
+          }
+          setSuggesties(kaarten.map(k => ({ ...k, keep: true })));
+          setFase('review');
+        } catch (e) {
+          setFout(e.message || 'Er ging iets mis.');
+          setFase('fout');
+        }
+      }
+
+      function wijzig(i, veld, waarde) {
+        setSuggesties(s => s.map((k, idx) => idx === i ? { ...k, [veld]: waarde } : k));
+      }
+      const geselecteerd = suggesties.filter(k => k.keep && k.vraag.trim() && k.antwoord.trim());
+
+      return (
+        <Overlay titel="📰 Krant importeren" onSluiten={onSluiten}>
+          {fase === 'kies' && (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Kies de PDF van de NRC-editie van vandaag. De app leest de tekst en laat
+                er automatisch kaartjes van maken — die jij daarna goedkeurt.
+              </p>
+              <div>
+                <div className="text-xs font-extrabold text-gray-500 mb-2 uppercase">Aantal kaartjes</div>
+                <div className="flex gap-2">
+                  {[5, 8, 12, 15].map(n => (
+                    <button key={n} onClick={() => setAantal(n)}
+                      className={'flex-1 rounded-2xl py-2 font-extrabold border-2 ' + (aantal === n ? 'text-white' : 'text-gray-600 border-gray-200')}
+                      style={aantal === n ? { background: ACCENT, borderColor: ACCENT } : {}}>{n}</button>
+                  ))}
+                </div>
+              </div>
+              <input ref={fileRef} type="file" accept="application/pdf" className="hidden"
+                onChange={e => verwerk(e.target.files[0])} />
+              <button onClick={() => fileRef.current.click()}
+                className="w-full rounded-2xl py-4 font-extrabold text-white text-lg active:translate-y-px" style={{ background: ACCENT }}>
+                📄 Kies krant-PDF
+              </button>
+              <p className="text-[11px] text-gray-400 text-center">
+                De PDF-tekst wordt verstuurd naar je eigen server-functie die Claude aanroept.
+                Vereist een ingestelde API-sleutel (zie KAARTEN.md).
+              </p>
+            </div>
+          )}
+
+          {(fase === 'lezen' || fase === 'genereren') && (
+            <div className="py-16 text-center space-y-3">
+              <div className="text-5xl animate-pulse">{fase === 'lezen' ? '📖' : '🧠'}</div>
+              <div className="font-extrabold">
+                {fase === 'lezen'
+                  ? `PDF lezen…${voortgang.n ? ` (pagina ${voortgang.p}/${voortgang.n})` : ''}`
+                  : 'Claude maakt kaartjes…'}
+              </div>
+              <div className="text-sm text-gray-500">{fase === 'genereren' ? 'Dit duurt meestal 10–30 seconden.' : 'Even geduld.'}</div>
+            </div>
+          )}
+
+          {fase === 'fout' && (
+            <div className="py-12 text-center space-y-4">
+              <div className="text-5xl">😕</div>
+              <div className="font-extrabold">Het lukte niet</div>
+              <div className="text-sm text-gray-500">{fout}</div>
+              <button onClick={() => { setFase('kies'); setFout(''); }}
+                className="rounded-2xl px-5 py-3 font-extrabold text-white" style={{ background: ACCENT }}>Opnieuw</button>
+            </div>
+          )}
+
+          {fase === 'review' && (
+            <div className="space-y-3">
+              <div className="text-sm text-gray-600">
+                {suggesties.length} voorstellen. Vink uit wat je niet wilt, pas aan waar nodig, en voeg ze toe.
+              </div>
+              {suggesties.map((k, i) => {
+                const t = themaById(themas, k.thema);
+                return (
+                  <div key={i} className={'rounded-2xl border p-3 ' + (k.keep ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100 opacity-60')}>
+                    <div className="flex items-start gap-2">
+                      <input type="checkbox" checked={k.keep} onChange={e => wijzig(i, 'keep', e.target.checked)} className="mt-1 w-5 h-5 accent-[#1cb0f6]" />
+                      <div className="flex-1 space-y-2">
+                        <textarea value={k.vraag} onChange={e => wijzig(i, 'vraag', e.target.value)} rows={2}
+                          className="w-full text-sm font-bold border border-gray-200 rounded-xl p-2" />
+                        <textarea value={k.antwoord} onChange={e => wijzig(i, 'antwoord', e.target.value)} rows={2}
+                          className="w-full text-sm border border-gray-200 rounded-xl p-2" />
+                        <div className="flex items-center gap-2">
+                          <select value={k.thema} onChange={e => wijzig(i, 'thema', e.target.value)}
+                            className="text-xs border border-gray-200 rounded-lg p-1.5 bg-white" style={{ color: t.kleur }}>
+                            {themas.map(x => <option key={x.id} value={x.id}>{x.naam}</option>)}
+                          </select>
+                          <span className="text-[11px] text-gray-400 truncate">{k.bron}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="sticky bottom-0 bg-white pt-2 pb-1">
+                <button onClick={() => { onToevoegen(geselecteerd); onSluiten(); }} disabled={geselecteerd.length === 0}
+                  className="w-full rounded-2xl py-4 font-extrabold text-white text-lg disabled:opacity-40 active:translate-y-px" style={{ background: '#58cc02' }}>
+                  ✓ {geselecteerd.length} kaart{geselecteerd.length === 1 ? '' : 'en'} toevoegen
+                </button>
+              </div>
+            </div>
+          )}
+        </Overlay>
       );
     }
 
