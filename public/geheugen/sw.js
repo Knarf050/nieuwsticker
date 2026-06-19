@@ -1,6 +1,6 @@
 /* Nieuwsgeheugen service worker (gehost onder /geheugen/) — installeerbaar + offline.
    Verhoog CACHE bij elke wijziging om een verse versie uit te rollen. */
-const CACHE = 'nieuwsgeheugen-v3';
+const CACHE = 'nieuwsgeheugen-v4';
 const SHELL = [
   '/geheugen/', '/geheugen/index.html', '/geheugen/geheugen-data.js', '/geheugen/manifest.webmanifest',
   '/geheugen/icon-192.png', '/geheugen/icon-512.png', '/geheugen/icon-maskable-512.png', '/geheugen/apple-touch-icon.png'

@@ -1,12 +1,14 @@
 // Vercel Serverless Function — genereert flashcards uit de tekst van de dagelijkse
 // krant (PDF). De browser haalt de tekst uit de PDF (pdf.js) en stuurt die hierheen;
-// deze functie laat Claude er kaartjes van maken en geeft ze als JSON terug.
+// deze functie laat Google Gemini er kaartjes van maken en geeft ze als JSON terug.
+//
+// Waarom Gemini: Google AI Studio heeft een GRATIS tier voor de flash-modellen,
+// dus dit onderdeel kost (binnen de gratis limieten) niets.
 //
 // Benodigde omgevingsvariabele (Vercel → Settings → Environment Variables):
-//   ANTHROPIC_API_KEY   je Claude API-sleutel (zie KAARTEN.md)
+//   GEMINI_API_KEY   je gratis sleutel van https://aistudio.google.com/apikey
 // Optioneel:
-//   KAARTEN_MODEL       model-id (standaard claude-opus-4-8; bijv. claude-haiku-4-5 = goedkoper)
-import Anthropic from '@anthropic-ai/sdk';
+//   GEMINI_MODEL     model-id (standaard gemini-2.0-flash; bijv. gemini-2.5-flash)
 
 const MAX_TEKST = 240000; // tekens; ruim genoeg voor een hele krant, binnen de body-limiet
 
@@ -17,9 +19,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Gebruik POST' });
   }
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return res.status(503).json({ error: 'ANTHROPIC_API_KEY ontbreekt op de server. Zie KAARTEN.md.' });
+    return res.status(503).json({ error: 'GEMINI_API_KEY ontbreekt op de server. Zie KAARTEN.md.' });
   }
 
   let body;
@@ -40,20 +42,19 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Te weinig leesbare tekst uit de PDF gehaald.' });
   }
 
+  // Gemini-schema (OpenAPI-subset, types in HOOFDLETTERS) — garandeert geldige JSON.
   const schema = {
-    type: 'object',
-    additionalProperties: false,
+    type: 'OBJECT',
     properties: {
       kaarten: {
-        type: 'array',
+        type: 'ARRAY',
         items: {
-          type: 'object',
-          additionalProperties: false,
+          type: 'OBJECT',
           properties: {
-            vraag: { type: 'string', description: 'Korte, concrete vraag (voorkant)' },
-            antwoord: { type: 'string', description: 'Bondig antwoord in eigen woorden (achterkant)' },
-            thema: { type: 'string', enum: themaIds, description: 'Een van de toegestane thema-ids' },
-            bron: { type: 'string', description: 'Korte bronverwijzing, bijv. "NRC" + onderwerp' },
+            vraag: { type: 'STRING' },
+            antwoord: { type: 'STRING' },
+            thema: { type: 'STRING', enum: themaIds },
+            bron: { type: 'STRING' },
           },
           required: ['vraag', 'antwoord', 'thema', 'bron'],
         },
@@ -74,29 +75,44 @@ export default async function handler(req, res) {
     '- Negeer advertenties, kolofon, tv-gids, weerbericht en pure opmaak/ruis uit de PDF-tekst.\n' +
     '- Schrijf in het Nederlands.';
 
-  try {
-    const client = new Anthropic({ apiKey });
-    const model = process.env.KAARTEN_MODEL || 'claude-opus-4-8';
+  const userPrompt =
+    `Hieronder staat de (ruwe) tekst van de NRC-editie van vandaag. Maak er ${aantal} flashcards van.\n\n` +
+    '=== KRANTTEKST ===\n' + tekst;
 
-    const message = await client.messages.create({
-      model,
-      max_tokens: 8000,
-      // effort 'low' houdt het snel en goedkoop; structured outputs garandeert geldige JSON.
-      output_config: { effort: 'low', format: { type: 'json_schema', schema } },
-      system: systemPrompt,
-      messages: [{
-        role: 'user',
-        content:
-          `Hieronder staat de (ruwe) tekst van de NRC-editie van vandaag. Maak er ${aantal} flashcards van.\n\n` +
-          '=== KRANTTEKST ===\n' + tekst,
-      }],
+  try {
+    const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        generationConfig: {
+          responseMimeType: 'application/json',
+          responseSchema: schema,
+          temperature: 0.4,
+          maxOutputTokens: 8192,
+        },
+      }),
     });
 
-    const txt = (message.content.find(b => b.type === 'text') || {}).text || '{}';
-    let data;
-    try { data = JSON.parse(txt); } catch { data = { kaarten: [] }; }
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      const melding = (data && data.error && data.error.message) || ('Gemini HTTP ' + r.status);
+      const status = r.status === 400 || r.status === 403 ? 401 : 502;
+      return res.status(status).json({ error: 'Kaarten genereren mislukt.', details: melding });
+    }
 
-    const kaarten = (Array.isArray(data.kaarten) ? data.kaarten : [])
+    // Met responseMimeType application/json is de tekst zuivere JSON.
+    const cand = (data.candidates && data.candidates[0]) || {};
+    const parts = (cand.content && cand.content.parts) || [];
+    const txt = parts.map(p => p.text || '').join('') || '{}';
+    let parsed;
+    try { parsed = JSON.parse(txt); } catch { parsed = { kaarten: [] }; }
+
+    const kaarten = (Array.isArray(parsed.kaarten) ? parsed.kaarten : [])
       .filter(k => k && k.vraag && k.antwoord)
       .map(k => ({
         vraag: String(k.vraag).trim(),
@@ -108,11 +124,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ kaarten, model });
   } catch (error) {
     console.error('kaarten error:', error);
-    const status = error && error.status === 401 ? 401 : 500;
-    const melding = status === 401
-      ? 'Claude API-sleutel ongeldig of geen toegang.'
-      : 'Kaarten genereren mislukt.';
-    return res.status(status).json({ error: melding, details: error && error.message });
+    return res.status(500).json({ error: 'Kaarten genereren mislukt.', details: error && error.message });
   }
 }
 
