@@ -100,8 +100,7 @@
     (function () {
       var root = document.getElementById('root');
       var articles = [];
-      var currentIndex = 0;
-      var rotateTimer = null;
+      var lastSig = '';
 
       function esc(s) {
         var d = document.createElement('div');
@@ -184,22 +183,13 @@
               '<a href="/geheugen/" style="display:inline-block;border:1px solid var(--ink);padding:8px 16px;border-radius:999px">📰 Onthoud wat je leest → Nieuwsgeheugen</a>' +
             '</div>' +
           '</div>';
-
-        startRotation();
       }
 
-      function startRotation() {
-        if (rotateTimer) clearInterval(rotateTimer);
-        if (articles.length === 0) return;
-        rotateTimer = setInterval(function () {
-          currentIndex = (currentIndex + 1) % articles.length;
-          var f = document.getElementById('featured');
-          if (f) f.innerHTML = leadHTML(articles[currentIndex]);
-        }, 6000);
-      }
-
-      function load() {
-        showLoading();
+      // isRefresh=true: stille achtergrond-verversing — geen laadscherm en
+      // alleen opnieuw renderen als het nieuws echt veranderd is, zodat de
+      // pagina niet verspringt tijdens het lezen.
+      function load(isRefresh) {
+        if (!isRefresh) showLoading();
         var controller = new AbortController();
         var timer = setTimeout(function () { controller.abort(); }, 12000);
         fetch('/api/news', { signal: controller.signal })
@@ -209,26 +199,28 @@
           })
           .then(function (data) {
             if (!Array.isArray(data)) throw new Error('Onverwacht antwoord');
-            articles = data;
-            currentIndex = 0;
-            if (articles.length === 0) {
-              showError('Geen nieuws beschikbaar op dit moment');
-            } else {
-              render();
+            if (data.length === 0) {
+              if (!isRefresh) showError('Geen nieuws beschikbaar op dit moment');
+              return;
             }
+            var sig = data.map(function (a) { return a.link; }).join('|');
+            if (sig === lastSig) return; // niets veranderd → niet opnieuw renderen
+            articles = data;
+            lastSig = sig;
+            render();
           })
           .catch(function (err) {
-            showError(err && err.name === 'AbortError' ? 'Het laden duurde te lang' : 'Fout bij laden nieuws');
+            if (!isRefresh) showError(err && err.name === 'AbortError' ? 'Het laden duurde te lang' : 'Fout bij laden nieuws');
           })
           .then(function () { clearTimeout(timer); });
       }
 
-      // Ververs elke 5 minuten
+      // Ververs stil elke 5 minuten (alleen opnieuw renderen bij nieuw nieuws)
       setInterval(function () {
-        if (document.getElementById('featured')) load();
+        if (document.getElementById('featured')) load(true);
       }, 300000);
 
-      load();
+      load(false);
     })();
   </script>
 </body>
