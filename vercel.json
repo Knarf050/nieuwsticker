@@ -4,6 +4,10 @@
       "memory": 1024,
       "maxDuration": 10
     },
+    "api/rss.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
     "api/notify.js": {
       "memory": 1024,
       "maxDuration": 30
