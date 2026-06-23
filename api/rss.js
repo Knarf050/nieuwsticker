@@ -30,12 +30,16 @@ export default async function handler(req, res) {
       const d = new Date(a.pubDate);
       const pub = isNaN(d.getTime()) ? now : d.toUTCString();
       const link = xmlEscape(a.link);
+      // Bron vóór de titel zodat hij in elke reader zichtbaar is, plus als
+      // auteur/byline (dc:creator) voor readers met een auteurskolom.
+      const titled = a.source ? a.source + ' · ' + a.title : a.title;
       return [
         '    <item>',
-        '      <title>' + xmlEscape(a.title) + '</title>',
+        '      <title>' + xmlEscape(titled) + '</title>',
         '      <link>' + link + '</link>',
         '      <guid isPermaLink="true">' + link + '</guid>',
         '      <pubDate>' + pub + '</pubDate>',
+        '      <dc:creator>' + xmlEscape(a.source) + '</dc:creator>',
         '      <category>' + xmlEscape(a.source) + '</category>',
         '      <description>' + xmlEscape(a.summary || a.title) + '</description>',
         '    </item>',
@@ -46,7 +50,7 @@ export default async function handler(req, res) {
     const selfUrl = SITE + '/api/rss' + (source ? '?source=' + encodeURIComponent(source) : '');
 
     const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-      '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n' +
+      '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">\n' +
       '  <channel>\n' +
       '    <title>' + title + '</title>\n' +
       '    <link>' + SITE + '/</link>\n' +
