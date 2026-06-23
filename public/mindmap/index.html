@@ -183,8 +183,11 @@ const data = {
   label: "Nieuwe mappenstructuur JZ",
   children: [
     {
-      label: "JZ Kennisdeling (Werkruimte 1)",
+      label: "JZ Kennisdeling",
       children: [
+        {
+          label: "Mails/documenten op onderwerp"
+        },
         {
           label: "Koppeling naar werkruimte 2",
           children: [
@@ -194,7 +197,7 @@ const data = {
       ]
     },
     {
-      label: "JZ Procedures/Processen (Werkruimte 2)",
+      label: "JZ Procedures/Processen",
       children: [
         {
           label: "Gekoppelde werkruimtes per zaak",
@@ -202,7 +205,23 @@ const data = {
             {
               label: "Vervolgprocedures (Map 1)",
               children: [
-                { label: "Besluit in primo" },
+                {
+                  label: "Besluit in primo",
+                  children: [
+                    {
+                      label: "Procedurele correspondentie",
+                      children: [{ label: "Submap" }]
+                    },
+                    {
+                      label: "Processtukken",
+                      children: [{ label: "Submap" }]
+                    },
+                    {
+                      label: "Stukken overig",
+                      children: [{ label: "Submap" }]
+                    }
+                  ]
+                },
                 { label: "Bezwaar" },
                 { label: "(Hoger) Beroep" }
               ]
@@ -217,8 +236,20 @@ const data = {
             {
               label: "Proces (Map 3)",
               children: [
-                { label: "Afhandelen klacht over SodM" },
-                { label: "Overige besluiten en overeenkomsten" }
+                {
+                  label: "Afhandelen klacht over SodM",
+                  children: [
+                    { label: "Gekoppelde werkruimtes per klacht" }
+                  ]
+                },
+                {
+                  label: "Overige besluiten en overeenkomsten",
+                  children: [
+                    { label: "Mandaatbesluiten" },
+                    { label: "Regelingen meldingen" },
+                    { label: "Samenwerkingsovereenkomsten" }
+                  ]
+                }
               ]
             }
           ]
