@@ -20,8 +20,8 @@ export default async function handler(req, res) {
     });
     if (fresh.length >= 8) articles = fresh;
 
-    // rawTitle is alleen voor interne breaking-detectie; niet meesturen naar de site.
-    const out = articles.map(({ rawTitle, ...rest }) => rest);
+    // rawTitle/categories zijn alleen voor interne filtering; niet meesturen naar de site.
+    const out = articles.map(({ rawTitle, categories, ...rest }) => rest);
     res.status(200).json(out);
   } catch (error) {
     console.error('Error:', error);
