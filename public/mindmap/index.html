@@ -76,6 +76,12 @@
     box-shadow: none;
   }
 
+  .node-box.link-node {
+    font-style: italic;
+    opacity: 0.85;
+    border: 1.5px dashed #059669;
+  }
+
   /* Chevron indicator */
   .chevron {
     font-size: 0.65rem;
@@ -200,13 +206,17 @@ const data = {
       label: "JZ Procedures/Processen",
       children: [
         {
-          label: "Gekoppelde werkruimtes per zaak",
+          label: "Vervolgprocedures",
           children: [
             {
-              label: "Vervolgprocedures",
+              label: "Gekoppelde werkruimte per zaak",
               children: [
                 {
-                  label: "Besluit in primo",
+                  label: "Besluit in primo (→ Havik/dossiernummer)",
+                  link: true
+                },
+                {
+                  label: "Bezwaar",
                   children: [
                     {
                       label: "Procedurele correspondentie",
@@ -222,19 +232,36 @@ const data = {
                     }
                   ]
                 },
-                { label: "Bezwaar" },
-                { label: "(Hoger) Beroep" }
+                {
+                  label: "(Hoger) Beroep",
+                  children: [
+                    {
+                      label: "Procedurele correspondentie",
+                      children: [{ label: "Submap" }]
+                    },
+                    {
+                      label: "Processtukken",
+                      children: [{ label: "Submap" }]
+                    },
+                    {
+                      label: "Stukken overig",
+                      children: [{ label: "Submap" }]
+                    }
+                  ]
+                }
               ]
-            },
-            {
-              label: "Woo-verzoeken",
-              children: [
-                { label: "Zelfde opbouw als Map 1" },
-                { label: "Bezwaren/beroepen via Map 1" }
-              ]
-            },
-            {
-              label: "Proces",
+            }
+          ]
+        },
+        {
+          label: "Woo-verzoek",
+          children: [
+            { label: "Zelfde opbouw als Vervolgprocedures" },
+            { label: "Bezwaren/beroepen via Vervolgprocedures" }
+          ]
+        },
+        {
+          label: "Proces/overig",
               children: [
                 {
                   label: "Afhandelen klacht over SodM",
@@ -269,7 +296,7 @@ function buildNode(node, level) {
   row.className = 'node-row';
 
   const box = document.createElement('div');
-  box.className = 'node-box' + (hasChildren ? '' : ' leaf');
+  box.className = 'node-box' + (hasChildren ? '' : ' leaf') + (node.link ? ' link-node' : '');
 
   if (hasChildren) {
     const chevron = document.createElement('span');
