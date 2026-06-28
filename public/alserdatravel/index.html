@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlserdaTravel – Lille & Omgeving | Zomer 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & tokens ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:   #1B2A4A;
+      --gold:   #C9973B;
+      --gold-l: #E8B96A;
+      --cream:  #FAF7F2;
+      --white:  #FFFFFF;
+      --ink:    #1A1A1A;
+      --grey:   #4A4A4A;
+      --light:  #888888;
+      --hair:   #E2DDD6;
+      --serif:  'Playfair Display', Georgia, serif;
+      --sans:   'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--white);
+      color: var(--ink);
+      font-family: var(--serif);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── Top bar ────────────────────────────────────────────── */
+    .topbar {
+      background: var(--navy);
+      color: #fff;
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 32px;
+    }
+    .topbar a { color: #fff; opacity: .75; }
+    .topbar a:hover { opacity: 1; }
+    .topbar-links { display: flex; gap: 20px; }
+
+    /* ── Masthead ────────────────────────────────────────────── */
+    .masthead {
+      background: var(--navy);
+      padding: 18px 32px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .logo {
+      font-family: var(--serif);
+      font-weight: 900;
+      font-size: 34px;
+      color: var(--gold);
+      letter-spacing: -.5px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .logo span { color: var(--white); }
+    .masthead-tagline {
+      font-family: var(--sans);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: rgba(255,255,255,.55);
+      margin-top: 3px;
+    }
+    .masthead-issue {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .masthead-issue .edition {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--gold-l);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    .masthead-issue .issue-no {
+      font-family: var(--serif);
+      font-size: 13px;
+      color: rgba(255,255,255,.5);
+    }
+    nav.mastnav {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    nav.mastnav a {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: rgba(255,255,255,.75);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      transition: color .15s;
+    }
+    nav.mastnav a:hover { color: var(--gold); }
+
+    /* ── Hero ───────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      height: 92vh;
+      min-height: 560px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(160deg, rgba(27,42,74,.72) 0%, rgba(27,42,74,.25) 50%, rgba(0,0,0,.55) 100%),
+        url('https://picsum.photos/seed/lille-grandplace/1600/900') center/cover no-repeat;
+    }
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 64px 64px;
+      max-width: 900px;
+    }
+    .hero-category {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: var(--gold-l);
+      margin-bottom: 14px;
+    }
+    .hero-title {
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.05;
+      margin-bottom: 18px;
+    }
+    .hero-title em { font-style: italic; color: var(--gold-l); }
+    .hero-deck {
+      font-family: var(--sans);
+      font-size: clamp(15px, 2vw, 19px);
+      color: rgba(255,255,255,.88);
+      font-weight: 300;
+      max-width: 560px;
+      line-height: 1.5;
+      margin-bottom: 28px;
+    }
+    .hero-meta {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+    .hero-badge {
+      background: var(--gold);
+      color: var(--navy);
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      padding: 6px 14px;
+    }
+    .hero-info {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: rgba(255,255,255,.7);
+      display: flex;
+      gap: 20px;
+    }
+    .hero-info span::before { content: '◆'; margin-right: 6px; color: var(--gold); font-size: 8px; vertical-align: middle; }
+
+    /* ── Quick-facts bar ─────────────────────────────────────── */
+    .quickfacts {
+      background: var(--navy);
+      display: flex;
+      justify-content: center;
+      gap: 0;
+    }
+    .qf-item {
+      flex: 1;
+      max-width: 220px;
+      padding: 20px 24px;
+      border-right: 1px solid rgba(255,255,255,.1);
+      text-align: center;
+    }
+    .qf-item:last-child { border-right: none; }
+    .qf-icon { font-size: 20px; margin-bottom: 6px; }
+    .qf-label {
+      font-family: var(--sans);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--gold-l);
+      margin-bottom: 4px;
+    }
+    .qf-value {
+      font-family: var(--serif);
+      font-size: 14px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* ── Section title ───────────────────────────────────────── */
+    .section-title {
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 30px;
+      height: 2px;
+      background: var(--gold);
+      margin-top: 6px;
+    }
+
+    /* ── Container ───────────────────────────────────────────── */
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+
+    /* ── Intro block ─────────────────────────────────────────── */
+    .intro-block {
+      padding: 64px 0 0;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 56px;
+      align-items: start;
+    }
+    .intro-sidebar {}
+    .intro-sidebar .big-initial {
+      font-size: 80px;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: .8;
+      margin-bottom: 10px;
+    }
+    .intro-sidebar .intro-facts {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--grey);
+      line-height: 1.6;
+      border-left: 3px solid var(--gold);
+      padding-left: 16px;
+      margin-top: 20px;
+    }
+    .intro-sidebar .intro-facts strong { color: var(--navy); display: block; margin-bottom: 4px; }
+    .intro-main h2 {
+      font-size: clamp(24px, 3.5vw, 38px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      color: var(--navy);
+    }
+    .intro-main h2 em { font-style: italic; }
+    .intro-main p {
+      font-size: 17px;
+      line-height: 1.75;
+      color: var(--grey);
+      margin-bottom: 18px;
+    }
+    .intro-main p:first-of-type::first-letter {
+      font-size: 64px;
+      font-weight: 900;
+      float: left;
+      line-height: .75;
+      margin-right: 8px;
+      margin-top: 6px;
+      color: var(--gold);
+    }
+
+    /* ── Divider ─────────────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--hair);
+      margin: 56px 0;
+    }
+    .divider.thick {
+      border-top: 2px solid var(--navy);
+    }
+
+    /* ── Photo grid ──────────────────────────────────────────── */
+    .photo-grid-3 {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 6px;
+      height: 500px;
+    }
+    .photo-grid-3 .main-photo { height: 100%; }
+    .photo-grid-3 .side-col { display: grid; grid-template-rows: 1fr 1fr; gap: 6px; }
+    .photo-cell { overflow: hidden; }
+    .photo-cell img { transition: transform .4s ease; }
+    .photo-cell:hover img { transform: scale(1.04); }
+    .photo-caption {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--light);
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    /* ── Feature article ─────────────────────────────────────── */
+    .feature {
+      padding: 64px 0;
+    }
+    .feature h2 {
+      font-size: clamp(26px, 4vw, 44px);
+      font-weight: 900;
+      line-height: 1.1;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .feature .feature-deck {
+      font-family: var(--sans);
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--grey);
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+    .feature-body {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 48px;
+      align-items: start;
+    }
+    .feature-body p {
+      font-size: 16px;
+      line-height: 1.75;
+      color: var(--grey);
+      margin-bottom: 16px;
+    }
+    .feature-body h3 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--navy);
+      margin: 28px 0 12px;
+    }
+    .feature-aside {}
+    .info-box {
+      background: var(--cream);
+      border-left: 4px solid var(--gold);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .info-box h4 {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+    .info-box ul {
+      list-style: none;
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--grey);
+      line-height: 1.7;
+    }
+    .info-box ul li::before { content: '→'; margin-right: 8px; color: var(--gold); }
+    .info-box p {
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--grey);
+      line-height: 1.65;
+    }
+    .rating {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--grey);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .stars { color: var(--gold); letter-spacing: 2px; }
+
+    /* ── Full-width feature image ────────────────────────────── */
+    .full-feature {
+      position: relative;
+      height: 520px;
+      overflow: hidden;
+      margin: 0;
+    }
+    .full-feature-bg {
+      position: absolute; inset: 0;
+    }
+    .full-feature-content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 48px 64px;
+      max-width: 700px;
+    }
+    .full-feature-content .category-tag {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: var(--gold-l);
+      margin-bottom: 12px;
+    }
+    .full-feature-content h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.08;
+      margin-bottom: 14px;
+    }
+    .full-feature-content p {
+      font-family: var(--sans);
+      font-size: 16px;
+      color: rgba(255,255,255,.85);
+      font-weight: 300;
+      line-height: 1.55;
+    }
+
+    /* ── Cards grid ──────────────────────────────────────────── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      padding: 56px 0;
+    }
+    .card {
+      border: 1px solid var(--hair);
+    }
+    .card-image {
+      height: 220px;
+      overflow: hidden;
+    }
+    .card-image img { transition: transform .4s; }
+    .card:hover .card-image img { transform: scale(1.06); }
+    .card-body { padding: 22px 20px 24px; }
+    .card-category {
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+    .card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .card p {
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--grey);
+      line-height: 1.65;
+    }
+    .card-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--hair);
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-footer .badge {
+      background: var(--navy);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding: 3px 8px;
+    }
+    .card-footer .badge.family { background: #2E7D32; }
+    .card-footer .badge.tip { background: var(--gold); color: var(--navy); }
+
+    /* ── Two column feature ──────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      padding: 56px 0;
+      align-items: start;
+    }
+    .two-col h2 {
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .two-col .sub {
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--light);
+      margin-bottom: 20px;
+    }
+    .two-col p {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--grey);
+      margin-bottom: 14px;
+    }
+    .two-col-image {
+      height: 360px;
+      overflow: hidden;
+    }
+
+    /* ── Big quote ───────────────────────────────────────────── */
+    .pull-quote {
+      background: var(--navy);
+      padding: 56px 80px;
+      text-align: center;
+      margin: 56px 0 0;
+    }
+    .pull-quote blockquote {
+      font-size: clamp(20px, 3vw, 30px);
+      font-style: italic;
+      color: #fff;
+      line-height: 1.4;
+      max-width: 800px;
+      margin: 0 auto 16px;
+    }
+    .pull-quote cite {
+      font-family: var(--sans);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: var(--gold-l);
+      font-style: normal;
+    }
+
+    /* ── Tips strip ──────────────────────────────────────────── */
+    .tips-strip {
+      background: var(--cream);
+      padding: 48px 0;
+      margin: 0;
+    }
+    .tips-inner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
+    }
+    .tip-item {
+      padding: 0 0 0 20px;
+      border-left: 3px solid var(--gold);
+    }
+    .tip-num {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+    .tip-item h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .tip-item p {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--grey);
+      line-height: 1.6;
+    }
+
+    /* ── Restaurant section ──────────────────────────────────── */
+    .restaurant-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+      padding: 24px 0;
+    }
+    .resto {
+      display: flex;
+      gap: 16px;
+      padding: 20px;
+      border: 1px solid var(--hair);
+    }
+    .resto-img {
+      width: 100px;
+      height: 100px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .resto-body {}
+    .resto-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .resto-type {
+      font-family: var(--sans);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+    .resto-desc {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--grey);
+      line-height: 1.55;
+    }
+
+    /* ── Practical info ──────────────────────────────────────── */
+    .practical {
+      background: var(--navy);
+      padding: 64px 0;
+    }
+    .practical .container { color: #fff; }
+    .practical-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      margin-top: 32px;
+    }
+    .practical-block h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(201,151,59,.3);
+    }
+    .practical-block ul {
+      list-style: none;
+      font-family: var(--sans);
+      font-size: 14px;
+      color: rgba(255,255,255,.8);
+      line-height: 1.8;
+    }
+    .practical-block ul li { position: relative; padding-left: 16px; }
+    .practical-block ul li::before { content: '–'; position: absolute; left: 0; color: var(--gold); }
+    .practical-block p {
+      font-family: var(--sans);
+      font-size: 14px;
+      color: rgba(255,255,255,.75);
+      line-height: 1.7;
+    }
+    .practical-block strong { color: #fff; }
+
+    /* ── Calendar ───────────────────────────────────────────── */
+    .calendar-section { padding: 64px 0; }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-top: 28px;
+    }
+    .cal-item {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      border: 1px solid var(--hair);
+    }
+    .cal-date {
+      flex-shrink: 0;
+      width: 56px;
+      text-align: center;
+    }
+    .cal-date .month {
+      font-family: var(--sans);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--gold);
+      font-weight: 700;
+      display: block;
+    }
+    .cal-date .day {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--navy);
+      line-height: 1;
+      display: block;
+    }
+    .cal-body {}
+    .cal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .cal-desc {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--grey);
+      line-height: 1.5;
+    }
+    .cal-tag {
+      display: inline-block;
+      font-family: var(--sans);
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      padding: 2px 7px;
+      background: var(--cream);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      margin-top: 6px;
+    }
+
+    /* ── Accommodation ───────────────────────────────────────── */
+    .hotel-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding: 28px 0;
+    }
+    .hotel-card {
+      border: 1px solid var(--hair);
+      overflow: hidden;
+    }
+    .hotel-image { height: 170px; overflow: hidden; }
+    .hotel-image img { transition: transform .4s; }
+    .hotel-card:hover .hotel-image img { transform: scale(1.06); }
+    .hotel-info { padding: 16px 16px 18px; }
+    .hotel-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .hotel-type {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--light);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 10px;
+    }
+    .hotel-desc {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--grey);
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+    .hotel-price {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--light);
+    }
+    .hotel-price strong { color: var(--navy); font-size: 16px; }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    .footer {
+      background: #111;
+      padding: 48px 0 28px;
+    }
+    .footer-inner {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 36px;
+      border-bottom: 1px solid #333;
+    }
+    .footer-brand .logo { font-size: 26px; margin-bottom: 12px; }
+    .footer-brand p {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: #777;
+      line-height: 1.6;
+    }
+    .footer-col h5 {
+      font-family: var(--sans);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    .footer-col ul li a:hover { color: var(--gold); }
+    .footer-bottom {
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-bottom p {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: #555;
+    }
+    .disclaimer {
+      background: var(--cream);
+      border-left: 3px solid var(--gold);
+      padding: 16px 20px;
+      margin: 32px 0 0;
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--grey);
+      line-height: 1.6;
+    }
+
+    /* ── Map placeholder ─────────────────────────────────────── */
+    .map-box {
+      background: #E8EFF5;
+      height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .map-box-inner {
+      text-align: center;
+      z-index: 2;
+      position: relative;
+    }
+    .map-box img {
+      position: absolute; inset: 0;
+      opacity: .5;
+    }
+    .map-box-inner p {
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--navy);
+      font-weight: 600;
+    }
+
+    /* ── Day-trip row ────────────────────────────────────────── */
+    .daytrip-list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid var(--hair);
+      margin: 28px 0;
+    }
+    .daytrip-item {
+      padding: 24px 22px;
+      border-right: 1px solid var(--hair);
+    }
+    .daytrip-item:last-child { border-right: none; }
+    .daytrip-dist {
+      font-family: var(--sans);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .daytrip-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .daytrip-desc {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--grey);
+      line-height: 1.55;
+    }
+    .daytrip-tag {
+      display: inline-block;
+      margin-top: 10px;
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--gold);
+    }
+
+    /* ── Responsive adjustments ──────────────────────────────── */
+    @media (max-width: 900px) {
+      .intro-block { grid-template-columns: 1fr; gap: 32px; }
+      .feature-body { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .cards-grid { grid-template-columns: 1fr 1fr; }
+      .tips-inner { grid-template-columns: 1fr 1fr; }
+      .practical-grid { grid-template-columns: 1fr; }
+      .calendar-grid { grid-template-columns: 1fr; }
+      .hotel-strip { grid-template-columns: 1fr 1fr; }
+      .daytrip-list { grid-template-columns: 1fr 1fr; }
+      .topbar { display: none; }
+      .hero-inner { padding: 0 32px 40px; }
+      .pull-quote { padding: 40px 32px; }
+    }
+    @media (max-width: 600px) {
+      .masthead { flex-direction: column; gap: 12px; align-items: flex-start; }
+      nav.mastnav { display: none; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .tips-inner { grid-template-columns: 1fr; }
+      .hotel-strip { grid-template-columns: 1fr; }
+      .restaurant-grid { grid-template-columns: 1fr; }
+      .daytrip-list { grid-template-columns: 1fr; }
+      .photo-grid-3 { grid-template-columns: 1fr; height: auto; }
+      .photo-grid-3 .side-col { grid-template-columns: 1fr 1fr; grid-template-rows: none; }
+      .photo-grid-3 .main-photo { height: 260px; }
+      .photo-grid-3 .side-col .photo-cell { height: 160px; }
+      .quickfacts { flex-wrap: wrap; }
+      .qf-item { max-width: 50%; width: 50%; }
+      .container { padding: 0 18px; }
+      .footer-inner { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ TOP BAR -->
+<div class="topbar">
+  <div>AlserdaTravel &ensp;|&ensp; Specialist in familiereizen</div>
+  <div class="topbar-links">
+    <a href="#">Alle bestemmingen</a>
+    <a href="#">Reisgidsen</a>
+    <a href="#">Contact</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ MASTHEAD -->
+<header class="masthead">
+  <div>
+    <div class="logo">Alserda<span>Travel</span></div>
+    <div class="masthead-tagline">Reisgids &middot; Familiebeleving &middot; Authentiek reizen</div>
+  </div>
+  <nav class="mastnav">
+    <a href="#intro">Over Lille</a>
+    <a href="#oudewijk">Vieux-Lille</a>
+    <a href="#kinderen">Voor de kids</a>
+    <a href="#uitstapjes">Uitstapjes</a>
+    <a href="#eten">Eten</a>
+    <a href="#praktisch">Praktisch</a>
+  </nav>
+  <div class="masthead-issue">
+    <div class="edition">Speciale Editie &mdash; Zomer 2026</div>
+    <div class="issue-no">Familie &middot; Noord-Frankrijk</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════ HERO -->
+<section class="hero">
+  <div class="hero-bg" style="background:
+    linear-gradient(155deg, rgba(27,42,74,.78) 0%, rgba(27,42,74,.18) 55%, rgba(0,0,0,.6) 100%),
+    url('https://picsum.photos/seed/lille-belfry-summer/1600/900') center/cover no-repeat;">
+  </div>
+  <div class="hero-inner">
+    <div class="hero-category">AlserdaTravel Familiegids &mdash; Noord-Frankrijk</div>
+    <h1 class="hero-title">Lille &amp; Omgeving<br><em>Zomervakantie met</em><br>kleine avonturiers</h1>
+    <p class="hero-deck">Een stad vol verrassing, cultuur en Vlaams-Frans erfgoed &mdash; perfect voor een zomervakantie met peuters en kleuters. Ontdek Vieux-Lille en de verborgen pareltjes van Noord-Frankrijk op dagafstand.</p>
+    <div class="hero-meta">
+      <div class="hero-badge">Familie Editie 2026</div>
+      <div class="hero-info">
+        <span>Kinderen 2 &amp; 5 jaar</span>
+        <span>15 juli – 15 augustus</span>
+        <span>Noord-Frankrijk + België</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ QUICK FACTS -->
+<div class="quickfacts">
+  <div class="qf-item">
+    <div class="qf-icon">🚗</div>
+    <div class="qf-label">Rijafstand vanuit NL</div>
+    <div class="qf-value">± 2,5 uur (Randstad)</div>
+  </div>
+  <div class="qf-item">
+    <div class="qf-icon">🌡️</div>
+    <div class="qf-label">Gemiddeld in juli</div>
+    <div class="qf-value">23 °C overdag</div>
+  </div>
+  <div class="qf-item">
+    <div class="qf-icon">👶</div>
+    <div class="qf-label">Kindvriendelijkheid</div>
+    <div class="qf-value">★★★★★</div>
+  </div>
+  <div class="qf-item">
+    <div class="qf-icon">🎠</div>
+    <div class="qf-label">Must-do's</div>
+    <div class="qf-value">12+ activiteiten</div>
+  </div>
+  <div class="qf-item">
+    <div class="qf-icon">🎨</div>
+    <div class="qf-label">Daguitstapjes tot</div>
+    <div class="qf-value">max. 30 min rijden</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ INTRO -->
+<section id="intro" class="container">
+  <div class="intro-block">
+    <div class="intro-sidebar">
+      <div class="section-title">Introductie</div>
+      <div class="big-initial">L</div>
+      <div class="intro-facts">
+        <strong>Hoofdstad van Nord</strong>
+        Departement Nord, Hauts-de-France
+        <br><br>
+        <strong>Inwoners</strong>
+        240.000 (stad) – 1,2 miljoen (metropool)
+        <br><br>
+        <strong>Taal</strong>
+        Frans, met Vlaamse invloeden (ch'ti dialect)
+        <br><br>
+        <strong>Munt</strong>
+        Euro (€)
+        <br><br>
+        <strong>Beste reistijd</strong>
+        Mei – september; zomer druk maar festief
+        <br><br>
+        <strong>Instappers</strong>
+        Riant, kindvriendelijk, vlak terrein
+      </div>
+    </div>
+    <div class="intro-main">
+      <div class="section-title">Waarom Lille?</div>
+      <h2>De <em>verborgen parel</em> van Noord-Frankrijk wacht op uw gezin</h2>
+      <p>Lille ligt op een boogscheut van de grens, slechts anderhalf uur rijden vanuit Utrecht en nog geen uur vanuit Antwerpen, maar voelt als een complete wereld op zichzelf. De stad ademt Frans charme met een onmiskenbaar Vlaams karakter: roodstenen gevels, beeldschone pleinen, markten vol kleur en geur, en een culinaire traditie die elke smaakpapil verwent. Met twee kleine reizigers van twee en vijf jaar heeft Lille bovendien iets bijzonders te bieden &mdash; een stad op mensenmaat, waar avontuur en rust hand in hand gaan.</p>
+      <p>De straten van Vieux-Lille zijn overdag autoluw en aangenaam breed. Kinderwagens en buggy's rijden er soepel over de keien, terwijl uw oudste snakt naar elk plein met fontein of duiven. 's Middags kunt u uitrusten in een van de schaduwrijke parken, 's avonds eten de Lilloisen &mdash; zoals de inwoners heten &mdash; vrolijk gezamenlijk buiten. Kinderen zijn hier welkom en worden verwend met frietjes, gaufres en chocolademelk.</p>
+      <p>Tegelijkertijd is Lille een uitvalsbasis van formaat. Binnen een halfuur rijden bereikt u Louvre-Lens met zijn spectaculaire kunstcollectie, het futuristische Forum des Sciences in Villeneuve d'Ascq, het verbluffende La Piscine museum in Roubaix en de Vlaamse marktstad Bailleul. Uw vakantie van half juli tot half augustus biedt ruim tijd om de stad zelf te verkennen én daguitstapjes te maken die ook de kleinste reizigers boeien. Dit magazine gidst u door de hoogtepunten.</p>
+    </div>
+  </div>
+
+  <hr class="divider thick" style="margin: 48px 0 0;">
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ PHOTO GRID 1 -->
+<section style="padding: 6px 0 0;">
+  <div class="container">
+    <div class="photo-grid-3">
+      <div class="photo-cell main-photo">
+        <img src="https://picsum.photos/seed/lille-vieux/800/500" alt="Vieux-Lille oude gevelwand">
+      </div>
+      <div class="side-col">
+        <div class="photo-cell">
+          <img src="https://picsum.photos/seed/lille-children-fountain/400/250" alt="Kinderen spelen bij fontein">
+        </div>
+        <div class="photo-cell">
+          <img src="https://picsum.photos/seed/lille-market-wazemmes/400/250" alt="Marché de Wazemmes">
+        </div>
+      </div>
+      <div class="side-col">
+        <div class="photo-cell">
+          <img src="https://picsum.photos/seed/french-waffles-food/400/250" alt="Verse gaufres op de markt">
+        </div>
+        <div class="photo-cell">
+          <img src="https://picsum.photos/seed/lille-parc-evening/400/250" alt="Parc de la Citadelle bij zonsondergang">
+        </div>
+      </div>
+    </div>
+    <p class="photo-caption">V.l.n.r.: de roodstenen gevelwand van Vieux-Lille &mdash; kinderfonteinen bij de Grand'Place &mdash; drukte op de Marché de Wazemmes &mdash; verse Luikse wafels &mdash; spelende kinderen in de Citadelpark</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ VIEUX-LILLE FEATURE -->
+<section id="oudewijk" class="container">
+  <div class="feature">
+    <div class="section-title">Hoogtepunt nr. 1</div>
+    <h2>Vieux-Lille – Een wandeling door de Geschichte</h2>
+    <p class="feature-deck">De historische binnenstad van Lille is een aaneenschakeling van Vlaamse barok, Art Nouveau en pittoreske straatjes. Met kleine kinderen is het een lust voor het oog én voor de benen.</p>
+
+    <div class="feature-body">
+      <div>
+        <p>Wie voor het eerst door Vieux-Lille flanert, begrijpt direct waarom deze wijk zo geliefd is bij gezinnen. De smalle Rue de la Monnaie loopt langs boetieks en galeries, maar het zijn de plotselinge pleintjes &mdash; met hun terrassen, muzikanten en altijd wel een fontein &mdash; die kinderen betoveren. De <strong>Grand'Place (Place du Général de Gaulle)</strong> is het kloppend hart: een breed, open plein met de bronzen Déesse (Godin) die de overwinning van 1792 symboliseert. Hier kunt u rustig op een terras zitten terwijl uw vijfjarige om de gedenknaald heen rent en de tweejaar-old met een croissant in de hand de duiven bekijkt.</p>
+        <h3>De bezienswaardige straten</h3>
+        <p>Laat u leiden door de <strong>Rue Esquermoise</strong>, de chicste winkelstraat met zijn 17e-eeuwse gevels en het beroemde warenhuispand Euralille pal erachter. Sla de <strong>Rue de Gand</strong> in voor een blik op een ander gezicht: gezellige bruine kroegen, brocantewinkels en kleine restaurants waar u de tweejaar-old alvast een kinderstoel kunt vragen. Eindig uw wandeling op de <strong>Place du Lion d'Or</strong>, waar op zomerse middagen straatmuzikanten optreden en kleine terrassen u uitnodigen voor een pichet rosé of een jus d'orange voor de kleintjes.</p>
+        <h3>Praktische tips voor peuters en kleuters</h3>
+        <p>Vieux-Lille is grotendeels autovrij, maar de kinderkopjes kunnen verraderlijk zijn voor kleine voetjes en wielen van een buggy. Neem een stevige kinderwagen mee, of &mdash; voor uw vijfjarige &mdash; een loopfiets die u mee kunt nemen in de auto. De wijk is compact: u loopt van oost naar west in 15 minuten. Plan nooit meer dan anderhalf uur achter elkaar, met daarna een rustmoment in het nabijgelegen <strong>Jardin Vauban</strong>.</p>
+        <p>Begin het bezoek bij voorkeur rond 9.30 uur, vóór de toeristenstroom op gang komt. Bakkerijen openen vroeg en de geur van versgebakken <em>ficelles picardes</em> en croissants is de beste beloning voor vroeg opstaan. Veel museumgebouwen in Vieux-Lille zijn kinderwagen-toegankelijk; vraag altijd aan de ingang of er een lift is, want niet alle historische panden zijn volledig gerenoveerd.</p>
+      </div>
+      <div class="feature-aside">
+        <div class="info-box">
+          <h4>Must-see in Vieux-Lille</h4>
+          <ul>
+            <li>Grand'Place met de Déesse</li>
+            <li>Vieille Bourse – Vlaamse renaissance</li>
+            <li>Rue de la Monnaie – boetieks &amp; galeries</li>
+            <li>Eglise Saint-Maurice – gotische kruiskerk</li>
+            <li>Place du Lion d'Or – terrassen</li>
+            <li>Rue Esquermoise – historische winkelpuien</li>
+          </ul>
+        </div>
+        <div class="info-box">
+          <h4>Kindvriendelijkheid score</h4>
+          <div class="rating">
+            Wandelwagen <span class="stars">★★★★★</span>
+          </div>
+          <div class="rating">
+            Speelplekken <span class="stars">★★★★☆</span>
+          </div>
+          <div class="rating">
+            Horeca kids <span class="stars">★★★★★</span>
+          </div>
+          <div class="rating">
+            WC's openbaar <span class="stars">★★★☆☆</span>
+          </div>
+          <p style="margin-top:12px; font-family:var(--sans); font-size:13px; color:var(--grey);">Tip: koop in een drogist een opvouwbaar reispotje – openbare toiletten in Vieux-Lille zijn schaars en niet altijd peuter-proof.</p>
+        </div>
+        <div class="info-box">
+          <h4>Handig om te weten</h4>
+          <p><strong>Parkeren:</strong> Parkeergarage Vieux-Lille (Rue du Molinel) – max. €12/dag. Loopafstand ±5 min naar de Grand'Place.<br><br>
+          <strong>Metro:</strong> Lijn 2 richting Lomme, stop Gare Lille-Flandres – vervolgens tram of te voet (12 min).<br><br>
+          <strong>Looproute:</strong> 2,5 km, ideaal &lt;10.00 of na 17.00 – minder drukte, koelere temperaturen.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ FULL-WIDTH CITADELLE -->
+<section class="full-feature">
+  <div class="full-feature-bg" style="background:
+    linear-gradient(to right, rgba(27,42,74,.88) 0%, rgba(27,42,74,.4) 60%, transparent 100%),
+    url('https://picsum.photos/seed/citadelle-parc-lille/1400/520') center/cover no-repeat;">
+  </div>
+  <div class="full-feature-content container">
+    <div class="category-tag">Buitenleven &middot; Natuur</div>
+    <h2>Parc de la Citadelle –<br>De groene long van Lille</h2>
+    <p>Het 60 hectare grote stadspark rondom Vauban's 17e-eeuwse citadel is kindervakantie in het klein: dierenparkje met herten en pauwen, speeltuinen voor alle leeftijden, roeiboten op de gracht en eindeloze grasvlakten om op te rollen. Op zomerse dagen staat er een ijswagen bij de ingang van de dierentuin. Entree gratis.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ KINDEREN SECTION -->
+<section id="kinderen" class="container">
+  <div class="feature" style="padding-bottom: 0;">
+    <div class="section-title">Activiteiten voor het gezin</div>
+    <h2>Lille op kindermaat</h2>
+    <p class="feature-deck">Van een minidiertuin tot een interactief wetenschapsmuseum: Lille verwent families met activiteiten die zowel de tweejarige als de vijfjarige volledig in de ban houden.</p>
+  </div>
+</section>
+
+<section class="container">
+  <div class="cards-grid">
+
+    <div class="card">
+      <div class="card-image">
+        <img src="https://picsum.photos/seed/zoo-kids-lille/600/400" alt="Dierentuin in de Citadel">
+      </div>
+      <div class="card-body">
+        <div class="card-category">Natuur &amp; Dieren</div>
+        <h3>Zoo de Lille</h3>
+        <p>Gratis toegankelijk dierenpark binnen de citadelmuren met herten, lama's, pauwen en een kinderboerderij. Vooral voor uw tweejarige een dagvullende activiteit: dichtbij de dieren, veilig omheind, en altijd afgedekt water in de buurt. Picknickplaatsen beschikbaar.</p>
+      </div>
+      <div class="card-footer">
+        <span>Gratis toegang &middot; dagelijks open</span>
+        <span class="badge family">Familie top</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-image">
+        <img src="https://picsum.photos/seed/museum-science-kids/600/400" alt="Kinderen in wetenschapsmuseum">
+      </div>
+      <div class="card-body">
+        <div class="card-category">Museum &amp; Ontdekking</div>
+        <h3>Forum des Sciences</h3>
+        <p>Hands-on wetenschapsmuseum in Villeneuve d'Ascq (15 min. rijden) dat speciaal voor gezinnen is ingericht. Uw vijfjarige kan experimenten doen met licht, water en geluid. Voor de kleintjes zijn er interactieve babycorners. In de zomer draaien bijzondere tijdelijke exposities rondom de natuur.</p>
+      </div>
+      <div class="card-footer">
+        <span>€7 / volw. – €5 / kind</span>
+        <span class="badge family">Familie top</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-image">
+        <img src="https://picsum.photos/seed/jardin-vauban-summer/600/400" alt="Kinderen in Jardin Vauban">
+      </div>
+      <div class="card-body">
+        <div class="card-category">Buitenspelen</div>
+        <h3>Jardin Vauban</h3>
+        <p>Een Engelse landschapstuin vlakbij het centrum met een prachtige speeltuin, walmpaviljoens en een groot Guignol-poppentheater dat al meer dan 100 jaar bezoekers vermaakte. Voorstellingen zijn in het Frans maar de visuele humor overstijgt de taalgrens. Gratis park; theater heeft kleine entreeprijs.</p>
+      </div>
+      <div class="card-footer">
+        <span>Gratis park &middot; theater €3-5</span>
+        <span class="badge tip">Aanrader</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-image">
+        <img src="https://picsum.photos/seed/swimming-pool-lille/600/400" alt="Binnenbad Lille">
+      </div>
+      <div class="card-body">
+        <div class="card-category">Water &amp; Zwemmen</div>
+        <h3>Piscine de la Citadelle</h3>
+        <p>Openluchtbad naast de Citadel dat in de zomermaanden open is. Een Peuter-bad van 40 cm diep is ideaal voor uw jongste; uw vijfjarige leert er spetteren in het ondiepe bad. Ligweide eromheen voor een nazomers middagdutje. Zonnebrand en zwembandjes niet vergeten!</p>
+      </div>
+      <div class="card-footer">
+        <span>€4 / volw. – €2 / kind</span>
+        <span class="badge">Juli-aug open</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-image">
+        <img src="https://picsum.photos/seed/lille-tramway-tour/600/400" alt="Historische tramrit door Lille">
+      </div>
+      <div class="card-body">
+        <div class="card-category">Vervoer &amp; Beleving</div>
+        <h3>VAL-metro &amp; tram</h3>
+        <p>Het automatische metrosysteem van Lille (volledig zonder bestuurder, het eerste ter wereld!) is een rit op zich voor kleine techniekliefhebbers. Pak de metro naar Villeneuve d'Ascq en spot de robots in de controlekamer. Uw vijfjarige zal verbaasd zijn dat de trein zelf rijdt. Ideaal voor een regenachtige middag.</p>
+      </div>
+      <div class="card-footer">
+        <span>€1.80 / rit &middot; dagpas €5</span>
+        <span class="badge tip">Regenplan</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-image">
+        <img src="https://picsum.photos/seed/patisserie-boulangerie-lille/600/400" alt="Bakker met croissants">
+      </div>
+      <div class="card-body">
+        <div class="card-category">Smaakbeleving</div>
+        <h3>Boulangerie-bezoek &amp; Chocolatier</h3>
+        <p>In Lille neemt bakkerijen de taak serieus om kinderen te laten genieten van het ambacht. Bezoek <em>Paul Boulangerie</em> op de Grand'Place voor verse pain au chocolat, of <em>Meert</em> &mdash; de beroemdste gaufre-bakker van de stad (opgericht 1761). Zelfs de meest kieskeurige tweejaar-old stemt in met een warme wafel met vanille.</p>
+      </div>
+      <div class="card-footer">
+        <span>€2-6 per traktatie</span>
+        <span class="badge tip">Must eat</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ PULL QUOTE -->
+<div class="pull-quote">
+  <blockquote>"Lille is de stad die u verrast: groter dan verwacht, gezelliger dan u dacht, en onverwacht Vlaams van karakter. Met kleine kinderen is het een ideale eerste stap in de Franstalige wereld."</blockquote>
+  <cite>AlserdaTravel Redactie &middot; Zomer 2026</cite>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ UITSTAPJES -->
+<section id="uitstapjes" class="container" style="padding-top: 64px;">
+  <div class="section-title">Daguitstapjes</div>
+  <h2 style="font-size:clamp(24px,3.5vw,40px); color:var(--navy); margin-bottom:8px;">De omgeving: een schat aan mogelijkheden</h2>
+  <p style="font-family:var(--sans); font-size:17px; color:var(--grey); max-width:720px; line-height:1.6; margin-bottom:0;">Lily ligt op het kruispunt van Noord-Frankrijk en België. Binnen een uur rijden bereikt u werelden van verschil &mdash; van zandstrand tot werelderfgoed kunstmuseum.</p>
+
+  <div class="daytrip-list">
+    <div class="daytrip-item">
+      <div class="daytrip-dist">15 min</div>
+      <div class="daytrip-name">Villeneuve d'Ascq</div>
+      <p class="daytrip-desc">Forum des Sciences: interactief wetenschapsmuseum met hands-on experimenten voor peuters en kleuters. Daarna het Lac du Héron: een natuurpark met strand, waterspeelplein en picknickweiden langs het meer.</p>
+      <span class="daytrip-tag">★★★★★ Familie</span>
+    </div>
+    <div class="daytrip-item">
+      <div class="daytrip-dist">20 min</div>
+      <div class="daytrip-name">Roubaix – La Piscine</div>
+      <p class="daytrip-desc">Een verbluffend art-déco zwembad omgebouwd tot kunstmuseum. Beelden staan rondom het oude bad, kinderen lopen er ogen uitkijkend. Aansluitend de Maison Folie voor zomerse buitenactiviteiten en ateliers.</p>
+      <span class="daytrip-tag">★★★★☆ Cultuur + kids</span>
+    </div>
+    <div class="daytrip-item">
+      <div class="daytrip-dist">25 min</div>
+      <div class="daytrip-name">Louvre-Lens</div>
+      <p class="daytrip-desc">Spectaculair museum met kunstwerken uit het Louvre in Parijs. Het glazen gebouw herbergt een indrukwekkende Galerij van de Tijd. Kids-parcours beschikbaar. Buiten: ruim park met picknicklawn en schapenweide.</p>
+      <span class="daytrip-tag">★★★★☆ Cultuur + natuur</span>
+    </div>
+    <div class="daytrip-item">
+      <div class="daytrip-dist">30 min</div>
+      <div class="daytrip-name">Bailleul</div>
+      <p class="daytrip-desc">Authentieke Vlaamse marktstad met karakteristieke bakstenen huizen, een imposant belfort en een wekelijkse markt vol lokale producten. Het Jardin des Plantes is vrij toegankelijk en ideaal voor een rustige middagwandeling.</p>
+      <span class="daytrip-tag">★★★☆☆ Sfeer &amp; natuur</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ LOUVRE-LENS FEATURE -->
+<section class="full-feature" style="margin-top: 0;">
+  <div class="full-feature-bg" style="background:
+    linear-gradient(to top, rgba(27,42,74,.82) 0%, rgba(27,42,74,.35) 60%, transparent 100%),
+    url('https://picsum.photos/seed/louvre-lens-museum-glass/1400/520') center/cover no-repeat;">
+  </div>
+  <div class="full-feature-content container">
+    <div class="category-tag">Daguitstap &middot; Cultuur &middot; 25 min rijden</div>
+    <h2>Louvre-Lens –<br>Wereldkunst op kniehoogte</h2>
+    <p>Op 25 minuten rijden van Lille staat een van de mooiste musea van Noord-Frankrijk: het Louvre-Lens. Het spectaculaire glazen gebouw herbergt meesterwerken die normaal in Parijs hangen, nu in een rustiger, ruimere context. Het speciale kinderparcours maakt het voor uw vijfjarige een echte speurtocht, terwijl het groene park eromheen een picknick op het gras uitnodigt voor de tweejaar-old.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ ETEN & DRINKEN -->
+<section id="eten" class="container">
+  <div class="two-col" style="padding-bottom: 28px;">
+    <div>
+      <div class="section-title">Culinaire ontdekking</div>
+      <h2>Eten in Lille &amp; omgeving</h2>
+      <p class="sub">Noord-Frankrijks eigen keuken &mdash; hartig, rijkelijk en vol smaak</p>
+      <p>Lille heeft een uitgesproken eigen culinaire identiteit die sterk verschilt van de meer bekend Parijse keuken. Het noorden van Frankrijk is het land van de <em>carbonnade flamande</em> (bierstoofpot), <em>moules-frites</em> (mosselen met friet), <em>Welsh rarebit</em> en de beroemde <em>ficelle picarde</em> &mdash; een pannenkoek gevuld met champignons en ham, overgoten met kaassaus. Voor kinderen is dit eten soms te uitgesproken van smaak, maar geen enkel kind weerstaat de frieten (werkelijk uitstekend in elke brasserie) en de dikke crêpes bij de straatverkopers.</p>
+      <p>Met een tweejarige en een vijfjarige is de <strong>Grand Brasserie</strong>-formule ideaal: grote kindvriendelijke restaurants met kinderstoelen, eenvoudige kinderkaarten en geduldige obers. De Lilloisen eten graag tussen 12.00 en 14.00 uur en opnieuw vanaf 19.30 uur &mdash; pas uw ritme hierop aan zodat u de drukste momenten mist. Boek bij voorkeur altijd vooraf voor populaire adressen in het weekend.</p>
+      <p>Een bijzondere aanrader is de zondagse <strong>Marché de Wazemmes</strong> (circa 3 km van het centrum). Dit is een van de levendigste markten van Noord-Frankrijk: Maghrebijnse specialiteiten, verse kazen, Belgische pralines, levende pluimvee en altijd een live-accordeonspeler. Uw vijfjarige zal er niet genoeg van krijgen; uw tweejaar-old kijkt ogen tekort.</p>
+    </div>
+    <div>
+      <div class="two-col-image">
+        <img src="https://picsum.photos/seed/lille-brasserie-interior/600/700" alt="Sfeervolle brasserie in Lille">
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Aanbevolen restaurants &amp; eetplekken</div>
+  <div class="restaurant-grid">
+    <div class="resto">
+      <div class="resto-img">
+        <img src="https://picsum.photos/seed/resto-mussels/200/200" alt="Moules frites">
+      </div>
+      <div class="resto-body">
+        <div class="resto-name">La Chicorée</div>
+        <div class="resto-type">Brasserie &middot; Grand'Place</div>
+        <div class="resto-desc">Iconische brasserie op de Grand'Place, open vanaf 9 uur 's morgens tot middernacht. Uitstekende kindermenu's, geduldig personeel en een onvergetelijk uitzicht op het plein. Bestelt u de moules voor uzelf, dan krijgen de kleintjes er automatisch een handje friet bij.</div>
+      </div>
+    </div>
+    <div class="resto">
+      <div class="resto-img">
+        <img src="https://picsum.photos/seed/waffle-shop-belle/200/200" alt="Gaufre Meert">
+      </div>
+      <div class="resto-body">
+        <div class="resto-name">Meert</div>
+        <div class="resto-type">Patisserie &middot; Rue Esquermoise</div>
+        <div class="resto-desc">Sinds 1761 het meest verfijnde adres voor gaufres fourrées. De Lille-wafel met vanillecrème is wereldberoemd en werd ooit geserveerd aan generaal De Gaulle. Voor kinderen: de kleinste versie (€3) is rijkelijk genoeg. Neem er ook een macarron voor de terugreis.</div>
+      </div>
+    </div>
+    <div class="resto">
+      <div class="resto-img">
+        <img src="https://picsum.photos/seed/pizza-kids-restaurant/200/200" alt="Kindvriendelijk restaurant">
+      </div>
+      <div class="resto-body">
+        <div class="resto-name">Les Trois Brasseurs</div>
+        <div class="resto-type">Brasserie &middot; Place de la Gare</div>
+        <div class="resto-desc">Huisbrouwerij met een brede menukaart voor het hele gezin. Kinderen kunnen via een venstertje zien hoe bier gebrouwen wordt (educatief en spannend voor een vijfjarige). Zelf brouwen ze ook limonade en sappen voor de kinderen. Groot terras, kindvriendelijk.</div>
+      </div>
+    </div>
+    <div class="resto">
+      <div class="resto-img">
+        <img src="https://picsum.photos/seed/marche-wazemmes-food/200/200" alt="Marché de Wazemmes">
+      </div>
+      <div class="resto-body">
+        <div class="resto-name">Marché de Wazemmes</div>
+        <div class="resto-type">Markt &middot; Place Nouvelle Aventure</div>
+        <div class="resto-desc">De zondagochtendmarkt (7-14u) is een belevenis op zich. Eet verse broodjes, droog fruit, Arabische zoetigheden en gegrilde merguez ter plekke op. Goedkoop, authentiek en bruisend. Kom voor 10 uur voor de beste sfeer en minder drukte. Neem een canvas tas mee.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ TIPS STRIP -->
+<section class="tips-strip" style="margin-top: 56px;">
+  <div class="container">
+    <div class="section-title">Ervaringen van AlserdaTravel-reizigers</div>
+    <h2 style="font-size:clamp(20px,2.5vw,30px); color:var(--navy); margin-bottom:28px;">8 gouden tips voor uw zomervakantie</h2>
+    <div class="tips-inner">
+      <div class="tip-item">
+        <div class="tip-num">Tip 01</div>
+        <h4>Vertrek vroeg</h4>
+        <p>Sla het Lille-centrum voor 9.30 uur in: koelste temperaturen, geen drukte en verse bakkerijen. Kleine kinderen zijn 's morgens friser dan 's middags.</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">Tip 02</div>
+        <h4>Dagpas metro</h4>
+        <p>Koop een dagpas voor het VAL-net (€5 p.p., kinderen &lt;4 gratis). U rijdt onbeperkt metro, tram en bus. Ideaal voor spontane tussenstops.</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">Tip 03</div>
+        <h4>Middagdutje thuis</h4>
+        <p>Plan van 13.00–15.00 uur het rustmoment in het appartement of hotel. De stad is dan ook het heetst. Nadien is alles luchtiger en vrolijker.</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">Tip 04</div>
+        <h4>Louvre-Lens op dinsdag</h4>
+        <p>Op doordeweekse dagen is Louvre-Lens aanmerkelijk rustiger dan in het weekend. Dinsdag of woensdag ideaal: meer ruimte voor kinderen in het museum en op het park. Gratis op de eerste zondag van de maand.</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">Tip 05</div>
+        <h4>App: Lille City Pass</h4>
+        <p>De digitale Lille City Pass geeft korting op musea, metro en rondvaartbooten. Twee dagen kost €25 per volwassene. Kinderen t/m 12 jaar zijn gratis op de meeste plekken.</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">Tip 06</div>
+        <h4>EHBO in Frans</h4>
+        <p>Schrijf "Mon enfant a de la fièvre" en "Mon enfant vomit" op een papiertje. Franse apotheken zijn uitstekend; zij helpen u snel en zonder afspraak.</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">Tip 07</div>
+        <h4>Peuterportie</h4>
+        <p>Vraag altijd naar een <em>assiette enfant</em> of een halve portie. De meeste brasseries bieden dit voor €5-8; het is genoeg en voorkomt verspilling.</p>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">Tip 08</div>
+        <h4>Zonnebrand liter</h4>
+        <p>In de zomer is de zon in Lille verrassend fel. Neem SPF50 mee uit Nederland (duurder in FR), en hersmeer elk uur bij wateractiviteiten en strandbezoek.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ CALENDAR -->
+<section id="kalender" class="container calendar-section">
+  <div class="section-title">Evenementenkalender</div>
+  <h2 style="font-size:clamp(22px,3vw,36px); color:var(--navy); margin-bottom:8px;">Wat te doen in juli &amp; augustus 2026</h2>
+  <p style="font-family:var(--sans); font-size:16px; color:var(--grey); max-width:680px; line-height:1.6;">De zomer in Noord-Frankrijk staat vol met festiviteiten, marchés en buitenevenementen. Hieronder een selectie van hoogtepunten die uw vakantie van half juli tot half augustus extra feestelijk maken.</p>
+
+  <div class="calendar-grid">
+    <div class="cal-item">
+      <div class="cal-date">
+        <span class="month">Juli</span>
+        <span class="day">14</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-title">Bastille Day – Fête Nationale</div>
+        <p class="cal-desc">De Franse nationale feestdag is in Lille een kleurrijke beleving: vuurwerk boven de citadel, militaire parade op de Grand'Place en muzikanten overal in de stad. Druk maar onvergetelijk voor kinderen.</p>
+        <span class="cal-tag">Gratis &middot; Vuurwerk 22u30</span>
+      </div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">
+        <span class="month">Juli</span>
+        <span class="day">20</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-title">Braderie de Vieux-Lille (lokaal)</div>
+        <p class="cal-desc">Kleine buurtrommelmarkt in de Rue de la Barre en omgeving. Speelgoed, tweedehands kinderkleding en vintage snuisterijen. Ideaal voor een rustige zondagmorgenwandeling.</p>
+        <span class="cal-tag">Zaterdag &middot; 8-13u &middot; Gratis</span>
+      </div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">
+        <span class="month">Juli</span>
+        <span class="day">25</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-title">La Plage de Lille</div>
+        <p class="cal-desc">Elk jaar wordt een stuk van de stadsboulevard omgetoverd tot een stadsstrand met zand, ligbedden, parasols, waterspelen en ijs. Gratis toegankelijk en perfect voor kleine kinderen die het echte strand missen.</p>
+        <span class="cal-tag">Gratis &middot; Dagelijks t/m aug.</span>
+      </div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">
+        <span class="month">Aug.</span>
+        <span class="day">1</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-title">Festival Jazz &amp; Jazz – Open Air</div>
+        <p class="cal-desc">Openlucht jazzfestival in het Parc de la Citadelle. Gezinnen liggen op dekens in het gras terwijl live bands spelen. Foodtrucks, ijskarren en een speciale kinderspeeltuin erbij geplaatst.</p>
+        <span class="cal-tag">Gratis toegang &middot; 18-22u</span>
+      </div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">
+        <span class="month">Aug.</span>
+        <span class="day">6</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-title">Louvre-Lens Nuit des Étoiles</div>
+        <p class="cal-desc">Speciale stargazing avond bij het Louvre-Lens museum in samenwerking met een sterrenwacht. Telescopen buiten opstelling, animatoren voor kinderen en een bijzondere toegang tot de galerijen 's avonds onder zachte lichtjes.</p>
+        <span class="cal-tag">€5 kind &middot; Lens &middot; 20-24u</span>
+      </div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">
+        <span class="month">Aug.</span>
+        <span class="day">10</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-title">Dimanche en Fête – Rue Piétonne</div>
+        <p class="cal-desc">Elke tweede zondag van augustus is de Rue de Paris volledig afgesloten voor voetgangers: straatartiesten, circusacts, springkastelen voor kinderen en pop-up kraampjes. Een mini-festival midden in de stad.</p>
+        <span class="cal-tag">Gratis &middot; Zondag 10-19u</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ PRACTICAL INFO -->
+<section id="praktisch" class="practical">
+  <div class="container">
+    <div class="section-title" style="color:var(--gold-l);">Praktische reisinformatie</div>
+    <h2 style="font-size:clamp(22px,3vw,36px); color:#fff;">Alles wat u moet weten vóór vertrek</h2>
+    <div class="practical-grid">
+      <div class="practical-block">
+        <h3>Reizen naar Lille</h3>
+        <ul>
+          <li><strong>Auto:</strong> A2/E19 vanuit Nederland via Antwerpen, daarna A25 richting Lille. Gratis tolwegen, ± 2,5 uur vanuit Randstad.</li>
+          <li><strong>Thalys/Eurostar:</strong> Directe verbinding Brussel–Lille in 38 min. Handige optie als u geen auto heeft.</li>
+          <li><strong>Parkeertip:</strong> Park & Ride Euralille: gratis parkeren, metro naar centrum in 8 min. Bespaart stress en kosten.</li>
+          <li><strong>Kinderzitje verhuur:</strong> Beschikbaar bij autoverhuurders op de luchthaven; beter meenemen van thuis.</li>
+          <li><strong>Brandstof:</strong> In Frankrijk betaalt u met bankpas; check of uw pas werkt bij automaten (geen PIN = probleem).</li>
+        </ul>
+      </div>
+      <div class="practical-block">
+        <h3>Gezondheid &amp; Veiligheid</h3>
+        <ul>
+          <li><strong>EHIC-kaart:</strong> Neem de Europese Zorgpas mee voor uzelf en de kinderen. Wordt vergoed bij noodgevallen.</li>
+          <li><strong>Apotheek (Pharmacie):</strong> Te herkennen aan groen kruis. Zonder afspraak, ook 's avonds via een urgentienummer.</li>
+          <li><strong>Ziekenhuis:</strong> CHRU de Lille – grootste ziekenhuis van Noord-Frankrijk. Spoedlijn: 15 (SAMU).</li>
+          <li><strong>112:</strong> Werkt overal in de EU voor noodgevallen. Gebruik altijd bij ernstig noodgeval.</li>
+          <li><strong>Hitte:</strong> In augustus kan de temperatuur 28-32°C bereiken. Plan wateractiviteiten 's middags en binnenactiviteiten 12-16u.</li>
+          <li><strong>Muggen:</strong> Waterrijke omgeving rond de citadel. Neem muggenspray mee voor 's avonds buiten.</li>
+        </ul>
+      </div>
+      <div class="practical-block">
+        <h3>Budgetplanning</h3>
+        <p><strong>Eten &amp; Drinken:</strong><br>± €50–€80/dag (gezin van 4, brasserie-stijl). Zelf ontbijten bespaart ± €20/dag.</p>
+        <br>
+        <p><strong>Activiteiten:</strong><br>Veel gratis (Zoo, parken, markten, stadsstrand). Betaald: Louvre-Lens €15 p.p., La Piscine Roubaix €12 p.p., Forum des Sciences €7 p.p.</p>
+        <br>
+        <p><strong>Brandstof/Transport:</strong><br>± €60–€90/week (auto + dagpassen metro)</p>
+        <br>
+        <p><strong>Totaalschatting 2 weken (excl. Airbnb):</strong><br>± €1.200 – €1.800 voor 2 volwassenen + 2 kinderen</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ DISCLAIMER / NOTE -->
+<div class="container">
+  <div class="disclaimer">
+    <strong>Redactionele noot:</strong> AlserdaTravel streeft naar actuele en betrouwbare reisinformatie. Openingstijden, tarieven en evenementendata kunnen wijzigen. Wij raden aan om vóór uw vertrek de officiële websites van bezienswaardigheden te raadplegen. Evenementendata voor 2026 zijn indicatief op basis van historische edities. Sommige evenementen vinden jaarlijks op wisselende data plaats.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="logo">Alserda<span>Travel</span></div>
+        <p>AlserdaTravel is een onafhankelijke reismagazine die families inspireert om de wereld te ontdekken op eigen tempo, met oog voor cultuur, beleving en het geluk van kleine reizigers.</p>
+      </div>
+      <div class="footer-col">
+        <h5>In dit nummer</h5>
+        <ul>
+          <li><a href="#intro">Waarom Lille</a></li>
+          <li><a href="#oudewijk">Vieux-Lille</a></li>
+          <li><a href="#kinderen">Voor de kids</a></li>
+          <li><a href="#uitstapjes">Daguitstapjes</a></li>
+          <li><a href="#eten">Eten</a></li>
+          <li><a href="#praktisch">Praktisch</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Over ons</h5>
+        <ul>
+          <li><a href="#">Redactie</a></li>
+          <li><a href="#">Alle bestemmingen</a></li>
+          <li><a href="#">Familie reisgidsen</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 AlserdaTravel &middot; Alle rechten voorbehouden</p>
+      <p>Samengesteld met zorg voor het gezin Alserda &middot; Zomer 2026</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
