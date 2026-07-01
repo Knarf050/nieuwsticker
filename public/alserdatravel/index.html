@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AlserdaTravel – Lille & Omgeving | Zomer 2026</title>
+  <meta name="description" content="Familiegids voor Lille & omgeving: Vieux-Lille, Parc de la Citadelle, Louvre-Lens en daguitstapjes — speciaal voor een zomervakantie met kinderen van 2 en 5 jaar.">
+  <meta property="og:title" content="AlserdaTravel – Lille & Omgeving | Zomer 2026">
+  <meta property="og:description" content="Familiegids voor Lille & omgeving: Vieux-Lille, Parc de la Citadelle, Louvre-Lens en daguitstapjes met peuter en kleuter.">
+  <meta property="og:type" content="article">
+  <meta property="og:locale" content="nl_NL">
+  <meta property="og:image" content="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_grand_place.JPG?width=1200">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -933,6 +939,26 @@
       .container { padding: 0 18px; }
       .footer-inner { grid-template-columns: 1fr; }
     }
+
+    /* ── Print ───────────────────────────────────────────────── */
+    @media print {
+      .topbar, nav.mastnav, footer.footer, .photo-grid-3, .photo-caption { display: none; }
+      .hero-bg, .full-feature-bg { display: none; }
+      .hero, .full-feature { min-height: 0; }
+      .hero-inner, .hero-title, .hero-deck, .hero-category, .hero-info,
+      .full-feature-content, .full-feature-content h2, .full-feature-content p,
+      .pull-quote, .pull-quote blockquote, .pull-quote cite {
+        color: var(--navy) !important;
+        text-shadow: none !important;
+      }
+      .practical, .tips-strip, .quickfacts { background: #fff !important; }
+      .practical h2, .practical h3, .practical p, .practical li,
+      .quickfacts .qf-label, .quickfacts .qf-value { color: var(--ink) !important; }
+      .card, .cal-item, .daytrip-item, .tip-item, .info-box, .resto,
+      .practical-block { break-inside: avoid; }
+      .card-image, .resto-img, .two-col-image { display: none; }
+      body { font-size: 12pt; }
+    }
   </style>
 </head>
 <body>
@@ -1039,15 +1065,15 @@
         <strong>Beste reistijd</strong>
         Mei – september; zomer druk maar festief
         <br><br>
-        <strong>Instappers</strong>
-        Riant, kindvriendelijk, vlak terrein
+        <strong>Toegankelijkheid</strong>
+        Compact, kindvriendelijk, vlak terrein
       </div>
     </div>
     <div class="intro-main">
       <div class="section-title">Waarom Lille?</div>
       <h2>De <em>verborgen parel</em> van Noord-Frankrijk wacht op uw gezin</h2>
-      <p>Lille ligt op een boogscheut van de grens, slechts anderhalf uur rijden vanuit Utrecht en nog geen uur vanuit Antwerpen, maar voelt als een complete wereld op zichzelf. De stad ademt Frans charme met een onmiskenbaar Vlaams karakter: roodstenen gevels, beeldschone pleinen, markten vol kleur en geur, en een culinaire traditie die elke smaakpapil verwent. Met twee kleine reizigers van twee en vijf jaar heeft Lille bovendien iets bijzonders te bieden &mdash; een stad op mensenmaat, waar avontuur en rust hand in hand gaan.</p>
-      <p>De straten van Vieux-Lille zijn overdag autoluw en aangenaam breed. Kinderwagens en buggy's rijden er soepel over de keien, terwijl uw oudste snakt naar elk plein met fontein of duiven. 's Middags kunt u uitrusten in een van de schaduwrijke parken, 's avonds eten de Lilloisen &mdash; zoals de inwoners heten &mdash; vrolijk gezamenlijk buiten. Kinderen zijn hier welkom en worden verwend met frietjes, gaufres en chocolademelk.</p>
+      <p>Lille ligt op een boogscheut van de grens, zo'n tweeënhalf uur rijden vanuit Utrecht en ruim een uur vanuit Antwerpen, maar voelt als een complete wereld op zichzelf. De stad ademt Frans charme met een onmiskenbaar Vlaams karakter: roodstenen gevels, beeldschone pleinen, markten vol kleur en geur, en een culinaire traditie die elke smaakpapil verwent. Met twee kleine reizigers van twee en vijf jaar heeft Lille bovendien iets bijzonders te bieden &mdash; een stad op mensenmaat, waar avontuur en rust hand in hand gaan.</p>
+      <p>De straten van Vieux-Lille zijn overdag autoluw en aangenaam breed. Kinderwagens en buggy's rijden er soepel over de keien, terwijl uw oudste afstormt op elk plein met fontein of duiven. 's Middags kunt u uitrusten in een van de schaduwrijke parken, 's avonds eten de Lillois &mdash; zoals de inwoners heten &mdash; vrolijk gezamenlijk buiten. Kinderen zijn hier welkom en worden verwend met frietjes, gaufres en chocolademelk.</p>
       <p>Tegelijkertijd is Lille een uitvalsbasis van formaat. Binnen een halfuur rijden bereikt u Louvre-Lens met zijn spectaculaire kunstcollectie, het futuristische Forum des Sciences in Villeneuve d'Ascq, het verbluffende La Piscine museum in Roubaix en de Vlaamse marktstad Bailleul. Uw vakantie van half juli tot half augustus biedt ruim tijd om de stad zelf te verkennen én daguitstapjes te maken die ook de kleinste reizigers boeien. Dit magazine gidst u door de hoogtepunten.</p>
     </div>
   </div>
@@ -1060,22 +1086,22 @@
   <div class="container">
     <div class="photo-grid-3">
       <div class="photo-cell main-photo">
-        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_vieille_bourse.JPG?width=800" onerror="this.src='https://picsum.photos/seed/vieille-bourse-lille/800/500';this.onerror=null;" alt="De Vieille Bourse op de Grand'Place van Lille">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_vieille_bourse.JPG?width=800" onerror="this.src='https://picsum.photos/seed/vieille-bourse-lille/800/500';this.onerror=null;" loading="lazy" alt="De Vieille Bourse op de Grand'Place van Lille">
       </div>
       <div class="side-col">
         <div class="photo-cell">
-          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_-_Les_Poussins%2C_Parc_de_la_Citadelle_%2802%29.JPG?width=400" onerror="this.src='https://picsum.photos/seed/citadelle-kinderen/400/250';this.onerror=null;" alt="Les Poussins sculpturen in het Parc de la Citadelle, Lille">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_-_Les_Poussins%2C_Parc_de_la_Citadelle_%2802%29.JPG?width=400" onerror="this.src='https://picsum.photos/seed/citadelle-kinderen/400/250';this.onerror=null;" loading="lazy" alt="Les Poussins sculpturen in het Parc de la Citadelle, Lille">
         </div>
         <div class="photo-cell">
-          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_2016_March%C3%A9_Couvert_de_Wazemmes_%281%29.jpg?width=400" onerror="this.src='https://picsum.photos/seed/wazemmes-markt/400/250';this.onerror=null;" alt="Marché Couvert de Wazemmes, Lille">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_2016_March%C3%A9_Couvert_de_Wazemmes_%281%29.jpg?width=400" onerror="this.src='https://picsum.photos/seed/wazemmes-markt/400/250';this.onerror=null;" loading="lazy" alt="Marché Couvert de Wazemmes, Lille">
         </div>
       </div>
       <div class="side-col">
         <div class="photo-cell">
-          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille%2C_Vieux_Lille%2C_Rue_Thiers.jpg?width=400" onerror="this.src='https://picsum.photos/seed/vieux-lille-straat/400/250';this.onerror=null;" alt="Pittoreske Rue Thiers in Vieux-Lille">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille%2C_Vieux_Lille%2C_Rue_Thiers.jpg?width=400" onerror="this.src='https://picsum.photos/seed/vieux-lille-straat/400/250';this.onerror=null;" loading="lazy" alt="Pittoreske Rue Thiers in Vieux-Lille">
         </div>
         <div class="photo-cell">
-          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_citadelle_aire_picnic.jpg?width=400" onerror="this.src='https://picsum.photos/seed/citadelle-park-zomer/400/250';this.onerror=null;" alt="Picknickweide bij het Parc de la Citadelle, Lille">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_citadelle_aire_picnic.jpg?width=400" onerror="this.src='https://picsum.photos/seed/citadelle-park-zomer/400/250';this.onerror=null;" loading="lazy" alt="Picknickweide bij het Parc de la Citadelle, Lille">
         </div>
       </div>
     </div>
@@ -1094,7 +1120,7 @@
       <div>
         <p>Wie voor het eerst door Vieux-Lille flanert, begrijpt direct waarom deze wijk zo geliefd is bij gezinnen. De smalle Rue de la Monnaie loopt langs boetieks en galeries, maar het zijn de plotselinge pleintjes &mdash; met hun terrassen, muzikanten en altijd wel een fontein &mdash; die kinderen betoveren. De <strong>Grand'Place (Place du Général de Gaulle)</strong> is het kloppend hart: een breed, open plein met de bronzen Déesse (Godin) die de overwinning van 1792 symboliseert. Hier kunt u rustig op een terras zitten terwijl uw vijfjarige om de gedenknaald heen rent en de tweejarige met een croissant in de hand de duiven bekijkt.</p>
         <h3>De bezienswaardige straten</h3>
-        <p>Laat u leiden door de <strong>Rue Esquermoise</strong>, de chicste winkelstraat met zijn 17e-eeuwse gevels en het beroemde warenhuispand Euralille pal erachter. Sla de <strong>Rue de Gand</strong> in voor een blik op een ander gezicht: gezellige bruine kroegen, brocantewinkels en kleine restaurants waar u de tweejarige alvast een kinderstoel kunt vragen. Eindig uw wandeling op de <strong>Place du Lion d'Or</strong>, waar op zomerse middagen straatmuzikanten optreden en kleine terrassen u uitnodigen voor een pichet rosé of een jus d'orange voor de kleintjes.</p>
+        <p>Laat u leiden door de <strong>Rue Esquermoise</strong>, de chicste winkelstraat met zijn 17e-eeuwse gevels, waar ook patisserie Meert (sinds 1761) achter een prachtige historische winkelpui zetelt. Sla de <strong>Rue de Gand</strong> in voor een blik op een ander gezicht: gezellige bruine kroegen, brocantewinkels en kleine restaurants waar u de tweejarige alvast een kinderstoel kunt vragen. Eindig uw wandeling op de <strong>Place du Lion d'Or</strong>, waar op zomerse middagen straatmuzikanten optreden en kleine terrassen u uitnodigen voor een pichet rosé of een jus d'orange voor de kleintjes.</p>
         <h3>Praktische tips voor peuters en kleuters</h3>
         <p>Vieux-Lille is grotendeels autovrij, maar de kinderkopjes kunnen verraderlijk zijn voor kleine voetjes en wielen van een buggy. Neem een stevige kinderwagen mee, of &mdash; voor uw vijfjarige &mdash; een loopfiets die u mee kunt nemen in de auto. De wijk is compact: u loopt van oost naar west in 15 minuten. Plan nooit meer dan anderhalf uur achter elkaar, met daarna een rustmoment in het nabijgelegen <strong>Jardin Vauban</strong>.</p>
         <p>Begin het bezoek bij voorkeur rond 9.30 uur, vóór de toeristenstroom op gang komt. Bakkerijen openen vroeg en de geur van versgebakken <em>ficelles picardes</em> en croissants is de beste beloning voor vroeg opstaan. Veel museumgebouwen in Vieux-Lille zijn kinderwagen-toegankelijk; vraag altijd aan de ingang of er een lift is, want niet alle historische panden zijn volledig gerenoveerd.</p>
@@ -1147,7 +1173,7 @@
   <div class="full-feature-content container">
     <div class="category-tag">Buitenleven &middot; Natuur</div>
     <h2>Parc de la Citadelle –<br>De groene long van Lille</h2>
-    <p>Het 60 hectare grote stadspark rondom Vauban's 17e-eeuwse citadel is kindervakantie in het klein: dierenparkje met herten en pauwen, speeltuinen voor alle leeftijden, roeiboten op de gracht en eindeloze grasvlakten om op te rollen. Op zomerse dagen staat er een ijswagen bij de ingang van de dierentuin. Entree gratis.</p>
+    <p>Het 60 hectare grote stadspark rondom Vauban's 17e-eeuwse citadel is kindervakantie in het klein: dierenparkje met herten en pauwen, speeltuinen voor alle leeftijden, roeiboten op de gracht en eindeloze grasvlakten om op te rollen. Op zomerse dagen staat er een ijswagen bij de ingang van de zoo. Het park zelf is gratis toegankelijk; de zoo vraagt een kleine entree (kinderen onder de 5 gratis).</p>
   </div>
 </section>
 
@@ -1165,22 +1191,22 @@
 
     <div class="card">
       <div class="card-image">
-        <img src="https://picsum.photos/seed/zoo-kids-lille/600/400" alt="Dierentuin in de Citadel">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/20101017_Zoo_de_Lille_%284%29.jpg?width=600" onerror="this.src='https://picsum.photos/seed/zoo-kids-lille/600/400';this.onerror=null;" loading="lazy" alt="Zoo de Lille in het Parc de la Citadelle">
       </div>
       <div class="card-body">
         <div class="card-category">Natuur &amp; Dieren</div>
         <h3>Zoo de Lille</h3>
-        <p>Gratis toegankelijk dierenpark binnen de citadelmuren met herten, lama's, pauwen en een kinderboerderij. Vooral voor uw tweejarige een dagvullende activiteit: dichtbij de dieren, veilig omheind, en altijd afgedekt water in de buurt. Picknickplaatsen beschikbaar.</p>
+        <p>Compact dierenpark binnen de citadelmuren met herten, lama's, pauwen en een kinderboerderij. Vooral voor uw tweejarige een topactiviteit: de dieren staan dichtbij, alles is veilig omheind en de paden zijn buggyvriendelijk. Entree €6 per volwassene, €3 per kind van 5 t/m 17; kinderen onder de 5 gratis.</p>
       </div>
       <div class="card-footer">
-        <span>Gratis toegang &middot; dagelijks open</span>
+        <span>€6 / volw. &middot; kind &lt;5 gratis</span>
         <span class="badge family">Familie top</span>
       </div>
     </div>
 
     <div class="card">
       <div class="card-image">
-        <img src="https://picsum.photos/seed/museum-science-kids/600/400" alt="Kinderen in wetenschapsmuseum">
+        <img src="https://picsum.photos/seed/museum-science-kids/600/400" loading="lazy" alt="Kinderen in wetenschapsmuseum">
       </div>
       <div class="card-body">
         <div class="card-category">Museum &amp; Ontdekking</div>
@@ -1195,7 +1221,7 @@
 
     <div class="card">
       <div class="card-image">
-        <img src="https://picsum.photos/seed/jardin-vauban-summer/600/400" alt="Kinderen in Jardin Vauban">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_%E2%80%94_La_Grotte_du_Jardin_Vauban.jpg?width=600" onerror="this.src='https://picsum.photos/seed/jardin-vauban-summer/600/400';this.onerror=null;" loading="lazy" alt="De grot in het Jardin Vauban, Lille">
       </div>
       <div class="card-body">
         <div class="card-category">Buitenspelen</div>
@@ -1210,7 +1236,7 @@
 
     <div class="card">
       <div class="card-image">
-        <img src="https://picsum.photos/seed/swimming-pool-lille/600/400" alt="Binnenbad Lille">
+        <img src="https://picsum.photos/seed/swimming-pool-lille/600/400" loading="lazy" alt="Openluchtbad">
       </div>
       <div class="card-body">
         <div class="card-category">Water &amp; Zwemmen</div>
@@ -1225,12 +1251,12 @@
 
     <div class="card">
       <div class="card-image">
-        <img src="https://picsum.photos/seed/lille-tramway-tour/600/400" alt="Historische tramrit door Lille">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Inside_VAL_208_%28Lille_Metro%29.jpg?width=600" onerror="this.src='https://picsum.photos/seed/lille-tramway-tour/600/400';this.onerror=null;" loading="lazy" alt="Interieur van de VAL-metro van Lille">
       </div>
       <div class="card-body">
         <div class="card-category">Vervoer &amp; Beleving</div>
         <h3>VAL-metro &amp; tram</h3>
-        <p>Het automatische metrosysteem van Lille (volledig zonder bestuurder, het eerste ter wereld!) is een rit op zich voor kleine techniekliefhebbers. Pak de metro naar Villeneuve d'Ascq en spot de robots in de controlekamer. Uw vijfjarige zal verbaasd zijn dat de trein zelf rijdt. Ideaal voor een regenachtige middag.</p>
+        <p>Het automatische metrosysteem van Lille (volledig zonder bestuurder, het eerste ter wereld!) is een rit op zich voor kleine techniekliefhebbers. Ga helemaal voorin zitten: zonder bestuurderscabine kijkt u met de kinderen recht de tunnel in. Uw vijfjarige zal verbaasd zijn dat de trein zelf rijdt. Ideaal voor een regenachtige middag.</p>
       </div>
       <div class="card-footer">
         <span>€1.80 / rit &middot; dagpas €5</span>
@@ -1240,7 +1266,7 @@
 
     <div class="card">
       <div class="card-image">
-        <img src="https://picsum.photos/seed/patisserie-boulangerie-lille/600/400" alt="Bakker met croissants">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_Meert.JPG?width=600" onerror="this.src='https://picsum.photos/seed/patisserie-boulangerie-lille/600/400';this.onerror=null;" loading="lazy" alt="De historische winkelpui van Meert in Lille">
       </div>
       <div class="card-body">
         <div class="card-category">Smaakbeleving</div>
@@ -1262,11 +1288,87 @@
   <cite>AlserdaTravel Redactie &middot; Zomer 2026</cite>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════ VOORBEELDDAG -->
+<section class="container" style="padding-top: 64px;">
+  <div class="section-title">Dagindeling</div>
+  <h2 style="font-size:clamp(24px,3.5vw,40px); color:var(--navy); margin-bottom:8px;">Zo ziet een perfecte Lille-dag eruit</h2>
+  <p style="font-family:var(--sans); font-size:17px; color:var(--grey); max-width:720px; line-height:1.6; margin-bottom:0;">Met een peuter en een kleuter draait een geslaagde vakantiedag om ritme: vroeg eropuit, rust tijdens de middaghitte en op tijd aan tafel. Een beproefd schema van de redactie.</p>
+
+  <div class="calendar-grid">
+    <div class="cal-item">
+      <div class="cal-date">
+        <span class="month">vanaf</span>
+        <span class="day" style="font-size:17px; line-height:1.3;">9.00</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-title">Croissants &amp; Vieux-Lille</div>
+        <p class="cal-desc">Haal het ontbijt bij de bakker en wandel door het nog stille Vieux-Lille. De keien zijn leeg, de temperatuur aangenaam en de duiven op de Grand'Place hebben alle aandacht van de tweejarige.</p>
+        <span class="cal-tag">Rustigste moment van de dag</span>
+      </div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">
+        <span class="month">rond</span>
+        <span class="day" style="font-size:17px; line-height:1.3;">10.30</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-title">Parc de la Citadelle</div>
+        <p class="cal-desc">Speeltuin, de kleine zoo of een roeibootje op de gracht &mdash; en een ijsje van de ijswagen als afsluiter. Hier raken beide kinderen hun energie kwijt vóór het middagdutje.</p>
+        <span class="cal-tag">Energie eruit</span>
+      </div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">
+        <span class="month">13.00</span>
+        <span class="day" style="font-size:17px; line-height:1.3;">–15.00</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-title">Lunch &amp; middagdutje</div>
+        <p class="cal-desc">Terug naar het appartement voor een eenvoudige lunch en het heilige middagdutje. De stad is op dit uur toch op zijn heetst en drukst; u mist niets.</p>
+        <span class="cal-tag">Rustmoment</span>
+      </div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">
+        <span class="month">rond</span>
+        <span class="day" style="font-size:17px; line-height:1.3;">15.30</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-title">Middagprogramma op maat</div>
+        <p class="cal-desc">Kies naar weer en energie: het openluchtbad, poppentheater in het Jardin Vauban, de VAL-metro als attractie of een daguitstap-licht naar Roubaix. Houd het bij één activiteit.</p>
+        <span class="cal-tag">Flexibel blok</span>
+      </div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">
+        <span class="month">rond</span>
+        <span class="day" style="font-size:17px; line-height:1.3;">18.00</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-title">Vroeg aan tafel</div>
+        <p class="cal-desc">Om 18.00 uur zijn de brasseries nog rustig en is het personeel op zijn geduldigst. Vraag een assiette enfant en bestel zelf alvast dat glas wijn &mdash; u heeft het verdiend.</p>
+        <span class="cal-tag">Vóór de Franse avonddrukte</span>
+      </div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-date">
+        <span class="month">tot</span>
+        <span class="day" style="font-size:17px; line-height:1.3;">20.00</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-title">Avondrondje &amp; bedtijd</div>
+        <p class="cal-desc">Een kort avondrondje over de Grand'Place &mdash; in de avondzon op zijn mooist &mdash; en dan naar bed. Uitgeruste kinderen zijn morgen weer de beste reisgenoten.</p>
+        <span class="cal-tag">Afronden</span>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══════════════════════════════════════════════════════════ UITSTAPJES -->
 <section id="uitstapjes" class="container" style="padding-top: 64px;">
   <div class="section-title">Daguitstapjes</div>
   <h2 style="font-size:clamp(24px,3.5vw,40px); color:var(--navy); margin-bottom:8px;">De omgeving: een schat aan mogelijkheden</h2>
-  <p style="font-family:var(--sans); font-size:17px; color:var(--grey); max-width:720px; line-height:1.6; margin-bottom:0;">Lille ligt op het kruispunt van Noord-Frankrijk en België. Binnen een uur rijden bereikt u werelden van verschil &mdash; van zandstrand tot werelderfgoed kunstmuseum.</p>
+  <p style="font-family:var(--sans); font-size:17px; color:var(--grey); max-width:720px; line-height:1.6; margin-bottom:0;">Lille ligt op het kruispunt van Noord-Frankrijk en België. Binnen een halfuur rijden bereikt u werelden van verschil &mdash; van Vlaamse marktstadjes tot wereldkunst uit het Louvre.</p>
 
   <div class="daytrip-list">
     <div class="daytrip-item">
@@ -1292,6 +1394,12 @@
       <div class="daytrip-name">Bailleul</div>
       <p class="daytrip-desc">Authentieke Vlaamse marktstad met karakteristieke bakstenen gevels, een imposant belfort en een wekelijkse markt vol lokale producten. Het centrum is compact en aangenaam te bewandelen; ideaal voor een rustig dagje buitenaf zonder de drukte van de grote stad.</p>
       <span class="daytrip-tag">★★★☆☆ Sfeer &amp; natuur</span>
+    </div>
+    <div class="daytrip-item">
+      <div class="daytrip-dist">30 min</div>
+      <div class="daytrip-name">Kortrijk (België)</div>
+      <p class="daytrip-desc">Net over de grens wacht Vlaanderen: wandel langs de middeleeuwse Broeltorens aan de Leie, bewonder het belfort (UNESCO-werelderfgoed) en laat de kinderen los op de speelzones langs de vernieuwde Leieboorden. Het autovrije centrum is compact en buggyvriendelijk &mdash; en u hoort er weer Nederlands.</p>
+      <span class="daytrip-tag">★★★★☆ België &amp; sfeer</span>
     </div>
   </div>
 </section>
@@ -1322,7 +1430,7 @@
     </div>
     <div>
       <div class="two-col-image">
-        <img src="https://picsum.photos/seed/lille-brasserie-interior/600/700" alt="Sfeervolle brasserie in Lille">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_-_Estaminet_%27T_Rijsel_-_20190423_%281%29.jpg?width=600" onerror="this.src='https://picsum.photos/seed/lille-brasserie-interior/600/700';this.onerror=null;" loading="lazy" alt="Estaminet 't Rijsel in Lille">
       </div>
     </div>
   </div>
@@ -1331,17 +1439,17 @@
   <div class="restaurant-grid">
     <div class="resto">
       <div class="resto-img">
-        <img src="https://picsum.photos/seed/resto-mussels/200/200" alt="Moules frites">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Moules_Frites.jpg?width=200" onerror="this.src='https://picsum.photos/seed/resto-mussels/200/200';this.onerror=null;" loading="lazy" alt="Moules-frites">
       </div>
       <div class="resto-body">
         <div class="resto-name">La Chicorée</div>
         <div class="resto-type">Brasserie &middot; Grand'Place</div>
-        <div class="resto-desc">Iconische brasserie op de Grand'Place, open vanaf 9 uur 's morgens tot middernacht. Uitstekende kindermenu's, geduldig personeel en een onvergetelijk uitzicht op het plein. Bestelt u de moules voor uzelf, dan krijgen de kleintjes er automatisch een handje friet bij.</div>
+        <div class="resto-desc">Iconische brasserie op de Grand'Place, open vanaf 9 uur 's morgens tot middernacht. Uitstekende kindermenu's, geduldig personeel en een onvergetelijk uitzicht op het plein. Bestel de moules voor uzelf en vraag voor de kleintjes een handje friet erbij.</div>
       </div>
     </div>
     <div class="resto">
       <div class="resto-img">
-        <img src="https://picsum.photos/seed/waffle-shop-belle/200/200" alt="Gaufre Meert">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_Meert2.JPG?width=200" onerror="this.src='https://picsum.photos/seed/waffle-shop-belle/200/200';this.onerror=null;" loading="lazy" alt="Patisserie Meert, Rue Esquermoise">
       </div>
       <div class="resto-body">
         <div class="resto-name">Meert</div>
@@ -1351,7 +1459,7 @@
     </div>
     <div class="resto">
       <div class="resto-img">
-        <img src="https://picsum.photos/seed/pizza-kids-restaurant/200/200" alt="Kindvriendelijk restaurant">
+        <img src="https://picsum.photos/seed/pizza-kids-restaurant/200/200" loading="lazy" alt="Kindvriendelijk restaurant">
       </div>
       <div class="resto-body">
         <div class="resto-name">Les Trois Brasseurs</div>
@@ -1361,7 +1469,7 @@
     </div>
     <div class="resto">
       <div class="resto-img">
-        <img src="https://picsum.photos/seed/marche-wazemmes-food/200/200" alt="Marché de Wazemmes">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lille_2016_March%C3%A9_Couvert_de_Wazemmes_%281%29.jpg?width=200" onerror="this.src='https://picsum.photos/seed/marche-wazemmes-food/200/200';this.onerror=null;" loading="lazy" alt="Marché de Wazemmes">
       </div>
       <div class="resto-body">
         <div class="resto-name">Marché de Wazemmes</div>
@@ -1381,7 +1489,7 @@
       <div class="tip-item">
         <div class="tip-num">Tip 01</div>
         <h4>Vertrek vroeg</h4>
-        <p>Sla het Lille-centrum voor 9.30 uur in: koelste temperaturen, geen drukte en verse bakkerijen. Kleine kinderen zijn 's morgens friser dan 's middags.</p>
+        <p>Trek vóór 9.30 uur het centrum in: koelste temperaturen, geen drukte en verse bakkerijen. Kleine kinderen zijn 's morgens frisser dan 's middags.</p>
       </div>
       <div class="tip-item">
         <div class="tip-num">Tip 02</div>
@@ -1401,7 +1509,7 @@
       <div class="tip-item">
         <div class="tip-num">Tip 05</div>
         <h4>App: Lille City Pass</h4>
-        <p>De digitale Lille City Pass geeft korting op musea, metro en rondvaartbooten. Twee dagen kost €25 per volwassene. Kinderen t/m 12 jaar zijn gratis op de meeste plekken.</p>
+        <p>De digitale Lille City Pass geeft korting op musea, metro en rondvaartboten. Twee dagen kost €25 per volwassene. Kinderen t/m 12 jaar zijn gratis op de meeste plekken.</p>
       </div>
       <div class="tip-item">
         <div class="tip-num">Tip 06</div>
@@ -1460,7 +1568,7 @@
       </div>
       <div class="cal-body">
         <div class="cal-title">Parc de la Citadelle – dagelijks plezier</div>
-        <p class="cal-desc">Geen specifiek evenement, maar een dagelijkse belevenis: de gratis dierentuin, roeiboten op de gracht, ijskarren bij de ingang en eindeloze grasvlakten. Op mooie avonden spelen lokale muzikanten spontaan. De ideale plek om niets te plannen.</p>
+        <p class="cal-desc">Geen specifiek evenement, maar een dagelijkse belevenis: de kleine stadszoo, roeiboten op de gracht, ijskarren bij de ingang en eindeloze grasvlakten. Op mooie avonden spelen lokale muzikanten spontaan. De ideale plek om niets te plannen.</p>
         <span class="cal-tag">Gratis &middot; Dagelijks open</span>
       </div>
     </div>
@@ -1500,6 +1608,32 @@
   </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════════════════ VERBLIJF & PAKLIJST -->
+<section class="container" style="padding: 56px 0 48px;">
+  <div class="section-title">Verblijf &amp; voorbereiding</div>
+  <h2 style="font-size:clamp(22px,3vw,36px); color:var(--navy); margin-bottom:28px;">Waar slaapt u &mdash; en wat gaat er mee?</h2>
+  <div class="two-col" style="align-items: start;">
+    <div class="info-box">
+      <h4>De beste wijken voor gezinnen</h4>
+      <p style="font-family:var(--sans); font-size:14px; color:var(--grey); line-height:1.7;"><strong>Vieux-Lille</strong> is het sfeervolst: alles te voet bereikbaar, maar reken op kinderkopjes en levendige avonden. <strong>Vauban-Esquermes</strong>, de wijk rond het Citadelpark, is rustig en groen met speeltuinen om de hoek &mdash; ideaal met een peuter. Rond <strong>Euralille en de stations</strong> vindt u de praktischste (parkeer)opties, maar minder charme.</p>
+      <p style="font-family:var(--sans); font-size:14px; color:var(--grey); line-height:1.7; margin-top:12px;"><strong>Tip van de redactie:</strong> kies een appartement met twee slaapkamers. Het middagdutje van de tweejarige bepaalt het dagritme, en niemand wil drie weken fluisterend in het donker zitten.</p>
+    </div>
+    <div class="info-box">
+      <h4>Paklijst voor de zomer met peuter &amp; kleuter</h4>
+      <ul>
+        <li>Stevige buggy met goede wielen (kinderkopjes!) en een loopfiets voor de vijfjarige</li>
+        <li>Opvouwbaar reispotje &mdash; openbare wc's zijn schaars</li>
+        <li>SPF50, zonnehoedjes en zwembandjes</li>
+        <li>Muggenspray voor avonden bij de Citadelle</li>
+        <li>EHIC-zorgpassen voor het hele gezin</li>
+        <li>Picknickdeken &mdash; ook handig bij de openluchtcinema</li>
+        <li>Canvas tas voor de markt van Wazemmes</li>
+        <li>Briefje met "Mon enfant a de la fièvre" voor de apotheek</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
 <!-- ═══════════════════════════════════════════════════════════ PRACTICAL INFO -->
 <section id="praktisch" class="practical">
   <div class="container">
@@ -1531,7 +1665,7 @@
         <h3>Budgetplanning</h3>
         <p><strong>Eten &amp; Drinken:</strong><br>± €50–€80/dag (gezin van 4, brasserie-stijl). Zelf ontbijten bespaart ± €20/dag.</p>
         <br>
-        <p><strong>Activiteiten:</strong><br>Veel gratis (Zoo, parken, markten, stadsstrand). Betaald: Louvre-Lens €15 p.p., La Piscine Roubaix €12 p.p., Forum des Sciences €7 p.p.</p>
+        <p><strong>Activiteiten:</strong><br>Veel gratis (parken, markten, speeltuinen). Betaald: Zoo de Lille €6 p.p., Louvre-Lens €15 p.p., La Piscine Roubaix €12 p.p., Forum des Sciences €7 p.p.</p>
         <br>
         <p><strong>Brandstof/Transport:</strong><br>± €60–€90/week (auto + dagpassen metro)</p>
         <br>
@@ -1554,7 +1688,7 @@
     <div class="footer-inner">
       <div class="footer-brand">
         <div class="logo">Alserda<span>Travel</span></div>
-        <p>AlserdaTravel is een onafhankelijke reismagazine die families inspireert om de wereld te ontdekken op eigen tempo, met oog voor cultuur, beleving en het geluk van kleine reizigers.</p>
+        <p>AlserdaTravel is een onafhankelijk reismagazine dat families inspireert om de wereld te ontdekken op eigen tempo, met oog voor cultuur, beleving en het geluk van kleine reizigers.</p>
       </div>
       <div class="footer-col">
         <h5>In dit nummer</h5>
