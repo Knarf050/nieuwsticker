@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zuid-Holland Vandaag</title>
+<style>
+  :root {
+    --bg: #ECEDE7;
+    --bg-raised: #F7F7F2;
+    --ink: #1C2024;
+    --ink-dim: #565C60;
+    --line: rgba(28,32,36,0.14);
+    --accent-dh: #B3232E;
+    --accent-dh-soft: rgba(179,35,46,0.12);
+    --accent-rt: #0E7C66;
+    --accent-rt-soft: rgba(14,124,102,0.12);
+    --accent-nl: #8A6A1E;
+    --accent-nl-soft: rgba(138,106,30,0.12);
+    --font-display: 'Bahnschrift', 'Arial Narrow', 'Helvetica Neue Condensed', 'Roboto Condensed', sans-serif;
+    --font-body: -apple-system, 'Segoe UI', system-ui, sans-serif;
+    --font-mono: ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0B0E11; --bg-raised: #12161A; --ink: #EDEAE0; --ink-dim: #8E9298; --line: rgba(237,234,224,0.14);
+      --accent-dh: #FF5D68; --accent-dh-soft: rgba(255,93,104,0.16);
+      --accent-rt: #2FD9B0; --accent-rt-soft: rgba(47,217,176,0.16);
+      --accent-nl: #F0B94A; --accent-nl-soft: rgba(240,185,74,0.14);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0B0E11; --bg-raised: #12161A; --ink: #EDEAE0; --ink-dim: #8E9298; --line: rgba(237,234,224,0.14);
+    --accent-dh: #FF5D68; --accent-dh-soft: rgba(255,93,104,0.16);
+    --accent-rt: #2FD9B0; --accent-rt-soft: rgba(47,217,176,0.16);
+    --accent-nl: #F0B94A; --accent-nl-soft: rgba(240,185,74,0.14);
+  }
+  :root[data-theme="light"] {
+    --bg: #ECEDE7; --bg-raised: #F7F7F2; --ink: #1C2024; --ink-dim: #565C60; --line: rgba(28,32,36,0.14);
+    --accent-dh: #B3232E; --accent-dh-soft: rgba(179,35,46,0.12);
+    --accent-rt: #0E7C66; --accent-rt-soft: rgba(14,124,102,0.12);
+    --accent-nl: #8A6A1E; --accent-nl-soft: rgba(138,106,30,0.12);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); line-height: 1.5; padding: clamp(16px, 4vw, 48px); }
+  .board { max-width: 920px; margin: 0 auto; }
+  .board-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; border-bottom: 3px solid var(--ink); padding-bottom: 14px; margin-bottom: 6px; flex-wrap: wrap; }
+  .board-title { font-family: var(--font-display); font-weight: 700; font-stretch: condensed; text-transform: uppercase; letter-spacing: 0.04em; font-size: clamp(28px, 6vw, 44px); margin: 0; }
+  .board-sub { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--ink-dim); font-size: 13px; text-align: right; }
+  .board-sub .live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-rt); margin-right: 6px; animation: pulse 2.4s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .live-dot, .row { animation: none !important; } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  .meta-strip { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); padding: 10px 2px 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+  section.platform { margin-bottom: 34px; }
+  .platform-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+  .platform-name { font-family: var(--font-display); font-stretch: condensed; text-transform: uppercase; letter-spacing: 0.03em; font-weight: 700; font-size: 22px; margin: 0; }
+  .platform-name.dh { color: var(--accent-dh); }
+  .platform-name.rt { color: var(--accent-rt); }
+  .platform-name.nl { color: var(--accent-nl); }
+  .platform-count { font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); }
+  .rows { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 2px; overflow: hidden; }
+  .row { display: grid; grid-template-columns: 92px 1fr auto; gap: 4px 14px; padding: 12px 16px; border-bottom: 1px solid var(--line); align-items: baseline; animation: flap-in 0.5s ease backwards; }
+  .row:last-child { border-bottom: none; }
+  @keyframes flap-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .row .time { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 13px; color: var(--ink-dim); white-space: nowrap; }
+  .row .what { min-width: 0; }
+  .row .what .title { font-weight: 600; font-size: 15px; }
+  .row .what .loc { font-size: 13px; color: var(--ink-dim); margin-top: 2px; }
+  .row .tag { grid-column: 3; grid-row: 1 / 3; align-self: center; font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+  .platform.dh .tag { background: var(--accent-dh-soft); color: var(--accent-dh); }
+  .platform.rt .tag { background: var(--accent-rt-soft); color: var(--accent-rt); }
+  .platform.nl .tag { background: var(--accent-nl-soft); color: var(--accent-nl); }
+  .row.highlight { outline: 1.5px dashed currentColor; outline-offset: -6px; }
+  footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-dim); }
+  footer .sources { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; }
+  footer a { color: var(--ink-dim); }
+  footer a:hover { color: var(--ink); }
+  .next-update { font-family: var(--font-mono); }
+  .back-link { display: inline-block; margin-bottom: 18px; font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); }
+  .back-link:hover { color: var(--ink); }
+  .empty-note { padding: 16px; font-size: 13px; color: var(--ink-dim); font-style: italic; }
+  @media (max-width: 480px) {
+    .row { grid-template-columns: 72px 1fr; }
+    .row .tag { grid-column: 1 / 3; grid-row: 3; justify-self: start; margin-top: 2px; }
+  }
+</style>
+</head>
+<body>
+  <div class="board">
+    <a class="back-link" href="/">← Nederlandse Nieuwsticker</a>
+    <div class="board-header">
+      <h1 class="board-title">Zuid-Holland Vandaag</h1>
+      <div class="board-sub"><span><span class="live-dot"></span><span id="date-label">—</span></span></div>
+    </div>
+    <div class="meta-strip">
+      <span id="updated-at">—</span>
+      <span class="next-update" id="next-update">—</span>
+    </div>
+    <div id="sections"></div>
+    <footer>
+      <div>Elke ochtend automatisch bijgewerkt met de agenda van die dag voor Den Haag, Rotterdam en de rest van Zuid-Holland.</div>
+      <div class="sources" id="sources">Bronnen:</div>
+    </footer>
+  </div>
+
+  <script src="agenda-data.js"></script>
+  <script>
+    function esc(s) {
+      var d = document.createElement('div');
+      d.textContent = s == null ? '' : String(s);
+      return d.innerHTML;
+    }
+
+    function render(data) {
+      document.getElementById('date-label').textContent = data.dateLabel || '';
+      document.getElementById('updated-at').textContent = 'Laatst bijgewerkt: ' + (data.updatedAt || '—');
+      document.getElementById('next-update').textContent = 'Volgende update: ' + (data.nextUpdate || '—');
+
+      var sectionsEl = document.getElementById('sections');
+      sectionsEl.innerHTML = (data.sections || []).map(function (section) {
+        var rows = (section.items || []).map(function (item) {
+          return '' +
+            '<div class="row' + (item.highlight ? ' highlight' : '') + '">' +
+              '<div class="time">' + esc(item.time) + '</div>' +
+              '<div class="what"><div class="title">' + esc(item.title) + '</div><div class="loc">' + esc(item.loc) + '</div></div>' +
+              '<div class="tag">' + esc(item.tag) + '</div>' +
+            '</div>';
+        }).join('');
+        if (!rows) rows = '<div class="empty-note">Geen evenementen gevonden voor vandaag.</div>';
+        return '' +
+          '<section class="platform ' + esc(section.accent) + '">' +
+            '<div class="platform-head">' +
+              '<h2 class="platform-name ' + esc(section.accent) + '">' + esc(section.name) + '</h2>' +
+              '<span class="platform-count">' + (section.items ? section.items.length : 0) + ' activiteiten</span>' +
+            '</div>' +
+            '<div class="rows">' + rows + '</div>' +
+          '</section>';
+      }).join('');
+
+      var sourcesEl = document.getElementById('sources');
+      var links = (data.sources || []).map(function (s) {
+        return '<a href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">' + esc(s.label) + '</a>';
+      }).join('');
+      sourcesEl.innerHTML = 'Bronnen: ' + links;
+    }
+
+    if (window.AGENDA_DATA) {
+      render(window.AGENDA_DATA);
+    } else {
+      document.getElementById('sections').innerHTML = '<div class="empty-note">Geen agendagegevens gevonden.</div>';
+    }
+  </script>
+</body>
+</html>
