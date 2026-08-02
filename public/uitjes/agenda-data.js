@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zaterdag 25 juli 2026',
-  updatedAt: '25-07-2026, 09:00',
+  dateLabel: 'Zondag 2 augustus 2026',
+  updatedAt: '02-08-2026, 09:15',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,14 +14,10 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '10:30', title: 'Familierondleiding Tweede Kamer', loc: 'Tweede Kamer — t/m 29 aug, elke zaterdag', tag: 'Familie', highlight: true },
-        { time: 't/m 2 aug', title: 'Jeugdactiviteiten Scheveningen Beach Resort', loc: 'Scheveningen', tag: 'Familie' },
-        { time: 't/m 31 jul', title: 'Elsewhere The Hague', loc: 'Diverse locaties', tag: 'Festival' },
-        { time: 't/m 30 jul', title: 'Dance-programma', loc: 'PAARD', tag: 'Muziek' },
-        { time: 't/m 30 jul', title: 'Filmprogramma', loc: 'Filmhuis Den Haag', tag: 'Film' },
-        { time: 't/m 26 sep', title: 'Court Pond Walking tours', loc: 'Hofvijver e.o.', tag: 'Wandeling' },
-        { time: 't/m 28 aug', title: 'Dreams and Talents: Ukraine (foto)', loc: 'Atrium Den Haag', tag: 'Expo' },
-        { time: 't/m 28 aug', title: 'Courage of a Nation (foto)', loc: 'Atrium Den Haag', tag: 'Expo' },
+        { time: '12:00–15:00', title: 'COC Haaglanden-evenement', loc: 'Zuiderparktheater', tag: 'Festival', highlight: true },
+        { time: '10:00–16:00', title: 'Commandobunker (museum)', loc: 'Den Haag', tag: 'Expo' },
+        { time: 't/m 21 sep', title: 'The Hague Summer Sports', loc: 'Diverse locaties — gratis sportclinics en festivals', tag: 'Sport' },
+        { time: 't/m 31 aug', title: 'Zomer in de bieb', loc: 'Bibliotheek Den Haag — gratis activiteiten', tag: 'Familie' },
       ],
     },
     {
@@ -29,9 +25,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '12:00', title: 'Zomercarnaval — Straatparade', loc: 'Vanaf de Blaak — hoofdevenement vandaag', tag: 'Festival', highlight: true },
-        { time: '13:00–15:00', title: 'Gratis kids-expo', loc: 'Kunstinstituut Melly', tag: 'Familie' },
-        { time: '17:30', title: 'Lovumba — Latin Boat Party', loc: 'Sint-Jobshavenkade', tag: 'Muziek' },
+        { time: '11:00–17:00', title: 'Strand in de stad', loc: 'Museum Rotterdam', tag: 'Familie', highlight: true },
+        { time: 't/m 31 aug', title: 'Rotterdam aan Zee (pop-up expo)', loc: 'Museum Rotterdam, Coolhaven — replica badkoets', tag: 'Expo' },
       ],
     },
     {
@@ -39,17 +34,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '10:00–17:00', title: 'Archeon: mode & textiel', loc: 'Alphen aan den Rijn — ook morgen', tag: 'Expo' },
-        { time: '10:00–16:00', title: 'Circulaire markt', loc: 'Ridderkerk', tag: 'Markt' },
-        { time: '12:00–16:00', title: 'Strand-ontdektocht', loc: 'Kust Zuid-Holland', tag: 'Familie' },
-        { time: '10:00–15:00', title: 'Vleermuisbunker-bezoek', loc: 'Zuid-Holland', tag: 'Natuur' },
+        { time: '2–15 aug', title: '27ste Internationaal Romeins Festival', loc: 'Archeon, Alphen aan den Rijn — legioenskamp, gladiatorenshows', tag: 'Festival', highlight: true },
       ],
     },
   ],
   sources: [
-    { label: 'DagjeWeg — Den Haag', url: 'https://www.dagjeweg.nl/kalender/den-haag-centrum/25-juli-2026' },
-    { label: 'UITagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'DagjeWeg — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/25-juli-2026' },
-    { label: 'denhaag.com', url: 'https://denhaag.com/en/calendar' },
+    { label: 'DagjeWeg — Zuid-Holland natuur', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/natuur/2-augustus-2026' },
+    { label: 'Kidsproof Den Haag', url: 'https://www.kidsproof.nl/denhaag/uitjes/zomervakantie/' },
+    { label: 'Museum Rotterdam — Rotterdam aan Zee', url: 'https://museumrotterdam.nl/tentoonstellingen/rotterdam-aan-zee/' },
+    { label: 'Archeon — evenementen', url: 'https://www.archeon.nl/nl/evenementen.html' },
   ],
 };
