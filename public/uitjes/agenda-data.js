@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 2 augustus 2026',
-  updatedAt: '02-08-2026, 09:15',
+  dateLabel: 'Maandag 3 augustus 2026',
+  updatedAt: '03-08-2026, 07:06',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,10 +14,9 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '12:00–15:00', title: 'COC Haaglanden-evenement', loc: 'Zuiderparktheater', tag: 'Festival', highlight: true },
-        { time: '10:00–16:00', title: 'Commandobunker (museum)', loc: 'Den Haag', tag: 'Expo' },
-        { time: 't/m 21 sep', title: 'The Hague Summer Sports', loc: 'Diverse locaties — gratis sportclinics en festivals', tag: 'Sport' },
+        { time: 't/m 21 sep', title: 'The Hague Summer Sports', loc: 'Diverse locaties — gratis sportclinics en festivals', tag: 'Sport', highlight: true },
         { time: 't/m 31 aug', title: 'Zomer in de bieb', loc: 'Bibliotheek Den Haag — gratis activiteiten', tag: 'Familie' },
+        { time: 'doorlopend', title: 'SEA LIFE Scheveningen (vernieuwd)', loc: 'Scheveningen', tag: 'Familie' },
       ],
     },
     {
@@ -25,8 +24,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '11:00–17:00', title: 'Strand in de stad', loc: 'Museum Rotterdam', tag: 'Familie', highlight: true },
-        { time: 't/m 31 aug', title: 'Rotterdam aan Zee (pop-up expo)', loc: 'Museum Rotterdam, Coolhaven — replica badkoets', tag: 'Expo' },
+        { time: 't/m 31 aug', title: 'Rotterdam aan Zee (pop-up expo)', loc: 'Museum Rotterdam, Coolhaven — replica badkoets', tag: 'Expo', highlight: true },
+        { time: 'doorlopend', title: 'Adventure City Rotterdam', loc: 'Klimparcours en zipline', tag: 'Actief' },
       ],
     },
     {
@@ -35,13 +34,14 @@ window.AGENDA_DATA = {
       accent: 'nl',
       items: [
         { time: '2–15 aug', title: '27ste Internationaal Romeins Festival', loc: 'Archeon, Alphen aan den Rijn — legioenskamp, gladiatorenshows', tag: 'Festival', highlight: true },
+        { time: 'doorlopend', title: 'Kinderdijk (UNESCO Werelderfgoed)', loc: 'Molens en waterbeheer', tag: 'Natuur' },
       ],
     },
   ],
   sources: [
-    { label: 'DagjeWeg — Zuid-Holland natuur', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/natuur/2-augustus-2026' },
-    { label: 'Kidsproof Den Haag', url: 'https://www.kidsproof.nl/denhaag/uitjes/zomervakantie/' },
+    { label: 'Kidsproof Den Haag — zomervakantie', url: 'https://www.kidsproof.nl/denhaag/uitjes/zomervakantie/' },
     { label: 'Museum Rotterdam — Rotterdam aan Zee', url: 'https://museumrotterdam.nl/tentoonstellingen/rotterdam-aan-zee/' },
     { label: 'Archeon — evenementen', url: 'https://www.archeon.nl/nl/evenementen.html' },
+    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
