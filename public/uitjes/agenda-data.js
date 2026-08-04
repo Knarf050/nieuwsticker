@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 3 augustus 2026',
-  updatedAt: '03-08-2026, 07:06',
+  dateLabel: 'Dinsdag 4 augustus 2026',
+  updatedAt: '04-08-2026, 07:07',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,9 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 't/m 21 sep', title: 'The Hague Summer Sports', loc: 'Diverse locaties — gratis sportclinics en festivals', tag: 'Sport', highlight: true },
-        { time: 't/m 31 aug', title: 'Zomer in de bieb', loc: 'Bibliotheek Den Haag — gratis activiteiten', tag: 'Familie' },
-        { time: 'doorlopend', title: 'SEA LIFE Scheveningen (vernieuwd)', loc: 'Scheveningen', tag: 'Familie' },
+        { time: 'vandaag geopend', title: 'Nieuwe tentoonstellingen', loc: 'Kunstmuseum, Panorama Mesdag & Louwman Museum — t/m 31 dec', tag: 'Expo', highlight: true },
+        { time: 't/m 14 sep', title: 'Walk of Fame (gratis)', loc: 'Scheveningen boulevard', tag: 'Familie' },
       ],
     },
     {
@@ -24,8 +23,9 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 't/m 31 aug', title: 'Rotterdam aan Zee (pop-up expo)', loc: 'Museum Rotterdam, Coolhaven — replica badkoets', tag: 'Expo', highlight: true },
-        { time: 'doorlopend', title: 'Adventure City Rotterdam', loc: 'Klimparcours en zipline', tag: 'Actief' },
+        { time: '19:00–23:00', title: 'Dansevenement', loc: 'Stadhuisplein', tag: 'Muziek', highlight: true },
+        { time: '11:00–17:00', title: 'Strand in de stad', loc: 'Museum Rotterdam', tag: 'Familie' },
+        { time: 'vanavond', title: 'Orgelpauzeconcert — Jan Wisse', loc: 'Laurenskerk', tag: 'Muziek' },
       ],
     },
     {
@@ -34,13 +34,14 @@ window.AGENDA_DATA = {
       accent: 'nl',
       items: [
         { time: '2–15 aug', title: '27ste Internationaal Romeins Festival', loc: 'Archeon, Alphen aan den Rijn — legioenskamp, gladiatorenshows', tag: 'Festival', highlight: true },
-        { time: 'doorlopend', title: 'Kinderdijk (UNESCO Werelderfgoed)', loc: 'Molens en waterbeheer', tag: 'Natuur' },
+        { time: 'deze zomer', title: 'Delfts blauw x streetart', loc: 'Royal Delft Museum, Delft', tag: 'Expo' },
+        { time: 'deze zomer', title: 'Galleria — mini-tentoonstellingen', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Expo' },
       ],
     },
   ],
   sources: [
-    { label: 'Kidsproof Den Haag — zomervakantie', url: 'https://www.kidsproof.nl/denhaag/uitjes/zomervakantie/' },
-    { label: 'Museum Rotterdam — Rotterdam aan Zee', url: 'https://museumrotterdam.nl/tentoonstellingen/rotterdam-aan-zee/' },
+    { label: 'Evenementen Den Haag', url: 'https://evenementen.denhaag.nl/events/' },
+    { label: 'Muziekladder — Rotterdam agenda', url: 'https://muziekladder.nl/nl/muziek/8-Rotterdam/agenda-9.html' },
     { label: 'Archeon — evenementen', url: 'https://www.archeon.nl/nl/evenementen.html' },
     { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
