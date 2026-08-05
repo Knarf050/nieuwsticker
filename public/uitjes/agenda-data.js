@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Dinsdag 4 augustus 2026',
-  updatedAt: '04-08-2026, 07:07',
+  dateLabel: 'Woensdag 5 augustus 2026',
+  updatedAt: '05-08-2026, 07:06',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,9 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vandaag geopend', title: 'Nieuwe tentoonstellingen', loc: 'Kunstmuseum, Panorama Mesdag & Louwman Museum — t/m 31 dec', tag: 'Expo', highlight: true },
-        { time: 't/m 14 sep', title: 'Walk of Fame (gratis)', loc: 'Scheveningen boulevard', tag: 'Familie' },
+        { time: '19:30–23:00', title: 'Musicon Rock-avond', loc: 'Musicon', tag: 'Muziek', highlight: true },
+        { time: '5–16 aug', title: 'Expo bij West Den Haag', loc: 'Voormalige Amerikaanse ambassade — 12:00–18:00', tag: 'Expo' },
+        { time: '5–23 aug', title: 'Exposities Pulchri Studio', loc: '12:00–17:00', tag: 'Expo' },
       ],
     },
     {
@@ -23,9 +24,9 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '19:00–23:00', title: 'Dansevenement', loc: 'Stadhuisplein', tag: 'Muziek', highlight: true },
-        { time: '11:00–17:00', title: 'Strand in de stad', loc: 'Museum Rotterdam', tag: 'Familie' },
-        { time: 'vanavond', title: 'Orgelpauzeconcert — Jan Wisse', loc: 'Laurenskerk', tag: 'Muziek' },
+        { time: '11:00–17:00', title: 'Strand in de stad', loc: 'Museum Rotterdam', tag: 'Familie', highlight: true },
+        { time: '11:30–13:30', title: 'Cooljutten op de Coolhaven', loc: 'Museum Rotterdam', tag: 'Familie' },
+        { time: '13:30–17:00', title: 'Portlantis', loc: 'Rotterdamse haven', tag: 'Familie' },
       ],
     },
     {
@@ -34,15 +35,15 @@ window.AGENDA_DATA = {
       accent: 'nl',
       items: [
         { time: '2–15 aug', title: '27ste Internationaal Romeins Festival', loc: 'Archeon, Alphen aan den Rijn — legioenskamp, gladiatorenshows', tag: 'Festival', highlight: true },
-        { time: 'deze zomer', title: 'Delfts blauw x streetart', loc: 'Royal Delft Museum, Delft', tag: 'Expo' },
-        { time: 'deze zomer', title: 'Galleria — mini-tentoonstellingen', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Expo' },
+        { time: 't/m 30 aug', title: 'Rondleidingen Koninklijke Porceleyne Fles', loc: 'Royal Delft Museum, Delft', tag: 'Rondleiding' },
+        { time: 't/m 30 aug', title: 'Schattenjacht', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie' },
       ],
     },
   ],
   sources: [
-    { label: 'Evenementen Den Haag', url: 'https://evenementen.denhaag.nl/events/' },
-    { label: 'Muziekladder — Rotterdam agenda', url: 'https://muziekladder.nl/nl/muziek/8-Rotterdam/agenda-9.html' },
+    { label: 'Evenementen Den Haag', url: 'https://evenementen.denhaag.nl/reserveringskalender-evenementen-2026/' },
+    { label: 'Muziekladder — Rotterdam agenda', url: 'https://muziekladder.nl/muziek/8-Rotterdam/agenda-10.html' },
     { label: 'Archeon — evenementen', url: 'https://www.archeon.nl/nl/evenementen.html' },
-    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
+    { label: 'DagjeWeg — Zuid-Holland 5 augustus', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/5-augustus-2026' },
   ],
 };
