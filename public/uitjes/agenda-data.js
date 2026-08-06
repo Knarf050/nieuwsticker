@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 5 augustus 2026',
-  updatedAt: '05-08-2026, 07:06',
+  dateLabel: 'Donderdag 6 augustus 2026',
+  updatedAt: '06-08-2026, 07:08',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,9 +14,9 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '19:30–23:00', title: 'Musicon Rock-avond', loc: 'Musicon', tag: 'Muziek', highlight: true },
-        { time: '5–16 aug', title: 'Expo bij West Den Haag', loc: 'Voormalige Amerikaanse ambassade — 12:00–18:00', tag: 'Expo' },
-        { time: '5–23 aug', title: 'Exposities Pulchri Studio', loc: '12:00–17:00', tag: 'Expo' },
+        { time: '14:00', title: 'Balletvoorstelling', loc: 'Zuiderparktheater', tag: 'Dans', highlight: true },
+        { time: '6–23 aug', title: 'Jeugdactiviteiten', loc: 'CORPUS — dagelijks 09:00–16:00', tag: 'Familie' },
+        { time: 't/m 14 sep', title: 'Walk of Fame (gratis)', loc: 'Scheveningen boulevard', tag: 'Familie' },
       ],
     },
     {
@@ -24,9 +24,9 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '11:00–17:00', title: 'Strand in de stad', loc: 'Museum Rotterdam', tag: 'Familie', highlight: true },
-        { time: '11:30–13:30', title: 'Cooljutten op de Coolhaven', loc: 'Museum Rotterdam', tag: 'Familie' },
-        { time: '13:30–17:00', title: 'Portlantis', loc: 'Rotterdamse haven', tag: 'Familie' },
+        { time: '6–8 aug', title: 'Pop-up restaurant Kantine Rotterdam', loc: 'Vier-gangendiner met regionale seizoensingrediënten', tag: 'Eten', highlight: true },
+        { time: '19:30', title: 'Hoelahoep-workshop — Xzieje', loc: 'Rotterdam', tag: 'Workshop' },
+        { time: '20:00', title: 'Theatervoorstelling', loc: 'Garden of Bird', tag: 'Theater' },
       ],
     },
     {
@@ -35,15 +35,14 @@ window.AGENDA_DATA = {
       accent: 'nl',
       items: [
         { time: '2–15 aug', title: '27ste Internationaal Romeins Festival', loc: 'Archeon, Alphen aan den Rijn — legioenskamp, gladiatorenshows', tag: 'Festival', highlight: true },
-        { time: 't/m 30 aug', title: 'Rondleidingen Koninklijke Porceleyne Fles', loc: 'Royal Delft Museum, Delft', tag: 'Rondleiding' },
-        { time: 't/m 30 aug', title: 'Schattenjacht', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie' },
+        { time: 't/m 30 aug', title: 'Schattenjacht', loc: 'Rijksmuseum van Oudheden, Leiden — vanaf 10:00', tag: 'Familie' },
       ],
     },
   ],
   sources: [
-    { label: 'Evenementen Den Haag', url: 'https://evenementen.denhaag.nl/reserveringskalender-evenementen-2026/' },
-    { label: 'Muziekladder — Rotterdam agenda', url: 'https://muziekladder.nl/muziek/8-Rotterdam/agenda-10.html' },
+    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
+    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
     { label: 'Archeon — evenementen', url: 'https://www.archeon.nl/nl/evenementen.html' },
-    { label: 'DagjeWeg — Zuid-Holland 5 augustus', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/5-augustus-2026' },
+    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
