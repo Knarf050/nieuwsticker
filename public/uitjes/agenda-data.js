@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zaterdag 8 augustus 2026',
-  updatedAt: '08-08-2026, 07:07',
+  dateLabel: 'Zondag 9 augustus 2026',
+  updatedAt: '09-08-2026, 07:06',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,9 +14,9 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '12:00–23:00', title: 'Fawaka Fest', loc: 'Zuiderpark — Surinaamse vibes, meerdere podia', tag: 'Festival', highlight: true },
-        { time: '7–9 aug', title: 'Zomerspelen 2026', loc: 'Oud-Hollandse spelen voor het hele gezin — 09:00–18:00', tag: 'Familie' },
-        { time: 't/m 9 aug', title: 'Paleis Noordeinde & Koninklijke Stallen', loc: 'Open voor publiek', tag: 'Expo' },
+        { time: '14:00', title: 'Myrchfest 2026', loc: 'Zuiderpark — "Where Desi\'s Unite"', tag: 'Festival', highlight: true },
+        { time: '12:00–15:00', title: 'Boerendorp-evenement', loc: 'Zuiderparktheater', tag: 'Familie' },
+        { time: 'laatste dag, t/m 17:00', title: 'Paleis Noordeinde & Koninklijke Stallen', loc: 'Open voor publiek', tag: 'Expo' },
       ],
     },
     {
@@ -24,8 +24,7 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vandaag', title: 'Blijdorp Festival', loc: 'Roel Langerakpark', tag: 'Festival', highlight: true },
-        { time: '17:00', title: 'OASE Strandtent — Weave', loc: 'Gratis entree, deep/soulful house', tag: 'Muziek' },
+        { time: 'vandaag', title: 'SEU Oogstfeestparade', loc: 'Afrikaanderplein', tag: 'Festival', highlight: true },
       ],
     },
     {
@@ -33,15 +32,15 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '2–15 aug', title: '27ste Internationaal Romeins Festival', loc: 'Archeon, Alphen aan den Rijn — legioenskamp, gladiatorenshows', tag: 'Festival', highlight: true },
-        { time: '14:30', title: 'Diner op eiland Tiengemeten', loc: 'Natuur- en cultuurbeleving nabij Rotterdam', tag: 'Natuur' },
+        { time: 'vandaag', title: 'Noordzee Zomer Festival — openingsfeest', loc: 'Strandboulevard Katwijk — coverbands', tag: 'Festival', highlight: true },
+        { time: '2–15 aug', title: '27ste Internationaal Romeins Festival', loc: 'Archeon, Alphen aan den Rijn — legioenskamp, gladiatorenshows', tag: 'Festival' },
       ],
     },
   ],
   sources: [
-    { label: 'Fawaka Fest — Zuiderpark', url: 'https://www.zuiderparkdenhaag.com/agenda/event/fawaka-fest-2026-08-08-8eb82080/' },
-    { label: 'Evenementen Den Haag', url: 'https://evenementen.denhaag.nl/events/' },
+    { label: 'Evenementen Den Haag', url: 'https://evenementen.denhaag.nl/reserveringskalender-evenementen-2026/' },
     { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
+    { label: 'DagjeWeg — 9 augustus', url: 'https://www.dagjeweg.nl/kalender/9-augustus-2026' },
     { label: 'Archeon — evenementen', url: 'https://www.archeon.nl/nl/evenementen.html' },
   ],
 };
