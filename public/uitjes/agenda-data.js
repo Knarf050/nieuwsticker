@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 9 augustus 2026',
-  updatedAt: '09-08-2026, 07:06',
+  dateLabel: 'Maandag 10 augustus 2026',
+  updatedAt: '10-08-2026, 07:08',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,9 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '14:00', title: 'Myrchfest 2026', loc: 'Zuiderpark — "Where Desi\'s Unite"', tag: 'Festival', highlight: true },
-        { time: '12:00–15:00', title: 'Boerendorp-evenement', loc: 'Zuiderparktheater', tag: 'Familie' },
-        { time: 'laatste dag, t/m 17:00', title: 'Paleis Noordeinde & Koninklijke Stallen', loc: 'Open voor publiek', tag: 'Expo' },
+        { time: '8–16 aug', title: 'Expo bij West Den Haag', loc: 'Voormalige Amerikaanse ambassade — 12:00–18:00', tag: 'Expo', highlight: true },
+        { time: '08:45–17:00', title: 'Haagse Markt', loc: 'Herman Costerstraat', tag: 'Markt' },
       ],
     },
     {
@@ -24,7 +23,7 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vandaag', title: 'SEU Oogstfeestparade', loc: 'Afrikaanderplein', tag: 'Festival', highlight: true },
+        { time: '10–21 aug (start vandaag)', title: 'Jeugdvakantieland', loc: 'Ahoy — grootste overdekte speeltuin van Nederland, 10:00–16:00', tag: 'Familie', highlight: true },
       ],
     },
     {
@@ -32,15 +31,15 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'vandaag', title: 'Noordzee Zomer Festival — openingsfeest', loc: 'Strandboulevard Katwijk — coverbands', tag: 'Festival', highlight: true },
+        { time: 't/m 23 aug', title: 'Delfts Blauw x streetart', loc: 'Royal Delft Museum, Delft — 09:30–17:00', tag: 'Expo', highlight: true },
         { time: '2–15 aug', title: '27ste Internationaal Romeins Festival', loc: 'Archeon, Alphen aan den Rijn — legioenskamp, gladiatorenshows', tag: 'Festival' },
       ],
     },
   ],
   sources: [
-    { label: 'Evenementen Den Haag', url: 'https://evenementen.denhaag.nl/reserveringskalender-evenementen-2026/' },
-    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'DagjeWeg — 9 augustus', url: 'https://www.dagjeweg.nl/kalender/9-augustus-2026' },
+    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
+    { label: 'Markten Den Haag', url: 'https://marktenmeer.nl/markten/den-haag/' },
+    { label: 'Uitagenda Rotterdam — Jeugdvakantieland', url: 'https://www.uitagendarotterdam.nl/agenda/jeugdvakantieland-2026/' },
     { label: 'Archeon — evenementen', url: 'https://www.archeon.nl/nl/evenementen.html' },
   ],
 };
