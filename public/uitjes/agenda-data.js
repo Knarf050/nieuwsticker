@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 10 augustus 2026',
-  updatedAt: '10-08-2026, 07:08',
+  dateLabel: 'Dinsdag 11 augustus 2026',
+  updatedAt: '11-08-2026, 07:08',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '8–16 aug', title: 'Expo bij West Den Haag', loc: 'Voormalige Amerikaanse ambassade — 12:00–18:00', tag: 'Expo', highlight: true },
-        { time: '08:45–17:00', title: 'Haagse Markt', loc: 'Herman Costerstraat', tag: 'Markt' },
+        { time: '19:30', title: 'Zuiderpark Live: Cory Henry & The Funk Apostles', loc: 'Zuiderparktheater', tag: 'Muziek', highlight: true },
+        { time: '10:30–19:00', title: 'Taal aan Zee', loc: 'Bibliotheken Laakkwartier, Segbroek, Escamp & Scheveningen', tag: 'Familie' },
       ],
     },
     {
@@ -23,7 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '10–21 aug (start vandaag)', title: 'Jeugdvakantieland', loc: 'Ahoy — grootste overdekte speeltuin van Nederland, 10:00–16:00', tag: 'Familie', highlight: true },
+        { time: '11–28 aug (start vandaag)', title: 'Pleinbioscoop Rotterdam', loc: 'Wilhelminapier — openluchtbioscoop', tag: 'Film', highlight: true },
+        { time: '17:30–19:00', title: 'Eten en drinken', loc: 'Fenixplein', tag: 'Eten' },
       ],
     },
     {
@@ -31,15 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 't/m 23 aug', title: 'Delfts Blauw x streetart', loc: 'Royal Delft Museum, Delft — 09:30–17:00', tag: 'Expo', highlight: true },
-        { time: '2–15 aug', title: '27ste Internationaal Romeins Festival', loc: 'Archeon, Alphen aan den Rijn — legioenskamp, gladiatorenshows', tag: 'Festival' },
+        { time: 'deze zomer', title: 'Noordzee Zomer Festival', loc: 'Strandboulevard Katwijk', tag: 'Festival', highlight: true },
+        { time: 'doorlopend', title: 'Bowlen in een metrotunnel & lasergamen', loc: "'s-Gravenzande (Westland)", tag: 'Actief' },
       ],
     },
   ],
   sources: [
-    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Markten Den Haag', url: 'https://marktenmeer.nl/markten/den-haag/' },
-    { label: 'Uitagenda Rotterdam — Jeugdvakantieland', url: 'https://www.uitagendarotterdam.nl/agenda/jeugdvakantieland-2026/' },
-    { label: 'Archeon — evenementen', url: 'https://www.archeon.nl/nl/evenementen.html' },
+    { label: 'De Grote Markt — agenda 11-19 aug', url: 'https://gmdh.nl/agenda/' },
+    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
+    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
