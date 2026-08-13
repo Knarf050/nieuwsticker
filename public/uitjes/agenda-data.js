@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 12 augustus 2026',
-  updatedAt: '12-08-2026, 07:08',
+  dateLabel: 'Donderdag 13 augustus 2026',
+  updatedAt: '13-08-2026, 07:08',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 't/m 16 aug', title: 'Expo bij West Den Haag', loc: 'Voormalige Amerikaanse ambassade — 12:00–18:00', tag: 'Expo', highlight: true },
-        { time: 't/m 23 aug', title: 'Jeugdactiviteiten', loc: 'CORPUS — dagelijks 09:00–16:00', tag: 'Familie' },
+        { time: '13–16 aug (start vandaag)', title: 'Expo bij West Den Haag', loc: 'Voormalige Amerikaanse ambassade — 12:00–22:00', tag: 'Expo', highlight: true },
+        { time: '13 aug–13 sep (start vandaag)', title: 'Rondleiding bij Passage', loc: 'Vanaf 10:00', tag: 'Rondleiding' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '12–23 aug (start vandaag)', title: 'Openluchtfilmfestival', loc: '20:00–23:59 — filmtalent van over de hele wereld', tag: 'Film', highlight: true },
-        { time: '11:00–17:00', title: 'Strand in de stad', loc: 'Museum Rotterdam', tag: 'Familie' },
+        { time: '10–21 aug', title: 'Rotterdam Rave Festival 2026', loc: 'Rotterdam', tag: 'Festival', highlight: true },
+        { time: '17:30–21:00', title: 'Open Woordkunstpodium', loc: "Kunstcafé 't Pakhuys", tag: 'Cultuur' },
       ],
     },
     {
@@ -32,13 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '2–15 aug', title: '27ste Internationaal Romeins Festival', loc: 'Archeon, Alphen aan den Rijn — legioenskamp, gladiatorenshows', tag: 'Festival', highlight: true },
+        { time: '13:30', title: 'Wandeltocht zomertuinen Waalenburg', loc: '2 uur — bloeiende bloemen, kruiden en vlinders', tag: 'Natuur', highlight: true },
+        { time: 't/m 23 aug', title: 'Delfts Blauw x streetart', loc: 'Royal Delft Museum, Delft — 09:30–17:00', tag: 'Expo' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
     { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'Archeon — evenementen', url: 'https://www.archeon.nl/nl/evenementen.html' },
+    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
