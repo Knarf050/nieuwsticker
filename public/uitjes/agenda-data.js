@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Donderdag 13 augustus 2026',
-  updatedAt: '13-08-2026, 07:08',
+  dateLabel: 'Vrijdag 14 augustus 2026',
+  updatedAt: '14-08-2026, 07:07',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '13–16 aug (start vandaag)', title: 'Expo bij West Den Haag', loc: 'Voormalige Amerikaanse ambassade — 12:00–22:00', tag: 'Expo', highlight: true },
-        { time: '13 aug–13 sep (start vandaag)', title: 'Rondleiding bij Passage', loc: 'Vanaf 10:00', tag: 'Rondleiding' },
+        { time: 'vanaf 19:00', title: 'Beachvolleybal Toernooi', loc: 'Scheveningen Beach', tag: 'Sport', highlight: true },
+        { time: '17:00', title: 'Bootjesfeest', loc: 'Zuiderparktheater', tag: 'Festival' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '10–21 aug', title: 'Rotterdam Rave Festival 2026', loc: 'Rotterdam', tag: 'Festival', highlight: true },
-        { time: '17:30–21:00', title: 'Open Woordkunstpodium', loc: "Kunstcafé 't Pakhuys", tag: 'Cultuur' },
+        { time: 'vanavond', title: 'FAALFEST Part II', loc: 'Rotown — punk/hardcore: Knife Massage, The Etters, Systeemfalen, Uitzendbureau', tag: 'Muziek', highlight: true },
+        { time: '07:00–19:00', title: 'Kaapse Kunstetalage — Ilona Bal', loc: 'Rotterdam', tag: 'Expo' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '13:30', title: 'Wandeltocht zomertuinen Waalenburg', loc: '2 uur — bloeiende bloemen, kruiden en vlinders', tag: 'Natuur', highlight: true },
-        { time: 't/m 23 aug', title: 'Delfts Blauw x streetart', loc: 'Royal Delft Museum, Delft — 09:30–17:00', tag: 'Expo' },
+        { time: 'vandaag', title: 'Blokart racen op het strand', loc: 'Ouddorp', tag: 'Actief', highlight: true },
+        { time: 'deze zomer', title: 'Galleria — mini-tentoonstellingen', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Expo' },
       ],
     },
   ],
   sources: [
-    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
+    { label: 'AllEvents — The Hague dit weekend', url: 'https://allevents.in/the-hague/this-weekend' },
+    { label: 'Rotown — Faalfest', url: 'https://www.rotown.nl/agenda/faalfest/' },
     { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
