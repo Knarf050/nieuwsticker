@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Vrijdag 14 augustus 2026',
-  updatedAt: '14-08-2026, 07:07',
+  dateLabel: 'Zaterdag 15 augustus 2026',
+  updatedAt: '15-08-2026, 07:07',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vanaf 19:00', title: 'Beachvolleybal Toernooi', loc: 'Scheveningen Beach', tag: 'Sport', highlight: true },
-        { time: '17:00', title: 'Bootjesfeest', loc: 'Zuiderparktheater', tag: 'Festival' },
+        { time: '20:30', title: 'Prime Time Saturday Comedy (NL)', loc: 'ComedyCity The Hague', tag: 'Comedy', highlight: true },
+        { time: 't/m 30 aug', title: 'Beasts of Bugatti', loc: 'Louwman Museum — 10:00–17:00', tag: 'Expo' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vanavond', title: 'FAALFEST Part II', loc: 'Rotown — punk/hardcore: Knife Massage, The Etters, Systeemfalen, Uitzendbureau', tag: 'Muziek', highlight: true },
-        { time: '07:00–19:00', title: 'Kaapse Kunstetalage — Ilona Bal', loc: 'Rotterdam', tag: 'Expo' },
+        { time: '15–16 aug (start vandaag)', title: 'Floating Pasar', loc: '12:00–22:00 — eten, muziek en kunst uit de Indische, Indonesische, Molukse en Papoea diaspora', tag: 'Festival', highlight: true },
+        { time: '15:00–23:00', title: 'Festival-evenement', loc: 'De Kerktuin', tag: 'Festival' },
       ],
     },
     {
@@ -32,14 +32,13 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'vandaag', title: 'Blokart racen op het strand', loc: 'Ouddorp', tag: 'Actief', highlight: true },
-        { time: 'deze zomer', title: 'Galleria — mini-tentoonstellingen', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Expo' },
+        { time: 'laatste dag', title: '27ste Internationaal Romeins Festival', loc: 'Archeon, Alphen aan den Rijn — legioenskamp, gladiatorenshows', tag: 'Festival', highlight: true },
       ],
     },
   ],
   sources: [
-    { label: 'AllEvents — The Hague dit weekend', url: 'https://allevents.in/the-hague/this-weekend' },
-    { label: 'Rotown — Faalfest', url: 'https://www.rotown.nl/agenda/faalfest/' },
-    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
+    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
+    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
+    { label: 'Archeon — evenementen', url: 'https://www.archeon.nl/nl/evenementen.html' },
   ],
 };
