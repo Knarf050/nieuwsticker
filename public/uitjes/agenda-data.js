@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zaterdag 15 augustus 2026',
-  updatedAt: '15-08-2026, 07:07',
+  dateLabel: 'Zondag 16 augustus 2026',
+  updatedAt: '16-08-2026, 07:06',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '20:30', title: 'Prime Time Saturday Comedy (NL)', loc: 'ComedyCity The Hague', tag: 'Comedy', highlight: true },
-        { time: 't/m 30 aug', title: 'Beasts of Bugatti', loc: 'Louwman Museum — 10:00–17:00', tag: 'Expo' },
+        { time: 'vandaag', title: 'Haags Beat Festival (8e editie)', loc: 'Zuiderparktheater — uitverkocht', tag: 'Festival', highlight: true },
+        { time: '12:00–15:00', title: 'Boerendorp & Stek-evenement', loc: 'Zuiderparktheater', tag: 'Familie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '15–16 aug (start vandaag)', title: 'Floating Pasar', loc: '12:00–22:00 — eten, muziek en kunst uit de Indische, Indonesische, Molukse en Papoea diaspora', tag: 'Festival', highlight: true },
-        { time: '15:00–23:00', title: 'Festival-evenement', loc: 'De Kerktuin', tag: 'Festival' },
+        { time: '17:00', title: 'Smaakvolle zomeravondrondvaart', loc: 'Havenrondvaart met fish & chips', tag: 'Actief', highlight: true },
+        { time: '10:30–14:30', title: 'Wandeltour Meidagen 1940', loc: 'Museum Rotterdam', tag: 'Wandeling' },
       ],
     },
     {
@@ -32,13 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'laatste dag', title: '27ste Internationaal Romeins Festival', loc: 'Archeon, Alphen aan den Rijn — legioenskamp, gladiatorenshows', tag: 'Festival', highlight: true },
+        { time: '14:00–16:00', title: 'Kamelenmelkerij Smits', loc: 'Knuffelen, voeren en kamelenmelk proeven', tag: 'Familie', highlight: true },
+        { time: '14:00–17:00', title: 'Safariboottocht "De Blauwe Bever"', loc: 'Naar de Eckse Waard — natuurwandeling', tag: 'Natuur' },
       ],
     },
   ],
   sources: [
-    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'Archeon — evenementen', url: 'https://www.archeon.nl/nl/evenementen.html' },
+    { label: 'Zuiderparktheater — Haags Beat Festival', url: 'https://zuiderparktheater.nl/agenda/haags-beat-festival/' },
+    { label: 'De Havenloods — agenda', url: 'https://www.dehavenloods.nl/agenda/evenement' },
+    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
