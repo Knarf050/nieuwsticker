@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 16 augustus 2026',
-  updatedAt: '16-08-2026, 07:06',
+  dateLabel: 'Maandag 17 augustus 2026',
+  updatedAt: '17-08-2026, 07:14',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vandaag', title: 'Haags Beat Festival (8e editie)', loc: 'Zuiderparktheater — uitverkocht', tag: 'Festival', highlight: true },
-        { time: '12:00–15:00', title: 'Boerendorp & Stek-evenement', loc: 'Zuiderparktheater', tag: 'Familie' },
+        { time: '10:30–15:30', title: 'Kinderevenement Spoorwijk', loc: 'Bij-1, Circaso & Laaktheater', tag: 'Familie', highlight: true },
+        { time: '10:00–16:00', title: 'Fietsevenement', loc: 'Den Haag Fietst!', tag: 'Sport' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '17:00', title: 'Smaakvolle zomeravondrondvaart', loc: 'Havenrondvaart met fish & chips', tag: 'Actief', highlight: true },
-        { time: '10:30–14:30', title: 'Wandeltour Meidagen 1940', loc: 'Museum Rotterdam', tag: 'Wandeling' },
+        { time: 't/m 23 aug', title: 'Openluchtfilmfestival', loc: 'Wilhelminapier — 20:00–23:59', tag: 'Film', highlight: true },
+        { time: 't/m 24 aug', title: 'Openluchtbioscoop', loc: "Binnentuin H'ART Museum — 20:00–23:45", tag: 'Film' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '14:00–16:00', title: 'Kamelenmelkerij Smits', loc: 'Knuffelen, voeren en kamelenmelk proeven', tag: 'Familie', highlight: true },
-        { time: '14:00–17:00', title: 'Safariboottocht "De Blauwe Bever"', loc: 'Naar de Eckse Waard — natuurwandeling', tag: 'Natuur' },
+        { time: 'doorlopend', title: 'Citroën 2CV huren', loc: 'Hellevoetsluis — Zuid-Hollandse eilanden en Zeeland verkennen', tag: 'Actief', highlight: true },
+        { time: 't/m 23 aug', title: 'Delfts Blauw x streetart', loc: 'Royal Delft Museum, Delft — 09:30–17:00', tag: 'Expo' },
       ],
     },
   ],
   sources: [
-    { label: 'Zuiderparktheater — Haags Beat Festival', url: 'https://zuiderparktheater.nl/agenda/haags-beat-festival/' },
-    { label: 'De Havenloods — agenda', url: 'https://www.dehavenloods.nl/agenda/evenement' },
+    { label: 'De Grote Markt — agenda 17-22 aug', url: 'https://gmdh.nl/agenda/' },
+    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
     { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
