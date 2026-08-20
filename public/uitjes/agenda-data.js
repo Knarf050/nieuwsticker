@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 19 augustus 2026',
-  updatedAt: '19-08-2026, 07:07',
+  dateLabel: 'Donderdag 20 augustus 2026',
+  updatedAt: '20-08-2026, 07:06',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 't/m 23 aug', title: 'Jeugdactiviteiten', loc: 'CORPUS — dagelijks 09:00–16:00', tag: 'Familie', highlight: true },
-        { time: 't/m 14 sep', title: 'Walk of Fame (gratis)', loc: 'Scheveningen boulevard', tag: 'Familie' },
+        { time: '20:00', title: 'Muziekevenement', loc: 'Grand Hotel Amrâth Kurhaus', tag: 'Muziek', highlight: true },
+        { time: 't/m 28 aug', title: 'Courage of a Nation (foto)', loc: 'Atrium Den Haag', tag: 'Expo' },
       ],
     },
     {
@@ -23,8 +23,7 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '11:00–17:00', title: 'Strand in de stad', loc: 'Museum Rotterdam', tag: 'Familie', highlight: true },
-        { time: 'vanavond', title: 'Spelletjesavond', loc: 'Rotown — gratis entree', tag: 'Cultuur' },
+        { time: '10:00–15:00', title: 'Workshop — Stichting Lokaal', loc: 'Rotterdam', tag: 'Workshop', highlight: true },
       ],
     },
     {
@@ -32,14 +31,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '09:00–16:00', title: 'Gouds Montmartre', loc: 'Antiek- en vintagemarkt, 120 kramen — Gouda', tag: 'Markt', highlight: true },
-        { time: 'doorlopend', title: 'Kinderdijk (UNESCO Werelderfgoed)', loc: '19 historische molens', tag: 'Natuur' },
+        { time: 'doorlopend', title: 'Bowlen in een metrotunnel, lasergamen & minigolf', loc: "The City, 's-Gravenzande", tag: 'Actief', highlight: true },
+        { time: 'doorlopend', title: 'GlowGolf — 3D-golf in onderwaterwereld', loc: 'Capelle aan den IJssel', tag: 'Actief' },
       ],
     },
   ],
   sources: [
-    { label: 'denhaag-agenda.nl', url: 'https://denhaag-agenda.nl/' },
+    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
     { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'DagjeWeg — Zuid-Holland 19 augustus', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/19-augustus-2026' },
+    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
