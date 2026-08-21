@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Donderdag 20 augustus 2026',
-  updatedAt: '20-08-2026, 07:06',
+  dateLabel: 'Vrijdag 21 augustus 2026',
+  updatedAt: '21-08-2026, 07:08',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '20:00', title: 'Muziekevenement', loc: 'Grand Hotel Amrâth Kurhaus', tag: 'Muziek', highlight: true },
-        { time: 't/m 28 aug', title: 'Courage of a Nation (foto)', loc: 'Atrium Den Haag', tag: 'Expo' },
+        { time: '20:30', title: 'Zuiderpark Live: Wolfmother', loc: 'Zuiderparktheater', tag: 'Muziek', highlight: true },
+        { time: '21–22 aug (start vandaag)', title: 'Wild Rooster Festival', loc: 'Grote Markt — eten, bier en rockabilly/bluegrass/rock \'n roll', tag: 'Festival' },
       ],
     },
     {
@@ -23,7 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '10:00–15:00', title: 'Workshop — Stichting Lokaal', loc: 'Rotterdam', tag: 'Workshop', highlight: true },
+        { time: '16:00–23:00', title: 'Twenty7 aan de Maas', loc: 'Muziek, expo, dans en hiphop', tag: 'Festival', highlight: true },
+        { time: 'vanavond', title: 'Rotown Zomerclub — "emo meets girlypop"', loc: 'Rotown — gratis entree', tag: 'Muziek' },
       ],
     },
     {
@@ -31,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Bowlen in een metrotunnel, lasergamen & minigolf', loc: "The City, 's-Gravenzande", tag: 'Actief', highlight: true },
-        { time: 'doorlopend', title: 'GlowGolf — 3D-golf in onderwaterwereld', loc: 'Capelle aan den IJssel', tag: 'Actief' },
+        { time: '09:00–12:30', title: 'Zomermarkt', loc: 'Westland', tag: 'Markt', highlight: true },
+        { time: 'deze zomer', title: 'Speurtocht', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie' },
       ],
     },
   ],
   sources: [
-    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
+    { label: 'De Grote Markt — agenda 20-24 aug', url: 'https://gmdh.nl/agenda/' },
     { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
+    { label: 'Agenda Westland', url: 'https://www.rodi.nl/westland/agenda' },
   ],
 };
