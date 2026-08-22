@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Vrijdag 21 augustus 2026',
-  updatedAt: '21-08-2026, 07:08',
+  dateLabel: 'Zaterdag 22 augustus 2026',
+  updatedAt: '22-08-2026, 07:07',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '20:30', title: 'Zuiderpark Live: Wolfmother', loc: 'Zuiderparktheater', tag: 'Muziek', highlight: true },
-        { time: '21–22 aug (start vandaag)', title: 'Wild Rooster Festival', loc: 'Grote Markt — eten, bier en rockabilly/bluegrass/rock \'n roll', tag: 'Festival' },
+        { time: 'laatste dag', title: 'Wild Rooster Festival', loc: 'Grote Markt — eten, bier en rockabilly/bluegrass/rock \'n roll', tag: 'Festival', highlight: true },
+        { time: 'dag 2', title: 'Drum3Daagse 2026', loc: 'Musicon', tag: 'Muziek' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '16:00–23:00', title: 'Twenty7 aan de Maas', loc: 'Muziek, expo, dans en hiphop', tag: 'Festival', highlight: true },
-        { time: 'vanavond', title: 'Rotown Zomerclub — "emo meets girlypop"', loc: 'Rotown — gratis entree', tag: 'Muziek' },
+        { time: '15:00–23:00', title: 'MAAS OPEN AIR', loc: 'Oude Plantage / Mallegatpark', tag: 'Festival', highlight: true },
+        { time: '17:00–21:00', title: 'ZOOmeravonden', loc: 'Diergaarde Blijdorp', tag: 'Familie' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '09:00–12:30', title: 'Zomermarkt', loc: 'Westland', tag: 'Markt', highlight: true },
-        { time: 'deze zomer', title: 'Speurtocht', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie' },
+        { time: 'doorlopend', title: 'Renzy elektrische GPS-tours', loc: 'Noordwijk aan Zee', tag: 'Actief', highlight: true },
+        { time: 'doorlopend', title: 'Museumpark Archeon', loc: 'Alphen aan den Rijn — zwaardvechten en boogschieten', tag: 'Familie' },
       ],
     },
   ],
   sources: [
-    { label: 'De Grote Markt — agenda 20-24 aug', url: 'https://gmdh.nl/agenda/' },
+    { label: 'Wild Rooster Festival', url: 'https://wildroosterfestival.nl/' },
     { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'Agenda Westland', url: 'https://www.rodi.nl/westland/agenda' },
+    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
