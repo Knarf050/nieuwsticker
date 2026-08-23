@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zaterdag 22 augustus 2026',
-  updatedAt: '22-08-2026, 07:07',
+  dateLabel: 'Zondag 23 augustus 2026',
+  updatedAt: '23-08-2026, 07:06',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'laatste dag', title: 'Wild Rooster Festival', loc: 'Grote Markt — eten, bier en rockabilly/bluegrass/rock \'n roll', tag: 'Festival', highlight: true },
-        { time: 'dag 2', title: 'Drum3Daagse 2026', loc: 'Musicon', tag: 'Muziek' },
+        { time: 'laatste dag', title: 'Art Nouveau Festijn', loc: 'Den Haag rond 1900', tag: 'Festival', highlight: true },
+        { time: 'laatste dag', title: 'NK Beachvolleybal (Robijn Quickwash)', loc: 'The Hague Beach Stadium', tag: 'Sport' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '15:00–23:00', title: 'MAAS OPEN AIR', loc: 'Oude Plantage / Mallegatpark', tag: 'Festival', highlight: true },
-        { time: '17:00–21:00', title: 'ZOOmeravonden', loc: 'Diergaarde Blijdorp', tag: 'Familie' },
+        { time: 'laatste dag', title: 'Openluchtfilmfestival', loc: 'Wilhelminapier — 20:00–23:59', tag: 'Film', highlight: true },
+        { time: '12:00–23:00', title: 'Klassiek in Het Park', loc: 'Gratis toegang', tag: 'Muziek' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Renzy elektrische GPS-tours', loc: 'Noordwijk aan Zee', tag: 'Actief', highlight: true },
-        { time: 'doorlopend', title: 'Museumpark Archeon', loc: 'Alphen aan den Rijn — zwaardvechten en boogschieten', tag: 'Familie' },
+        { time: 'laatste dag', title: '"Thuis bij Jan Steen"', loc: 'Museum De Lakenhal, Leiden — 10:00–17:00', tag: 'Expo', highlight: true },
+        { time: 't/m 30 aug', title: 'Speurtocht', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie' },
       ],
     },
   ],
   sources: [
-    { label: 'Wild Rooster Festival', url: 'https://wildroosterfestival.nl/' },
+    { label: 'Art Nouveau Festijn', url: 'https://www.artnouveaufestijn.nl/' },
     { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
+    { label: 'DagjeWeg — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
   ],
 };
