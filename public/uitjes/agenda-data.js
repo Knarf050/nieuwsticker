@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 23 augustus 2026',
-  updatedAt: '23-08-2026, 07:06',
+  dateLabel: 'Maandag 24 augustus 2026',
+  updatedAt: '24-08-2026, 07:07',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'laatste dag', title: 'Art Nouveau Festijn', loc: 'Den Haag rond 1900', tag: 'Festival', highlight: true },
-        { time: 'laatste dag', title: 'NK Beachvolleybal (Robijn Quickwash)', loc: 'The Hague Beach Stadium', tag: 'Sport' },
+        { time: 'vanavond', title: 'Social Dance: Balfolk', loc: 'Amare', tag: 'Muziek', highlight: true },
+        { time: 'doorlopend', title: 'SEA LIFE Scheveningen', loc: 'Onderwaterwereld met bijzondere dieren', tag: 'Familie' },
       ],
     },
     {
@@ -23,8 +23,7 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'laatste dag', title: 'Openluchtfilmfestival', loc: 'Wilhelminapier — 20:00–23:59', tag: 'Film', highlight: true },
-        { time: '12:00–23:00', title: 'Klassiek in Het Park', loc: 'Gratis toegang', tag: 'Muziek' },
+        { time: '12:00–16:00', title: 'Prikkelvriendelijk bezoek', loc: 'Museum Rotterdam', tag: 'Familie', highlight: true },
       ],
     },
     {
@@ -32,14 +31,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'laatste dag', title: '"Thuis bij Jan Steen"', loc: 'Museum De Lakenhal, Leiden — 10:00–17:00', tag: 'Expo', highlight: true },
-        { time: 't/m 30 aug', title: 'Speurtocht', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie' },
+        { time: 't/m 30 aug', title: 'Workshops voor nieuwsgierige kids', loc: 'Rijksmuseum Boerhaave, Leiden', tag: 'Familie', highlight: true },
+        { time: 't/m 30 aug', title: '"HALLO? 150 jaar telefonie"', loc: 'Museum van de 20ste eeuw', tag: 'Expo' },
       ],
     },
   ],
   sources: [
-    { label: 'Art Nouveau Festijn', url: 'https://www.artnouveaufestijn.nl/' },
+    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
     { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'DagjeWeg — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
+    { label: 'Uitzinnig — zomervakantie Zuid-Holland', url: 'https://www.uitzinnig.nl/zuid-holland/zomervakantie.aspx' },
   ],
 };
