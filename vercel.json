@@ -19,6 +19,10 @@
     "api/denktanks-rss.js": {
       "memory": 1024,
       "maxDuration": 15
+    },
+    "api/vakantie-nieuws.js": {
+      "memory": 1024,
+      "maxDuration": 20
     }
   },
   "crons": [

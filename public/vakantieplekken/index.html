@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vakantieplekken</title>
+<meta name="description" content="Blijf op de hoogte van nieuws over plekken waar je ooit op vakantie bent geweest.">
+<style>
+  :root {
+    --bg: #FAF9F6; --bg-raised: #FFFFFF; --ink: #1A1A1A; --grey: #4A4A4A; --light: #767676; --hair: #E2DDD6;
+    --accent: #B3232E; --accent-soft: rgba(179,35,46,0.10);
+    --serif: Georgia, 'Times New Roman', Times, serif;
+    --sans: -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #121212; --bg-raised: #1B1B1B; --ink: #EDEAE0; --grey: #B9B4A9; --light: #8E8A80; --hair: rgba(237,234,224,0.16); --accent: #FF6B76; --accent-soft: rgba(255,107,118,0.14); }
+  }
+  :root[data-theme="dark"] { --bg: #121212; --bg-raised: #1B1B1B; --ink: #EDEAE0; --grey: #B9B4A9; --light: #8E8A80; --hair: rgba(237,234,224,0.16); --accent: #FF6B76; --accent-soft: rgba(255,107,118,0.14); }
+  :root[data-theme="light"] { --bg: #FAF9F6; --bg-raised: #FFFFFF; --ink: #1A1A1A; --grey: #4A4A4A; --light: #767676; --hair: #E2DDD6; --accent: #B3232E; --accent-soft: rgba(179,35,46,0.10); }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: clamp(16px, 4vw, 40px) 16px 64px; }
+  .back-link { display: inline-block; margin-bottom: 18px; font-size: 13px; color: var(--light); text-decoration: none; }
+  .back-link:hover { color: var(--ink); }
+
+  header.masthead { border-bottom: 2px solid var(--ink); padding-bottom: 16px; margin-bottom: 28px; }
+  header.masthead h1 { font-family: var(--serif); font-weight: 700; font-size: clamp(28px, 6vw, 42px); margin: 0 0 6px; display: flex; align-items: center; gap: 10px; }
+  header.masthead .tag { font-size: 13px; color: var(--light); }
+
+  section.block { margin-bottom: 36px; }
+  .section-head { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: 12px; }
+
+  form#add-form { display: flex; gap: 8px; margin-bottom: 16px; }
+  form#add-form input { flex: 1; padding: 11px 14px; border: 1px solid var(--hair); border-radius: 8px; background: var(--bg-raised); color: var(--ink); font-family: var(--sans); font-size: 15px; }
+  form#add-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  form#add-form button { padding: 11px 18px; border: none; border-radius: 8px; background: var(--ink); color: var(--bg); font-family: var(--sans); font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap; }
+  form#add-form button:hover { opacity: .85; }
+  .hint { font-size: 12px; color: var(--light); margin: -8px 0 18px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; background: var(--bg-raised); border: 1px solid var(--hair); border-radius: 999px; padding: 6px 8px 6px 14px; font-size: 14px; }
+  .chip button { border: none; background: var(--accent-soft); color: var(--accent); width: 20px; height: 20px; border-radius: 50%; cursor: pointer; font-size: 13px; line-height: 1; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .chip button:hover { opacity: .8; }
+
+  .empty-note { padding: 18px; border: 1px dashed var(--hair); border-radius: 10px; color: var(--light); font-size: 14px; }
+
+  .plek-section { margin-bottom: 28px; }
+  .plek-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+  .plek-head h3 { font-family: var(--serif); font-size: 20px; margin: 0; }
+  .plek-head .count { font-size: 12px; color: var(--light); }
+  .news-list { background: var(--bg-raised); border: 1px solid var(--hair); border-radius: 10px; overflow: hidden; }
+  .news-item { display: block; padding: 14px 16px; border-bottom: 1px solid var(--hair); text-decoration: none; color: var(--ink); }
+  .news-item:last-child { border-bottom: none; }
+  .news-item:hover { background: var(--accent-soft); }
+  .news-item .src { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); margin-bottom: 4px; }
+  .news-item .headline { font-size: 15px; font-weight: 600; line-height: 1.35; margin-bottom: 4px; }
+  .news-item .when { font-size: 12px; color: var(--light); }
+  .news-empty { padding: 16px; font-size: 13px; color: var(--light); font-style: italic; }
+  .news-loading { padding: 16px; font-size: 13px; color: var(--light); }
+
+  footer.info { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--hair); font-size: 12.5px; color: var(--light); }
+  footer.info p { margin: 0 0 8px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back-link" href="/">← Nederlandse Nieuwsticker</a>
+    <header class="masthead">
+      <h1><span>🧳</span><span id="app-naam">Vakantieplekken</span></h1>
+      <div class="tag" id="app-tag">Blijf op de hoogte van plekken waar je bent geweest</div>
+    </header>
+
+    <section class="block">
+      <div class="section-head">Mijn plekken</div>
+      <form id="add-form">
+        <input id="plek-input" type="text" placeholder="Bijv. Lille, Kreta, Texel…" autocomplete="off" maxlength="60">
+        <button type="submit">Toevoegen</button>
+      </form>
+      <div class="hint">Je lijst staat alleen lokaal op dit toestel — er wordt niets gedeeld of opgeslagen op een server.</div>
+      <div id="chips" class="chips"></div>
+    </section>
+
+    <section class="block">
+      <div class="section-head">Nieuws per plek</div>
+      <div id="news-root"></div>
+    </section>
+
+    <footer class="info">
+      <p>Nieuws komt van Google News, gezocht per plek uit de afgelopen 30 dagen. Ververst elke 15 minuten vanzelf.</p>
+      <p>Geen plekken toegevoegd? Voeg er hierboven een toe om nieuws te zien.</p>
+    </footer>
+  </div>
+
+  <script src="/vakantieplekken/plekken-data.js"></script>
+  <script>
+  (function () {
+    var STORAGE_KEY = 'vakantieplekken:list:v1';
+    var REFRESH_MS = 15 * 60 * 1000;
+    var newsByPlek = {};
+    var refreshTimer = null;
+
+    function esc(s) {
+      var d = document.createElement('div');
+      d.textContent = (s == null ? '' : String(s));
+      return d.innerHTML;
+    }
+
+    function formatTime(dateStr) {
+      var date = new Date(dateStr);
+      var diff = Math.floor((Date.now() - date.getTime()) / 1000);
+      if (isNaN(diff)) return '';
+      if (diff < 60) return 'Zojuist';
+      if (diff < 3600) return Math.floor(diff / 60) + ' min geleden';
+      if (diff < 86400) return Math.floor(diff / 3600) + ' uur geleden';
+      if (diff < 86400 * 30) return Math.floor(diff / 86400) + ' dagen geleden';
+      return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function loadPlekken() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (raw == null) {
+          var seed = (window.VAKANTIE_CONFIG && window.VAKANTIE_CONFIG.seedPlekken) || [];
+          savePlekken(seed);
+          return seed.slice();
+        }
+        var parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function savePlekken(list) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+
+    var plekken = loadPlekken();
+
+    function normKey(s) { return String(s).trim().toLowerCase(); }
+
+    function addPlek(naam) {
+      naam = String(naam || '').trim();
+      if (!naam) return;
+      var key = normKey(naam);
+      if (plekken.some(function (p) { return normKey(p) === key; })) return;
+      plekken.push(naam);
+      savePlekken(plekken);
+      renderChips();
+      fetchNews();
+    }
+
+    function removePlek(naam) {
+      plekken = plekken.filter(function (p) { return p !== naam; });
+      savePlekken(plekken);
+      delete newsByPlek[naam];
+      renderChips();
+      renderNews();
+    }
+
+    function renderChips() {
+      var el = document.getElementById('chips');
+      if (plekken.length === 0) {
+        el.innerHTML = '<div class="empty-note">Nog geen plekken toegevoegd. Typ hierboven een plaats- of streeknaam en klik op "Toevoegen".</div>';
+        return;
+      }
+      el.innerHTML = plekken.map(function (p) {
+        return '<span class="chip">📍 ' + esc(p) +
+          '<button type="button" aria-label="Verwijder ' + esc(p) + '" data-plek="' + esc(p) + '">×</button></span>';
+      }).join('');
+      Array.prototype.forEach.call(el.querySelectorAll('button[data-plek]'), function (btn) {
+        btn.addEventListener('click', function () { removePlek(btn.getAttribute('data-plek')); });
+      });
+    }
+
+    function newsSectionHTML(plek) {
+      var items = newsByPlek[plek];
+      var body;
+      if (items === undefined) {
+        body = '<div class="news-loading">Nieuws laden…</div>';
+      } else if (items.length === 0) {
+        body = '<div class="news-empty">Geen recent nieuws gevonden over ' + esc(plek) + '.</div>';
+      } else {
+        body = '<div class="news-list">' + items.map(function (a) {
+          return '<a class="news-item" href="' + esc(a.link) + '" target="_blank" rel="noopener noreferrer">' +
+            '<div class="src">' + esc(a.source) + '</div>' +
+            '<div class="headline">' + esc(a.title) + '</div>' +
+            '<div class="when">' + esc(formatTime(a.pubDate)) + '</div>' +
+          '</a>';
+        }).join('') + '</div>';
+      }
+      var count = items === undefined ? '' : '<span class="count">' + items.length + (items.length === 1 ? ' bericht' : ' berichten') + '</span>';
+      return '<div class="plek-section">' +
+        '<div class="plek-head"><h3>' + esc(plek) + '</h3>' + count + '</div>' +
+        body +
+      '</div>';
+    }
+
+    function renderNews() {
+      var el = document.getElementById('news-root');
+      if (plekken.length === 0) {
+        el.innerHTML = '';
+        return;
+      }
+      el.innerHTML = plekken.map(newsSectionHTML).join('');
+    }
+
+    function fetchNews() {
+      if (plekken.length === 0) { renderNews(); return; }
+      renderNews();
+      var controller = new AbortController();
+      var timer = setTimeout(function () { controller.abort(); }, 20000);
+      var url = '/api/vakantie-nieuws?plekken=' + encodeURIComponent(plekken.join(','));
+      fetch(url, { signal: controller.signal })
+        .then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          if (data && typeof data === 'object') {
+            plekken.forEach(function (p) {
+              newsByPlek[p] = Array.isArray(data[p]) ? data[p] : (newsByPlek[p] || []);
+            });
+          }
+          renderNews();
+        })
+        .catch(function () {
+          // Stille fout: bestaande (of lege) staat blijft staan, geen storende foutmelding
+          // voor een achtergrondfunctie die simpelweg opnieuw probeert bij de volgende ververs-cyclus.
+          plekken.forEach(function (p) { if (newsByPlek[p] === undefined) newsByPlek[p] = []; });
+          renderNews();
+        })
+        .then(function () { clearTimeout(timer); });
+    }
+
+    function armRefresh() {
+      if (refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = setInterval(fetchNews, REFRESH_MS);
+    }
+
+    // Config toepassen (appnaam/tagline aanpasbaar via plekken-data.js).
+    if (window.VAKANTIE_CONFIG) {
+      if (window.VAKANTIE_CONFIG.appNaam) {
+        document.getElementById('app-naam').textContent = window.VAKANTIE_CONFIG.appNaam;
+        document.title = window.VAKANTIE_CONFIG.appNaam;
+      }
+      if (window.VAKANTIE_CONFIG.tagline) {
+        document.getElementById('app-tag').textContent = window.VAKANTIE_CONFIG.tagline;
+      }
+    }
+
+    document.getElementById('add-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var input = document.getElementById('plek-input');
+      addPlek(input.value);
+      input.value = '';
+      input.focus();
+    });
+
+    renderChips();
+    fetchNews();
+    armRefresh();
+  })();
+  </script>
+</body>
+</html>
