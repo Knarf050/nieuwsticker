@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 24 augustus 2026',
-  updatedAt: '24-08-2026, 07:07',
+  dateLabel: 'Dinsdag 25 augustus 2026',
+  updatedAt: '25-08-2026, 07:10',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vanavond', title: 'Social Dance: Balfolk', loc: 'Amare', tag: 'Muziek', highlight: true },
-        { time: 'doorlopend', title: 'SEA LIFE Scheveningen', loc: 'Onderwaterwereld met bijzondere dieren', tag: 'Familie' },
+        { time: '19:30', title: 'Workshop', loc: 'Zeeheldentheater', tag: 'Workshop', highlight: true },
+        { time: '25–30 aug', title: 'Filmhuis Den Haag programma', loc: '21:00', tag: 'Film' },
       ],
     },
     {
@@ -23,7 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '12:00–16:00', title: 'Prikkelvriendelijk bezoek', loc: 'Museum Rotterdam', tag: 'Familie', highlight: true },
+        { time: '14:00', title: 'Film (Kids)', loc: 'LantarenVenster', tag: 'Film', highlight: true },
+        { time: '19:00–23:00', title: 'Theatervoorstellingen', loc: 'Nieuwe Luxor Theater & Café Dox', tag: 'Theater' },
       ],
     },
     {
@@ -31,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 't/m 30 aug', title: 'Workshops voor nieuwsgierige kids', loc: 'Rijksmuseum Boerhaave, Leiden', tag: 'Familie', highlight: true },
-        { time: 't/m 30 aug', title: '"HALLO? 150 jaar telefonie"', loc: 'Museum van de 20ste eeuw', tag: 'Expo' },
+        { time: 'doorlopend', title: 'Portlantis', loc: 'Maasvlakte — interactieve haven­beleving en panoramisch uitzicht', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Bowlen in een metrotunnel, lasergamen & minigolf', loc: "The City, 's-Gravenzande", tag: 'Actief' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
     { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'Uitzinnig — zomervakantie Zuid-Holland', url: 'https://www.uitzinnig.nl/zuid-holland/zomervakantie.aspx' },
+    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
