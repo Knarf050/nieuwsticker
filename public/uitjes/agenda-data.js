@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Dinsdag 25 augustus 2026',
-  updatedAt: '25-08-2026, 07:10',
+  dateLabel: 'Woensdag 26 augustus 2026',
+  updatedAt: '26-08-2026, 07:11',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '19:30', title: 'Workshop', loc: 'Zeeheldentheater', tag: 'Workshop', highlight: true },
-        { time: '25–30 aug', title: 'Filmhuis Den Haag programma', loc: '21:00', tag: 'Film' },
+        { time: '19:30', title: 'Zuiderpark Live: Orchestra Baobab', loc: 'Zuiderparktheater', tag: 'Muziek', highlight: true },
+        { time: 'vandaag', title: 'Murder mystery familietocht', loc: 'Rijksmuseum de Gevangenpoort', tag: 'Familie' },
       ],
     },
     {
@@ -23,18 +23,16 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '14:00', title: 'Film (Kids)', loc: 'LantarenVenster', tag: 'Film', highlight: true },
-        { time: '19:00–23:00', title: 'Theatervoorstellingen', loc: 'Nieuwe Luxor Theater & Café Dox', tag: 'Theater' },
+        { time: '20:00', title: 'CeCe Winans & Charity Gayle', loc: 'Ahoy Arena', tag: 'Muziek', highlight: true },
+        { time: '11:00–16:00', title: 'Portlantis', loc: 'Maasvlakte — interactieve havenbeleving', tag: 'Familie' },
+        { time: '19:00–21:30', title: 'Rollerdam', loc: 'Museumpark', tag: 'Actief' },
       ],
     },
     {
       id: 'regio',
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
-      items: [
-        { time: 'doorlopend', title: 'Portlantis', loc: 'Maasvlakte — interactieve haven­beleving en panoramisch uitzicht', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Bowlen in een metrotunnel, lasergamen & minigolf', loc: "The City, 's-Gravenzande", tag: 'Actief' },
-      ],
+      items: [],
     },
   ],
   sources: [
