@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 26 augustus 2026',
-  updatedAt: '26-08-2026, 07:11',
+  dateLabel: 'Donderdag 27 augustus 2026',
+  updatedAt: '27-08-2026, 07:08',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '19:30', title: 'Zuiderpark Live: Orchestra Baobab', loc: 'Zuiderparktheater', tag: 'Muziek', highlight: true },
-        { time: 'vandaag', title: 'Murder mystery familietocht', loc: 'Rijksmuseum de Gevangenpoort', tag: 'Familie' },
+        { time: '27–29 aug (start vandaag)', title: 'Jazz-evenement', loc: 'Haagse binnenstad — 16:00–23:00', tag: 'Muziek', highlight: true },
+        { time: '14:30', title: 'Circus-evenement', loc: 'Zuiderparktheater', tag: 'Familie' },
       ],
     },
     {
@@ -23,16 +23,19 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '20:00', title: 'CeCe Winans & Charity Gayle', loc: 'Ahoy Arena', tag: 'Muziek', highlight: true },
-        { time: '11:00–16:00', title: 'Portlantis', loc: 'Maasvlakte — interactieve havenbeleving', tag: 'Familie' },
-        { time: '19:00–21:30', title: 'Rollerdam', loc: 'Museumpark', tag: 'Actief' },
+        { time: '20:00', title: 'For King & Country & Josh Baldwin', loc: 'Ahoy Arena', tag: 'Muziek', highlight: true },
+        { time: '10:00–16:15', title: 'Circus Rotjeknor — workshop voor kids', loc: 'Rotterdam', tag: 'Familie' },
+        { time: '11:00–17:00', title: 'Strand in de stad', loc: 'Museum Rotterdam', tag: 'Familie' },
       ],
     },
     {
       id: 'regio',
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
-      items: [],
+      items: [
+        { time: 'doorlopend', title: 'Escape room — research lab / detective room', loc: 'Capelle aan den IJssel', tag: 'Actief', highlight: true },
+        { time: 't/m 30 aug', title: 'Speurtocht', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie' },
+      ],
     },
   ],
   sources: [
