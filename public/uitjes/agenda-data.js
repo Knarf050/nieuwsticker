@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zaterdag 29 augustus 2026',
-  updatedAt: '29-08-2026, 07:07',
+  dateLabel: 'Zondag 30 augustus 2026',
+  updatedAt: '30-08-2026, 07:06',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '19:30', title: 'Zuiderpark Live: Someone Like Her', loc: 'Zuiderparktheater', tag: 'Muziek', highlight: true },
-        { time: 'laatste dag', title: 'Familierondleiding Tweede Kamer', loc: 'Voor kinderen 6–12 jaar', tag: 'Familie' },
+        { time: 'laatste dag', title: 'Beasts of Bugatti', loc: 'Louwman Museum — 10:00–17:00', tag: 'Expo', highlight: true },
+        { time: 'doorlopend', title: 'SEA LIFE Scheveningen', loc: 'Onderwaterwereld met bijzondere dieren', tag: 'Familie' },
       ],
     },
     {
@@ -23,9 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '29–30 aug (start vandaag)', title: 'Kaapse Kunstroute & Kunstmarkt 2026', loc: '12:00–17:00', tag: 'Expo', highlight: true },
-        { time: '11:00–16:00', title: 'Gezellig Oogstfeest', loc: 'Live muziek, roofvogelshow en oud-Hollandse spellen', tag: 'Familie' },
-        { time: '13:00–23:00', title: 'Rotterdam Rave Festival 2026', loc: 'Rotterdam', tag: 'Festival' },
+        { time: 'laatste dag', title: 'Klassiek in Het Park', loc: '12:00–23:00 — sluit de zomer af', tag: 'Muziek', highlight: true },
+        { time: 'laatste dag', title: 'Kaapse Kunstroute & Kunstmarkt', loc: 'Katendrecht en Wilhelminapier — 12:00–17:00', tag: 'Expo' },
       ],
     },
     {
@@ -33,8 +32,8 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'vandaag', title: 'Donckse Kermis', loc: 'Cultuurmarkt en familiedag op Buitenplaats', tag: 'Familie', highlight: true },
-        { time: 'vandaag', title: 'Gezellige kunstmarkt', loc: 'Centrum Oud-Beijerland', tag: 'Markt' },
+        { time: 'laatste dag', title: 'Speurtocht', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Escape room — research lab / detective room', loc: 'Capelle aan den IJssel', tag: 'Actief' },
       ],
     },
   ],
