@@ -47,7 +47,7 @@ export default async function handler(req, res) {
 
     const feedTitle = source
       ? 'Denktanks Geopolitiek — ' + xmlEscape(source)
-      : 'Denktanks Geopolitiek — HCSS · Clingendael · Atlcom · WRR · Rathenau · PAX · Asser · AIV · NIOD · OSCE · Crisis Group · ELN · RAND Europe · TNO · EUISS';
+      : 'Denktanks Geopolitiek — HCSS · Clingendael · Atlcom · WRR · Rathenau · PAX · Asser · AIV · NIOD · OSCE · Crisis Group · ELN · RAND Europe · TNO · EUISS · SCP · SIPRI · Bruegel';
     const selfUrl = SITE + '/api/denktanks-rss' + (source ? '?source=' + encodeURIComponent(source) : '');
 
     const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
