@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 30 augustus 2026',
-  updatedAt: '30-08-2026, 07:06',
+  dateLabel: 'Maandag 31 augustus 2026',
+  updatedAt: '31-08-2026, 07:07',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'laatste dag', title: 'Beasts of Bugatti', loc: 'Louwman Museum — 10:00–17:00', tag: 'Expo', highlight: true },
-        { time: 'doorlopend', title: 'SEA LIFE Scheveningen', loc: 'Onderwaterwereld met bijzondere dieren', tag: 'Familie' },
+        { time: 't/m 14 sep', title: 'Walk of Fame (gratis)', loc: 'Scheveningen boulevard', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Drievliet', loc: 'Familiepark — Formule X, Jungle River, Kopermijn', tag: 'Familie' },
       ],
     },
     {
@@ -23,8 +23,7 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'laatste dag', title: 'Klassiek in Het Park', loc: '12:00–23:00 — sluit de zomer af', tag: 'Muziek', highlight: true },
-        { time: 'laatste dag', title: 'Kaapse Kunstroute & Kunstmarkt', loc: 'Katendrecht en Wilhelminapier — 12:00–17:00', tag: 'Expo' },
+        { time: 'vandaag', title: '"A Taste of Home" — Ketoprak', loc: 'OASE Strandtent — gerecht van Lisa Smith', tag: 'Eten', highlight: true },
       ],
     },
     {
@@ -32,14 +31,13 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'laatste dag', title: 'Speurtocht', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Escape room — research lab / detective room', loc: 'Capelle aan den IJssel', tag: 'Actief' },
+        { time: 'doorlopend', title: 'Museumpark Archeon', loc: 'Alphen aan den Rijn — zwaardvechten en boogschieten', tag: 'Familie', highlight: true },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
+    { label: 'OASE Rotterdam — programma', url: 'https://www.oaserotterdam.nl/programma' },
     { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
