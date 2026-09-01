@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 31 augustus 2026',
-  updatedAt: '31-08-2026, 07:07',
+  dateLabel: 'Dinsdag 1 september 2026',
+  updatedAt: '01-09-2026, 07:08',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 't/m 14 sep', title: 'Walk of Fame (gratis)', loc: 'Scheveningen boulevard', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Drievliet', loc: 'Familiepark — Formule X, Jungle River, Kopermijn', tag: 'Familie' },
+        { time: 'vandaag', title: 'Internationale gypsy-punkband met Oekraïense roots', loc: 'PAARD', tag: 'Muziek', highlight: true },
+        { time: 't/m 14 sep', title: 'Walk of Fame (gratis)', loc: 'Scheveningen boulevard', tag: 'Familie' },
       ],
     },
     {
@@ -23,21 +23,19 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vandaag', title: '"A Taste of Home" — Ketoprak', loc: 'OASE Strandtent — gerecht van Lisa Smith', tag: 'Eten', highlight: true },
+        { time: '19:15–20:45', title: 'Gratis workshop', loc: 'Fenixplein', tag: 'Workshop', highlight: true },
       ],
     },
     {
       id: 'regio',
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
-      items: [
-        { time: 'doorlopend', title: 'Museumpark Archeon', loc: 'Alphen aan den Rijn — zwaardvechten en boogschieten', tag: 'Familie', highlight: true },
-      ],
+      items: [],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'OASE Rotterdam — programma', url: 'https://www.oaserotterdam.nl/programma' },
+    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
     { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
