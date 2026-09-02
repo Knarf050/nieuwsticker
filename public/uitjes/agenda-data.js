@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Dinsdag 1 september 2026',
-  updatedAt: '01-09-2026, 07:08',
+  dateLabel: 'Woensdag 2 september 2026',
+  updatedAt: '02-09-2026, 07:06',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vandaag', title: 'Internationale gypsy-punkband met Oekraïense roots', loc: 'PAARD', tag: 'Muziek', highlight: true },
-        { time: 't/m 14 sep', title: 'Walk of Fame (gratis)', loc: 'Scheveningen boulevard', tag: 'Familie' },
+        { time: '2–13 sep (start vandaag)', title: '"The Hague Creates" expositie', loc: 'Kunstbar', tag: 'Expo', highlight: true },
+        { time: '22:00', title: 'Gratis Salsa', loc: 'Boterwaag', tag: 'Muziek' },
       ],
     },
     {
@@ -23,7 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '19:15–20:45', title: 'Gratis workshop', loc: 'Fenixplein', tag: 'Workshop', highlight: true },
+        { time: '15:00–16:20', title: 'Familiefilm "Splish Splash Forever!"', loc: 'Cinema Islemunda — 12,5 jaar jubileum & Wereldhavendagen', tag: 'Familie', highlight: true },
+        { time: '13:00', title: 'Evenement', loc: 'Natuurhistorisch Museum Rotterdam', tag: 'Expo' },
       ],
     },
     {
