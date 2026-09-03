@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 2 september 2026',
-  updatedAt: '02-09-2026, 07:06',
+  dateLabel: 'Donderdag 3 september 2026',
+  updatedAt: '03-09-2026, 07:07',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '2–13 sep (start vandaag)', title: '"The Hague Creates" expositie', loc: 'Kunstbar', tag: 'Expo', highlight: true },
-        { time: '22:00', title: 'Gratis Salsa', loc: 'Boterwaag', tag: 'Muziek' },
+        { time: '20:00', title: 'Rock-avond', loc: 'PAARD', tag: 'Muziek', highlight: true },
+        { time: '17:00', title: 'Pop-evenement', loc: 'Scheveningen Beach Resort', tag: 'Muziek' },
       ],
     },
     {
@@ -23,15 +23,17 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '15:00–16:20', title: 'Familiefilm "Splish Splash Forever!"', loc: 'Cinema Islemunda — 12,5 jaar jubileum & Wereldhavendagen', tag: 'Familie', highlight: true },
-        { time: '13:00', title: 'Evenement', loc: 'Natuurhistorisch Museum Rotterdam', tag: 'Expo' },
+        { time: '20:00', title: 'Theatervoorstelling', loc: 'Nieuwe Luxor Theater', tag: 'Theater', highlight: true },
+        { time: '18:00', title: 'Eten en drinken', loc: 'ss Rotterdam', tag: 'Eten' },
       ],
     },
     {
       id: 'regio',
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
-      items: [],
+      items: [
+        { time: 'deze zomer', title: 'Delfts Blauw x streetart', loc: 'Royal Delft Museum, Delft', tag: 'Expo', highlight: true },
+      ],
     },
   ],
   sources: [
