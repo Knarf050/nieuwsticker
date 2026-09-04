@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Donderdag 3 september 2026',
-  updatedAt: '03-09-2026, 07:07',
+  dateLabel: 'Vrijdag 4 september 2026',
+  updatedAt: '04-09-2026, 07:07',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '20:00', title: 'Rock-avond', loc: 'PAARD', tag: 'Muziek', highlight: true },
-        { time: '17:00', title: 'Pop-evenement', loc: 'Scheveningen Beach Resort', tag: 'Muziek' },
+        { time: 'vandaag', title: 'Americana band', loc: 'PAARD — eerste en oudste Americana-band van Nederland', tag: 'Muziek', highlight: true },
+        { time: 'vandaag', title: 'Prime Time Friday Comedy', loc: 'ComedyCity The Hague', tag: 'Comedy' },
       ],
     },
     {
@@ -23,8 +23,9 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '20:00', title: 'Theatervoorstelling', loc: 'Nieuwe Luxor Theater', tag: 'Theater', highlight: true },
-        { time: '18:00', title: 'Eten en drinken', loc: 'ss Rotterdam', tag: 'Eten' },
+        { time: 'dit weekend (start vandaag)', title: 'Wereldhavendagen', loc: 'Ontdek de Rotterdamse haven', tag: 'Festival', highlight: true },
+        { time: 'vandaag', title: 'ZuiderWoord (11e editie)', loc: 'Podium voor woordkunstenaars in Zuid-Rotterdam', tag: 'Cultuur' },
+        { time: '4–5 sep', title: 'TAPT Festival Rotterdam 2026', loc: 'Museumpark', tag: 'Festival' },
       ],
     },
     {
@@ -32,7 +33,7 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'deze zomer', title: 'Delfts Blauw x streetart', loc: 'Royal Delft Museum, Delft', tag: 'Expo', highlight: true },
+        { time: 'deze zomer', title: 'Galleria — mini-tentoonstellingen', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Expo', highlight: true },
       ],
     },
   ],
