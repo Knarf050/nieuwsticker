@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Vrijdag 4 september 2026',
-  updatedAt: '04-09-2026, 07:07',
+  dateLabel: 'Zaterdag 5 september 2026',
+  updatedAt: '05-09-2026, 07:06',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,9 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vandaag', title: 'Americana band', loc: 'PAARD — eerste en oudste Americana-band van Nederland', tag: 'Muziek', highlight: true },
-        { time: 'vandaag', title: 'Prime Time Friday Comedy', loc: 'ComedyCity The Hague', tag: 'Comedy' },
+        { time: '19:00–23:00', title: 'Culture Night', loc: 'Centrum Den Haag', tag: 'Cultuur', highlight: true },
+        { time: 'vandaag', title: 'Market Mayhem', loc: 'Grote Markt omgetoverd tot skatepark', tag: 'Sport' },
+        { time: 'laatste dag', title: 'Spotlight Festival', loc: 'Gratis podiumkunsten bij deelnemende locaties', tag: 'Cultuur' },
       ],
     },
     {
@@ -23,9 +24,9 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'dit weekend (start vandaag)', title: 'Wereldhavendagen', loc: 'Ontdek de Rotterdamse haven', tag: 'Festival', highlight: true },
-        { time: 'vandaag', title: 'ZuiderWoord (11e editie)', loc: 'Podium voor woordkunstenaars in Zuid-Rotterdam', tag: 'Cultuur' },
-        { time: '4–5 sep', title: 'TAPT Festival Rotterdam 2026', loc: 'Museumpark', tag: 'Festival' },
+        { time: '4–6 sep', title: 'Wereldhavendagen / Havendag', loc: 'Vanaf 10:00', tag: 'Festival', highlight: true },
+        { time: '11:00–17:00', title: 'Maritiem Museum Rotterdam', loc: 'Openingsweekend', tag: 'Familie' },
+        { time: '18:00', title: 'GLORY 109', loc: 'RTM Stage, Ahoy', tag: 'Sport' },
       ],
     },
     {
@@ -33,7 +34,8 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'deze zomer', title: 'Galleria — mini-tentoonstellingen', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Expo', highlight: true },
+        { time: 'vandaag', title: 'Arenddag', loc: 'Biesbosch — vissen en zeearenden', tag: 'Natuur', highlight: true },
+        { time: '13:00–16:00', title: 'Open dag Voedselbos de VliereLier', loc: 'Westland', tag: 'Familie' },
       ],
     },
   ],
