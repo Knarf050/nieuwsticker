@@ -1,7 +1,7 @@
 // Vercel Serverless Function — levert een RSS 2.0-feed van het samengevoegde,
-// ontdubbelde en opgeschoonde nieuws (NOS + NU.nl + NRC).
+// ontdubbelde en opgeschoonde nieuws (NOS + NU.nl), plus handgekozen aanbevelingen.
 // Optioneel filteren op bron: /api/rss?source=NOS
-import { fetchArticles } from '../lib/feeds.js';
+import { fetchArticles, withRecommendations } from '../lib/feeds.js';
 
 const SITE = 'https://nieuwsticker.vercel.app';
 
@@ -22,6 +22,9 @@ export default async function handler(req, res) {
     if (source) {
       const want = String(source).toLowerCase();
       articles = articles.filter(a => (a.source || '').toLowerCase() === want);
+    } else {
+      // Zonder bron-filter ook de handgekozen aanbevelingen meesturen.
+      articles = withRecommendations(articles, 5);
     }
     articles = articles.slice(0, 50);
 
@@ -32,7 +35,9 @@ export default async function handler(req, res) {
       const link = xmlEscape(a.link);
       // Bron vóór de titel zodat hij in elke reader zichtbaar is, plus als
       // auteur/byline (dc:creator) voor readers met een auteurskolom.
-      const titled = a.source ? a.source + ' · ' + a.title : a.title;
+      // Aanbevelingen krijgen een ster en een aparte categorie.
+      const star = a.recommended ? '★ ' : '';
+      const titled = star + (a.source ? a.source + ' · ' + a.title : a.title);
       return [
         '    <item>',
         '      <title>' + xmlEscape(titled) + '</title>',
@@ -40,7 +45,7 @@ export default async function handler(req, res) {
         '      <guid isPermaLink="true">' + link + '</guid>',
         '      <pubDate>' + pub + '</pubDate>',
         '      <dc:creator>' + xmlEscape(a.source) + '</dc:creator>',
-        '      <category>' + xmlEscape(a.source) + '</category>',
+        '      <category>' + xmlEscape(a.recommended ? 'Aanbevolen' : a.source) + '</category>',
         '      <description>' + xmlEscape(a.summary || a.title) + '</description>',
         '    </item>',
       ].join('\n');
@@ -55,7 +60,7 @@ export default async function handler(req, res) {
       '    <title>' + title + '</title>\n' +
       '    <link>' + SITE + '/</link>\n' +
       '    <atom:link href="' + xmlEscape(selfUrl) + '" rel="self" type="application/rss+xml" />\n' +
-      '    <description>Samengevoegd, ontdubbeld en opgeschoond nieuws van NOS, NU.nl en NRC.</description>\n' +
+      '    <description>Samengevoegd, ontdubbeld en opgeschoond nieuws van NOS en NU.nl, met handgekozen aanbevelingen (geopolitiek &amp; tech/AI).</description>\n' +
       '    <language>nl-nl</language>\n' +
       '    <lastBuildDate>' + now + '</lastBuildDate>\n' +
       items + '\n' +
