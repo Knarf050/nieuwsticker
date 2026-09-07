@@ -1,5 +1,5 @@
 // Vercel Serverless Function — levert het nieuws voor de site.
-import { fetchArticles } from '../lib/feeds.js';
+import { fetchArticles, withRecommendations } from '../lib/feeds.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,8 +20,11 @@ export default async function handler(req, res) {
     });
     if (fresh.length >= 8) articles = fresh;
 
-    // rawTitle/categories zijn alleen voor interne filtering; niet meesturen naar de site.
-    const out = articles.map(({ rawTitle, categories, ...rest }) => rest);
+    // Handgekozen aanbevelingen toevoegen (omzeilen het versheidsfilter hierboven).
+    articles = withRecommendations(articles, 5);
+
+    // rawTitle/categories/sortDate zijn intern; niet meesturen naar de site.
+    const out = articles.map(({ rawTitle, categories, sortDate, ...rest }) => rest);
     res.status(200).json(out);
   } catch (error) {
     console.error('Error:', error);

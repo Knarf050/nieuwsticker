@@ -48,6 +48,9 @@
 
     .container { max-width: 1100px; margin: 0 auto; padding: 28px 16px 48px; }
     .kicker { font-family: var(--sans); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+    .rec-badge { display: inline-block; font-family: var(--sans); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #fff; background: #7A5CFF; padding: 2px 7px; border-radius: 999px; margin-left: 8px; vertical-align: middle; }
+    .rec-why { font-family: var(--sans); font-size: 12.5px; line-height: 1.4; color: #7A5CFF; margin: -2px 0 10px; }
+    .rec-why b { font-weight: 700; }
     .time { font-family: var(--sans); font-size: 12px; color: var(--light); }
 
     /* Lead-verhaal */
@@ -139,16 +142,26 @@
       }
 
       function tickerItem(a) {
-        return '<span class="ticker-item"><b>' + esc(a.source) + '</b> &nbsp;' + esc(a.title) + '</span>';
+        var star = a.recommended ? '★ ' : '';
+        return '<span class="ticker-item"><b>' + esc(a.source) + '</b> &nbsp;' + star + esc(a.title) + '</span>';
+      }
+
+      function badge(a) {
+        return a.recommended ? '<span class="rec-badge">Aanbevolen</span>' : '';
+      }
+
+      function whyHTML(a) {
+        return (a.recommended && a.why) ? '<p class="rec-why"><b>Waarom:</b> ' + esc(a.why) + '</p>' : '';
       }
 
       function leadHTML(a) {
         if (!a) return '';
         var color = esc(a.color || '#121212');
         return '' +
-          '<div class="kicker" style="color:' + color + '">' + esc(a.source) + '</div>' +
+          '<div class="kicker" style="color:' + color + '">' + esc(a.source) + badge(a) + '</div>' +
           '<a href="' + esc(a.link) + '" target="_blank" rel="noopener noreferrer"><h2>' + esc(a.title) + '</h2></a>' +
           (a.summary ? '<p class="summary">' + esc(a.summary) + '</p>' : '') +
+          whyHTML(a) +
           '<span class="time">' + esc(formatTime(a.pubDate)) + '</span>&nbsp;&nbsp;' +
           '<a class="more" href="' + esc(a.link) + '" target="_blank" rel="noopener noreferrer">Lees verder</a>';
       }
@@ -162,9 +175,10 @@
           var color = esc(a.color || '#121212');
           return '' +
             '<div class="card">' +
-              '<div class="kicker" style="color:' + color + '">' + esc(a.source) + '</div>' +
+              '<div class="kicker" style="color:' + color + '">' + esc(a.source) + badge(a) + '</div>' +
               '<a href="' + esc(a.link) + '" target="_blank" rel="noopener noreferrer"><h4>' + esc(a.title) + '</h4></a>' +
               (a.summary ? '<p class="summary">' + esc(a.summary) + '</p>' : '') +
+              whyHTML(a) +
               '<span class="time">' + esc(formatTime(a.pubDate)) + '</span>' +
             '</div>';
         }).join('');
