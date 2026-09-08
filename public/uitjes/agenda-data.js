@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 7 september 2026',
-  updatedAt: '07-09-2026, 07:06',
+  dateLabel: 'Dinsdag 8 september 2026',
+  updatedAt: '08-09-2026, 07:06',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '11:00–16:00', title: 'Make It Art Worthy', loc: 'Noordwal 18', tag: 'Expo', highlight: true },
-        { time: '19:30', title: 'Stand-up comedy', loc: "O'Casey's Irish Pub & Restaurant", tag: 'Comedy' },
+        { time: 'nieuw', title: '"De Groene Camera"', loc: 'Fototentoonstelling — winnaars Groene Camera 2026', tag: 'Expo', highlight: true },
+        { time: 't/m 14 sep', title: 'Walk of Fame (gratis)', loc: 'Scheveningen boulevard', tag: 'Familie' },
       ],
     },
     {
@@ -23,7 +23,7 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '6–13 sep', title: 'ALL CAPS 2026', loc: 'Streetart-festival — murals in Afrikaanderwijk en Feijenoord', tag: 'Expo', highlight: true },
+        { time: '19:15–20:45', title: 'Gratis workshop', loc: 'Fenixplein', tag: 'Workshop', highlight: true },
       ],
     },
     {
@@ -31,14 +31,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Kinderdijk (UNESCO Werelderfgoed)', loc: '19 historische molens', tag: 'Natuur', highlight: true },
-        { time: 'doorlopend', title: 'Funmax', loc: 'Capelle aan den IJssel — 3D-onderwaterwereld', tag: 'Familie' },
+        { time: 'doorlopend', title: 'Royal Delft Museum', loc: 'Delft — laatste Delftware-fabriek uit de 17e eeuw', tag: 'Expo', highlight: true },
+        { time: 'doorlopend', title: 'Kinderdijk (UNESCO Werelderfgoed)', loc: '19 historische molens', tag: 'Natuur' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Rotterdam Centrum — evenementen september', url: 'https://www.rotterdamcentrum.nl/en/plan-your-visit/travel-inspiration/fun-event-september-rotterdam' },
+    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
     { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
