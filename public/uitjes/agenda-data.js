@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Vrijdag 18 september 2026',
-  updatedAt: '18-09-2026, 07:06',
+  dateLabel: 'Zaterdag 19 september 2026',
+  updatedAt: '19-09-2026, 07:05',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '20:30', title: 'Prime Time Friday Comedy', loc: 'ComedyCity The Hague — met Mino van Nassau en Niels Andriessen', tag: 'Comedy', highlight: true },
-        { time: 't/m 21 sep', title: 'Haagse Sportzomer', loc: 'Gratis sportfestivals voor gezinnen', tag: 'Sport' },
+        { time: '20:30', title: 'Prime Time Saturday Comedy', loc: 'ComedyCity The Hague', tag: 'Comedy', highlight: true },
+        { time: 'vandaag', title: 'Vrolijke voorstelling', loc: "Kooman's Poppentheater", tag: 'Familie' },
       ],
     },
     {
@@ -23,8 +23,9 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vandaag', title: 'Soul/Reggae-avond', loc: 'Rotown — M.U.G., Forbidden Wizards e.a.', tag: 'Muziek', highlight: true },
-        { time: 'vandaag (start)', title: 'Fototentoonstelling "Baroeg centraal"', loc: 'Maastunnel', tag: 'Expo' },
+        { time: '19:20', title: 'Junior Songfestival 2026 — finale', loc: 'RTM Stage', tag: 'Festival', highlight: true },
+        { time: '19–20 sep (start vandaag)', title: 'Old but Gold Festival 2026', loc: 'Maassilo', tag: 'Festival' },
+        { time: '17:00–20:00', title: 'Surinaamse roti-dinercruise', loc: 'Over de Rotterdamse wateren', tag: 'Eten' },
       ],
     },
     {
@@ -32,8 +33,8 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'vandaag', title: 'Leiden Essay Film Festival', loc: 'Leiden', tag: 'Film', highlight: true },
-        { time: 'doorlopend', title: 'Bowlen in een metrotunnel, lasergamen & minigolf', loc: "The City, 's-Gravenzande", tag: 'Actief' },
+        { time: 'doorlopend', title: 'GPS-tours met Renzy', loc: 'Noordwijk aan Zee — elektrische Twizy langs molens en bollenvelden', tag: 'Actief', highlight: true },
+        { time: 'doorlopend', title: 'Royal Delft Museum', loc: 'Delft — Delfts Blauw en streetart', tag: 'Expo' },
       ],
     },
   ],
