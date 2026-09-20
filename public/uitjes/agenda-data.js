@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zaterdag 19 september 2026',
-  updatedAt: '19-09-2026, 07:05',
+  dateLabel: 'Zondag 20 september 2026',
+  updatedAt: '20-09-2026, 07:14',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '20:30', title: 'Prime Time Saturday Comedy', loc: 'ComedyCity The Hague', tag: 'Comedy', highlight: true },
-        { time: 'vandaag', title: 'Vrolijke voorstelling', loc: "Kooman's Poppentheater", tag: 'Familie' },
+        { time: 'vandaag', title: 'Stadsspelen Den Haag', loc: 'Gratis sport- en bewegingsfestival voor het hele gezin', tag: 'Sport', highlight: true },
+        { time: 'vandaag', title: 'Derby Day', loc: 'Draf- & Renbaan Duindigt — paardenraces en kinderactiviteiten', tag: 'Familie' },
       ],
     },
     {
@@ -23,9 +23,9 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '19:20', title: 'Junior Songfestival 2026 — finale', loc: 'RTM Stage', tag: 'Festival', highlight: true },
-        { time: '19–20 sep (start vandaag)', title: 'Old but Gold Festival 2026', loc: 'Maassilo', tag: 'Festival' },
-        { time: '17:00–20:00', title: 'Surinaamse roti-dinercruise', loc: 'Over de Rotterdamse wateren', tag: 'Eten' },
+        { time: 'laatste dag', title: 'Old but Gold Festival 2026', loc: 'Maassilo', tag: 'Festival', highlight: true },
+        { time: 'laatste dag', title: 'Theaterfestival Wonderlijk Delfshaven', loc: 'Zakkendragershuisje', tag: 'Theater' },
+        { time: 'vandaag', title: 'WereldWijde Wijkfestival 2026', loc: 'Serumpark', tag: 'Festival' },
       ],
     },
     {
@@ -33,8 +33,8 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'GPS-tours met Renzy', loc: 'Noordwijk aan Zee — elektrische Twizy langs molens en bollenvelden', tag: 'Actief', highlight: true },
-        { time: 'doorlopend', title: 'Royal Delft Museum', loc: 'Delft — Delfts Blauw en streetart', tag: 'Expo' },
+        { time: 'doorlopend', title: 'Citroën 2CV huren', loc: 'Hellevoetsluis — Zuid-Hollandse eilanden en Zeeland verkennen', tag: 'Actief', highlight: true },
+        { time: 'doorlopend', title: 'Kinderdijk (UNESCO Werelderfgoed)', loc: '19 historische molens', tag: 'Natuur' },
       ],
     },
   ],
