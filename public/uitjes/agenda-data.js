@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 20 september 2026',
-  updatedAt: '20-09-2026, 07:14',
+  dateLabel: 'Maandag 21 september 2026',
+  updatedAt: '21-09-2026, 07:14',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,27 +14,24 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vandaag', title: 'Stadsspelen Den Haag', loc: 'Gratis sport- en bewegingsfestival voor het hele gezin', tag: 'Sport', highlight: true },
-        { time: 'vandaag', title: 'Derby Day', loc: 'Draf- & Renbaan Duindigt — paardenraces en kinderactiviteiten', tag: 'Familie' },
+        { time: '12:30', title: 'Klassiek concert', loc: 'Nieuwe Kerk', tag: 'Muziek', highlight: true },
+        { time: '17:00–18:30', title: 'Cultureel evenement', loc: 'Amare', tag: 'Cultuur' },
+        { time: '19:30', title: 'Stand-up comedy', loc: "O'Casey's Irish Pub & Restaurant", tag: 'Comedy' },
       ],
     },
     {
       id: 'rotterdam',
       name: 'Rotterdam',
       accent: 'rt',
-      items: [
-        { time: 'laatste dag', title: 'Old but Gold Festival 2026', loc: 'Maassilo', tag: 'Festival', highlight: true },
-        { time: 'laatste dag', title: 'Theaterfestival Wonderlijk Delfshaven', loc: 'Zakkendragershuisje', tag: 'Theater' },
-        { time: 'vandaag', title: 'WereldWijde Wijkfestival 2026', loc: 'Serumpark', tag: 'Festival' },
-      ],
+      items: [],
     },
     {
       id: 'regio',
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Citroën 2CV huren', loc: 'Hellevoetsluis — Zuid-Hollandse eilanden en Zeeland verkennen', tag: 'Actief', highlight: true },
-        { time: 'doorlopend', title: 'Kinderdijk (UNESCO Werelderfgoed)', loc: '19 historische molens', tag: 'Natuur' },
+        { time: 'vandaag', title: 'Blokarts (zeilwagens)', loc: 'Ouddorp — met Natural High', tag: 'Actief', highlight: true },
+        { time: 'doorlopend', title: 'GlowGolf', loc: 'Capelle aan den IJssel — 3D-minigolf', tag: 'Familie' },
       ],
     },
   ],
