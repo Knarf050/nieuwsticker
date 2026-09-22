@@ -1,0 +1,18 @@
+{
+  "id": "/rijbewijs/",
+  "name": "RijTheorie — theorie-examen oefenen",
+  "short_name": "RijTheorie",
+  "description": "Oefen gratis voor het Nederlandse theorie-examen rijbewijs B: voorrang, verkeersborden, snelheid, alcohol en meer, met een oefenexamen en voortgangsbijhouding.",
+  "lang": "nl",
+  "start_url": "/rijbewijs/",
+  "scope": "/rijbewijs/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#d7263d",
+  "theme_color": "#d7263d",
+  "icons": [
+    { "src": "/rijbewijs/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/rijbewijs/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/rijbewijs/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
