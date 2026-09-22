@@ -720,7 +720,9 @@
       const [vraagActief, setVraagActief] = useState(null); // { vraag, opties, categorie, isHq, magWedge, isEind }
       const [boodschap, setBoodschap] = useState('Rol de dobbelsteen 🎲');
       const [winnaar, setWinnaar] = useState(null);
-      const gebruikteVragen = useRef(new Set());
+      const categorieBags = useRef({}); // per categorie: geschudde rij vraag-ids, leegtrekken vóór herhaling
+      const categorieHistorie = useRef({}); // per categorie: laatst gestelde vraag-ids (kleine ringbuffer)
+      const laatsteVraagId = useRef(null);
       const goedBeantwoord = useRef(0);
 
       function wijzigSpeler(i, patch) { setSpelers(s => s.map((sp, idx) => idx === i ? { ...sp, ...patch } : sp)); }
@@ -740,18 +742,42 @@
         setSpelers(namen);
         setPosities(namen.map(() => 0));
         setWedges(namen.map(() => []));
-        setBeurt(0); setWinnaar(null); goedBeantwoord.current = 0; gebruikteVragen.current = new Set();
+        setBeurt(0); setWinnaar(null); goedBeantwoord.current = 0;
+        categorieBags.current = {}; categorieHistorie.current = {}; laatsteVraagId.current = null;
         setBoodschap(`${namen[0].naam} mag beginnen — rol de dobbelsteen 🎲`);
         setFase('spelen');
       }
 
+      // Trekt een vraag uit een geschudde 'tas' per categorie: elke vraag in die categorie
+      // komt precies één keer aan bod voor er herhaald wordt. Bij het vullen van een nieuwe
+      // tas zetten we de laatst-geziene vragen (categorieHistorie) achteraan de nieuwe schudding
+      // in plaats van ergens willekeurig — zo krijgt een net gestelde vraag altijd de maximale
+      // afstand tot z'n volgende beurt, ook aan het begin van een nieuwe cyclus.
       function kiesVraag(categorieId) {
-        const gebruikt = gebruikteVragen.current;
-        let poel = vragen.filter(v => v.categorie === categorieId && !gebruikt.has(v.id));
-        if (!poel.length) poel = vragen.filter(v => v.categorie === categorieId);
-        if (!poel.length) poel = vragen.filter(v => !gebruikt.has(v.id));
-        if (!poel.length) poel = vragen;
-        return poel[Math.floor(Math.random() * poel.length)];
+        let bag = categorieBags.current[categorieId];
+        if (!bag || !bag.length) {
+          const poel = vragen.filter(v => v.categorie === categorieId);
+          if (!poel.length) {
+            let alt = vragen.filter(v => v.id !== laatsteVraagId.current);
+            if (!alt.length) alt = vragen;
+            const gekozen = alt[Math.floor(Math.random() * alt.length)];
+            laatsteVraagId.current = gekozen.id;
+            return gekozen;
+          }
+          const historie = new Set(categorieHistorie.current[categorieId] || []);
+          const vers = shuffle(poel.filter(v => !historie.has(v.id)).map(v => v.id));
+          const recent = shuffle(poel.filter(v => historie.has(v.id)).map(v => v.id));
+          bag = [...vers, ...recent];
+          // Veiligheidsnetje voor piepkleine categorieën (2-3 vragen over): voorkom in elk
+          // geval dat de zojuist gestelde vraag letterlijk de allereerstvolgende is.
+          if (bag.length > 1 && bag[0] === laatsteVraagId.current) [bag[0], bag[1]] = [bag[1], bag[0]];
+          categorieBags.current[categorieId] = bag;
+        }
+        const id = bag.shift();
+        laatsteVraagId.current = id;
+        const h = categorieHistorie.current[categorieId] || [];
+        categorieHistorie.current[categorieId] = [...h, id].slice(-3);
+        return vragen.find(v => v.id === id);
       }
 
       function rol() {
@@ -780,7 +806,6 @@
       function beantwoord(optie) {
         const v = vraagActief;
         onRegistreer(v.vraag.id, optie.juist);
-        gebruikteVragen.current.add(v.vraag.id);
         if (optie.juist) goedBeantwoord.current += 1;
 
         setTimeout(() => {

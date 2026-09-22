@@ -250,6 +250,230 @@ window.TRIVIANT_CONFIG = {
         uitleg: 'Hans van Breukelen was tot 1994 zijn ploeggenoot bij PSV in Eindhoven.',
         bron: 'Goedlachse voetballer met een krasje',
       },
+
+      // --- extra vragen (tweede lichting uit dezelfde editie, tegen herhaling in het potje) ---
+
+      // Binnenland & Politiek
+      {
+        vraag: 'Welke Europese afspraak dwingt de IND om asielprocedures te versnellen?',
+        opties: ['Het Europese migratiepact', 'Het Verdrag van Schengen', 'De Vluchtelingenconventie van Genève', 'Het Verdrag van Dublin'],
+        antwoordIndex: 0, categorie: 'binnenland', moeilijkheid: 'gemiddeld',
+        uitleg: 'Sinds 12 juni is het pact van kracht; de IND wil er "de beste dienstverlener" van Nederland mee worden.',
+        bron: 'IND voert het tempo op',
+      },
+      {
+        vraag: 'Hoeveel procent efficiënter wil de IND worden volgens de eigen beleidsstukken?',
+        opties: ['25 procent', '10 procent', '50 procent', '15 procent'],
+        antwoordIndex: 0, categorie: 'binnenland', moeilijkheid: 'moeilijk',
+        uitleg: 'Voorheen verplichte stappen in de asielprocedure zijn afgeschaft om tijd te winnen.',
+        bron: 'IND voert het tempo op',
+      },
+      {
+        vraag: 'Bij welk ministerie hoort de Arbeidsinspectie, die kritiek kreeg om de titel van een onderzoeksrapport?',
+        opties: ['Sociale Zaken en Werkgelegenheid', 'Justitie en Veiligheid', 'Binnenlandse Zaken', 'Financiën'],
+        antwoordIndex: 0, categorie: 'binnenland', moeilijkheid: 'gemiddeld',
+        uitleg: 'Het rapport heette ‘Babi Pangang met bami’ — een rechter noemde die titel al ongepast.',
+        bron: '‘Babi Pangang met bami’: hoe de overheid racisme niet herkent',
+      },
+      {
+        vraag: 'Welke wet wordt in een opiniestuk over het geweld in Overasselt ‘hopeloos achterhaald’ genoemd?',
+        opties: ['De Opiumwet', 'De Drank- en Horecawet', 'De Wet publieke gezondheid', 'De Wet wapens en munitie'],
+        antwoordIndex: 0, categorie: 'binnenland', moeilijkheid: 'gemiddeld',
+        uitleg: 'De wet maakt onderscheid tussen legale drugs als alcohol en illegale drugs als xtc.',
+        bron: 'Het geweld in Overasselt begint bij de Opiumwet',
+      },
+      {
+        vraag: 'Welke publieke omroep raakte in opspraak na het uitzenden van een fragment van een Hitler-toespraak?',
+        opties: ['Ongehoord Nederland', 'WNL', 'PowNed', 'Ongehoord Nieuws'],
+        antwoordIndex: 0, categorie: 'binnenland', moeilijkheid: 'makkelijk',
+        uitleg: 'Pas nadat het fragment massaal werd gedeeld op X ontstond er grote ophef in Hilversum en Den Haag.',
+        bron: 'Hoe Ongehoord Nederland al het krediet verspeelde',
+      },
+      {
+        vraag: 'Wie is de hoofdredacteur van Ongehoord Nederland die zich kon vinden in delen van Hitlers ‘strijd tegen globalisering’?',
+        opties: ['Joost Niemöller', 'Arlette Adriani', 'Peter Vlemmix', 'Raisa Blommestijn'],
+        antwoordIndex: 0, categorie: 'binnenland', moeilijkheid: 'moeilijk',
+        uitleg: 'Algemeen directeur Peter Vlemmix probeerde de gemoederen daarna nog te bedaren.',
+        bron: 'Hoe Ongehoord Nederland al het krediet verspeelde',
+      },
+      {
+        vraag: 'Columnist Marike Stellinga stelt dat Nederland vermogen relatief laag belast en — wat — relatief hoog?',
+        opties: ['Werken', 'Consumeren', 'Erven', 'Wonen'],
+        antwoordIndex: 0, categorie: 'binnenland', moeilijkheid: 'moeilijk',
+        uitleg: 'Dat maakt rentenieren en investeren in huizen aantrekkelijker dan investeren in scholing en carrière.',
+        bron: 'Vermogen hoog belast? Ja, als je door een rietje kijkt',
+      },
+
+      // Buitenland
+      {
+        vraag: 'Sinds welk jaartal is Amerika volgens columnist Caroline de Gruyter de enige grootmacht in Europa geweest?',
+        opties: ['1945', '1989', '1991', '1957'],
+        antwoordIndex: 0, categorie: 'buitenland', moeilijkheid: 'gemiddeld',
+        uitleg: 'Na de val van de Muur en het uiteenvallen van de Sovjet-Unie was Amerika zelfs dominant in heel Europa.',
+        bron: 'Keep the Germans in',
+      },
+      {
+        vraag: 'Welk land steekt tussen nu en 2029 meer geld in defensie dan Frankrijk en Engeland samen?',
+        opties: ['Duitsland', 'Polen', 'Italië', 'Spanje'],
+        antwoordIndex: 0, categorie: 'buitenland', moeilijkheid: 'moeilijk',
+        uitleg: 'Dat brengt Duitsland voor het eerst sinds 1945 ook militair in een Europese leidersrol.',
+        bron: 'Keep the Germans in',
+      },
+      {
+        vraag: 'Rechter Kimberly Prost van het Internationaal Strafhof staat op de Amerikaanse sanctielijst. Uit welk land komt ze?',
+        opties: ['Canada', 'Australië', 'Zuid-Afrika', 'Nieuw-Zeeland'],
+        antwoordIndex: 0, categorie: 'buitenland', moeilijkheid: 'makkelijk',
+        uitleg: 'Door de sancties werd zelfs haar Nederlandse creditcard binnen een paar dagen geblokkeerd.',
+        bron: 'Dat je op dezelfde lijst staat als de misdadigers is moeilijk te verwerken',
+      },
+      {
+        vraag: 'Bij welk tribunaal was Kimberly Prost eerder rechter, voordat ze bij het Internationaal Strafhof kwam?',
+        opties: ['Het Joegoslavië Tribunaal', 'Het Rwanda Tribunaal', 'Het Neurenberg Tribunaal', 'Het Sierra Leone Tribunaal'],
+        antwoordIndex: 0, categorie: 'buitenland', moeilijkheid: 'moeilijk',
+        uitleg: 'Ze begon haar carrière in 1982 als officier van justitie in Winnipeg, Canada.',
+        bron: 'Dat je op dezelfde lijst staat als de misdadigers is moeilijk te verwerken',
+      },
+
+      // Economie
+      {
+        vraag: 'In welke Indonesische stad lunchen kantoormedewerkers voor één euro in een parkeergarage, vijf verdiepingen onder de grond?',
+        opties: ['Jakarta', 'Bangkok', 'Manila', 'Kuala Lumpur'],
+        antwoordIndex: 0, categorie: 'economie', moeilijkheid: 'makkelijk',
+        uitleg: 'De warung bevindt zich onder een luxe kantoorgebouw van 270 meter hoog in het zakenhart van de stad.',
+        bron: 'In garages onder dure flats in Jakarta wordt geluncht voor één euro per gerecht',
+      },
+      {
+        vraag: 'Hoeveel verdiepingen onder de grond bevindt zich de warung van Lidya Wahyuwidyati in het gebouw The Energy?',
+        opties: ['Vijf', 'Twee', 'Acht', 'Drie'],
+        antwoordIndex: 0, categorie: 'economie', moeilijkheid: 'moeilijk',
+        uitleg: 'Boven de garages zitten een wellnesscentrum en een chic Frans restaurant.',
+        bron: 'In garages onder dure flats in Jakarta wordt geluncht voor één euro per gerecht',
+      },
+      {
+        vraag: 'De discussie over vermogensbelasting werd deze zomer op links volgens columnist Marike Stellinga verengd tot welke uitspraak?',
+        opties: ['‘De allerrijksten worden ontzien’', '‘Belasting moet omhoog’', '‘Vermogen is diefstal’', '‘Erfenissen afschaffen’'],
+        antwoordIndex: 0, categorie: 'economie', moeilijkheid: 'moeilijk',
+        uitleg: 'Op rechts werd het juist verengd tot ‘waarom moeten de belastingen altijd omhoog?’',
+        bron: 'Vermogen hoog belast? Ja, als je door een rietje kijkt',
+      },
+      {
+        vraag: 'Tot hoeveel hectoliter bier per jaar mag een brouwerij maximaal produceren om als ‘kleine brouwerij’ te gelden?',
+        opties: ['200.000 hectoliter', '500.000 hectoliter', '50.000 hectoliter', '1 miljoen hectoliter'],
+        antwoordIndex: 0, categorie: 'economie', moeilijkheid: 'moeilijk',
+        uitleg: 'Branchevereniging Craft komt op voor deze kleine brouwerijen, waaronder Pronck uit Leiden.',
+        bron: '‘Het kabinet moet de compensatie voor kleine brouwers juist uitbreiden’',
+      },
+      {
+        vraag: 'Bij welk gebouw van Tata Steel demonstreerden werknemers tegen bezuinigingsplannen op sociale zekerheid?',
+        opties: ['Het opleidingscentrum in Velsen-Noord', 'Het gemeentehuis van Velsen', 'De Hoogovens-poort', 'Het stationsplein van IJmuiden'],
+        antwoordIndex: 0, categorie: 'economie', moeilijkheid: 'gemiddeld',
+        uitleg: 'OR-voorzitter Cinta Groos riep vanaf het podium: "De tijd dringt."',
+        bron: 'Twijfel groeit: is een deal met Tata Steel over vergroening wel mogelijk?',
+      },
+
+      // Wetenschap & Natuur
+      {
+        vraag: 'Tot welke hoogte leeft de Himalayamarmot maximaal, volgens onderzoek van Wageningse hoogleraar Herbert Prins?',
+        opties: ['Circa 5.500 meter', 'Circa 3.000 meter', 'Circa 7.000 meter', 'Circa 2.000 meter'],
+        antwoordIndex: 0, categorie: 'wetenschap', moeilijkheid: 'moeilijk',
+        uitleg: 'Daarmee is het een van de hoogst levende zoogdieren op aarde.',
+        bron: 'Holenbibberaar / Himalayamarmot / Marmota himalayana',
+      },
+      {
+        vraag: 'Waarom trotseren Himalayamarmotten overdag het risico van roofdieren als sneeuwluipaarden en adelaars?',
+        opties: ['Om op te warmen in de zon', 'Om voedsel te zoeken', 'Om te paren', 'Om hun hol te verplaatsen'],
+        antwoordIndex: 0, categorie: 'wetenschap', moeilijkheid: 'gemiddeld',
+        uitleg: 'In hun holen kan het flink koud worden — hoe hoger in de bergen, hoe kouder.',
+        bron: 'Holenbibberaar / Himalayamarmot / Marmota himalayana',
+      },
+      {
+        vraag: 'Uit een Amsterdams temperatuuronderzoek van wetenschapsjournalist Karel Knip bleek dat bomen de straattemperatuur...?',
+        opties: ['Nauwelijks beïnvloeden', 'Met 10 graden verlagen', 'Verdubbelen', 'Alleen ’s nachts verlagen'],
+        antwoordIndex: 0, categorie: 'wetenschap', moeilijkheid: 'gemiddeld',
+        uitleg: 'De gemeten temperaturen in beschaduwde en onbeschaduwde straten verschilden nauwelijks.',
+        bron: 'De kille waarheid van de groene straten',
+      },
+      {
+        vraag: 'Welke Amsterdamse straat wijzen AI-machines aan als de meest ‘lommerrijke’ straat van de stad?',
+        opties: ['De Lomanstraat', 'De Jacob Obrechtstraat', 'De Apollolaan', 'De Bredeweg'],
+        antwoordIndex: 0, categorie: 'wetenschap', moeilijkheid: 'moeilijk',
+        uitleg: 'De straat heet zo omdat makelaars hem zo noemen — echt veel schaduw geven de platanen er niet.',
+        bron: 'De kille waarheid van de groene straten',
+      },
+      {
+        vraag: 'Bij welk percentage van de jongeren met een depressie komt die later in het leven nog eens terug, volgens onderzoek van Wilma Wentholt?',
+        opties: ['70 tot 80 procent', '30 tot 40 procent', '90 tot 100 procent', '50 procent'],
+        antwoordIndex: 0, categorie: 'wetenschap', moeilijkheid: 'moeilijk',
+        uitleg: 'De helft van alle depressies begint al tijdens de adolescentie.',
+        bron: '‘Verplaats je in je kind als het depressief is’',
+      },
+
+      // Cultuur & Media
+      {
+        vraag: 'Welke Nederlandse schrijfster is het onderwerp van de column ‘Connie Palmen en ik’, met haar roman Johnnie Walker?',
+        opties: ['Connie Palmen', 'Renate Dorrestein', 'Marion Bloem', 'Anna Enquist'],
+        antwoordIndex: 0, categorie: 'cultuur', moeilijkheid: 'makkelijk',
+        uitleg: 'Palmen liet weten dat moederschap en schrijverschap voor haar niet goed te combineren zijn.',
+        bron: 'Connie Palmen en ik',
+      },
+      {
+        vraag: 'In welke stad speelt het essay ‘Rio: een liefdesverklaring aan mijn stad’ van correspondent Nina Jurna?',
+        opties: ['Rio de Janeiro', 'São Paulo', 'Salvador', 'Brasília'],
+        antwoordIndex: 0, categorie: 'cultuur', moeilijkheid: 'makkelijk',
+        uitleg: 'Jurna werd er al verliefd op tijdens een kort bezoek in 2008.',
+        bron: 'Rio: een liefdesverklaring aan mijn stad',
+      },
+      {
+        vraag: 'Vanuit welk land vertrok Nina Jurna in 2011 naar Rio de Janeiro?',
+        opties: ['Suriname', 'Nederland', 'Curaçao', 'Aruba'],
+        antwoordIndex: 0, categorie: 'cultuur', moeilijkheid: 'gemiddeld',
+        uitleg: 'Vanuit het geïsoleerde Suriname was haar droom om Zuid-Amerika-correspondent te worden moeilijk te realiseren.',
+        bron: 'Rio: een liefdesverklaring aan mijn stad',
+      },
+      {
+        vraag: 'Chef Raymond Prinsen van Café La Tête kookte twaalf jaar lang een Michelinster bij welk restaurant?',
+        opties: ['De Stenen Tafel', 'De Kas', 'Bord’Eau', 'Librije'],
+        antwoordIndex: 0, categorie: 'cultuur', moeilijkheid: 'moeilijk',
+        uitleg: 'Dat was in Borculo — in 2011 gaf hij de sterrenkeuken op omdat de lol ervan af was.',
+        bron: 'Klassiek bistro-eten met Michelin-raffinement',
+      },
+      {
+        vraag: 'Wie is de gastvrouw van Café La Tête in Lochem, de vrouw van chef Raymond Prinsen?',
+        opties: ['Margriet Smaal', 'Janneke Vreugdenhil', 'Nina Jurna', 'Sarah Sluimer'],
+        antwoordIndex: 0, categorie: 'cultuur', moeilijkheid: 'moeilijk',
+        uitleg: 'Het restaurant zit in een pand met Jugendstil-stickers en een marmeren bar.',
+        bron: 'Klassiek bistro-eten met Michelin-raffinement',
+      },
+
+      // Sport & Overig
+      {
+        vraag: 'Welke Nederlandse schaakster wil grootmeester worden en werd derde op het WK blitz?',
+        opties: ['Eline Roebers', 'Anish Giri', 'Judit Polgár', 'Fiona Sieber'],
+        antwoordIndex: 0, categorie: 'sport', moeilijkheid: 'moeilijk',
+        uitleg: 'Een maand na het WK blitz won ze ook het EK snelschaken.',
+        bron: 'Ze wil grootmeester worden, en dat is ‘heel realistisch’',
+      },
+      {
+        vraag: 'Met welk handelshuis wordt schaakster Eline Roebers gesponsord?',
+        opties: ['Optiver', 'ASML', 'ING', 'Booking.com'],
+        antwoordIndex: 0, categorie: 'sport', moeilijkheid: 'moeilijk',
+        uitleg: 'Ze verblijft gemiddeld twee derde van het jaar in het buitenland voor toernooien.',
+        bron: 'Ze wil grootmeester worden, en dat is ‘heel realistisch’',
+      },
+      {
+        vraag: 'Welke titel voert Eline Roebers sinds 2022, de hoogste rang onder grootmeester?',
+        opties: ['Internationaal meester', 'FIDE-meester', 'Kandidaat-meester', 'Grootmeester'],
+        antwoordIndex: 0, categorie: 'sport', moeilijkheid: 'gemiddeld',
+        uitleg: 'Haar vader Jan is zelf ‘FIDE-meester’, de op twee na hoogste titel.',
+        bron: 'Ze wil grootmeester worden, en dat is ‘heel realistisch’',
+      },
+      {
+        vraag: 'Volgens columnist Bas van Putten is de fiets in vergelijking met de auto vaak...?',
+        opties: ['Praktischer, sneller en schoner', 'Alleen goedkoper', 'Alleen trager maar veiliger', 'Alleen geschikt voor korte ritten'],
+        antwoordIndex: 0, categorie: 'sport', moeilijkheid: 'gemiddeld',
+        uitleg: 'Hij stapt daarom voortaan ook op de fiets, na jarenlang auto’s getest te hebben.',
+        bron: 'De fietser is de nieuwe top-aap op de apenrots',
+      },
     ],
   },
 };
