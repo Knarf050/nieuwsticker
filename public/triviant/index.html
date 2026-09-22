@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Triviant — de krant als bordspel</title>
+  <link rel="manifest" href="/triviant/manifest.webmanifest">
+  <meta name="theme-color" content="#111827">
+  <link rel="icon" href="/triviant/icon-192.png">
+  <link rel="apple-touch-icon" href="/triviant/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Triviant">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/triviant/triviant-data.js"></script>
+  <style>
+    body { font-family: 'Nunito', system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+    .pop { animation: pop .3s ease; }
+    @keyframes pop { 0% { transform: scale(.9); } 60% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    .toast-in { animation: toastin .3s ease; }
+    @keyframes toastin { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .pieces span { position: absolute; font-size: 22px; animation: fall 1.2s ease-out forwards; }
+    @keyframes fall { 0% { transform: translateY(-10px) rotate(0); opacity: 1; } 100% { transform: translateY(160px) rotate(360deg); opacity: 0; } }
+    .dobbel { animation: dobbel .5s ease; }
+    @keyframes dobbel { 0% { transform: rotate(0) scale(1); } 40% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 6px; }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  </style>
+</head>
+<body class="bg-[#f7f7f7]">
+  <div id="root"></div>
+
+  <button id="installBtn" style="display:none"
+    class="fixed bottom-24 left-5 z-40 bg-white text-[#111827] font-extrabold text-sm px-4 py-3 rounded-2xl shadow-lg border-2 border-[#111827]">
+    ⬇️ Installeer app
+  </button>
+
+  <script>
+    let deferredPrompt = null;
+    const installBtn = document.getElementById('installBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block';
+    });
+    installBtn.addEventListener('click', async () => {
+      installBtn.style.display = 'none';
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null;
+    });
+    window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/triviant/sw.js').catch(() => {}));
+    }
+  </script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    const CONFIG = window.TRIVIANT_CONFIG;
+    const CATS = CONFIG.categorieen; // altijd precies 6 — de taartpunten van het bord
+    const STORE_KEY = 'triviant.v1';
+    const DAY = 86400000;
+    const INKT = '#111827';
+
+    // ---------- algemene helpers ----------
+    const todayStr = () => new Date().toISOString().slice(0, 10);
+    const parseDate = (s) => new Date(s + 'T00:00:00');
+    const addDaysStr = (s, n) => new Date(parseDate(s).getTime() + n * DAY).toISOString().slice(0, 10);
+    const fmtKort = (s) => s ? parseDate(s).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : '';
+    const fmtLang = (s) => s ? parseDate(s).toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'long' }) : '';
+    const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    const catById = (id) => CATS.find(c => c.id === id) || { naam: 'Overig', kleur: '#9aa0a6', icon: '❓' };
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+      return a;
+    }
+    // Toont de 4 opties in willekeurige volgorde, zonder de opgeslagen vraag te muteren.
+    function geschudOpties(vraag) {
+      return shuffle(vraag.opties.map((tekst, i) => ({ tekst, juist: i === vraag.antwoordIndex })));
+    }
+
+    // ---------- PDF → tekst (pdf.js via CDN) ----------
+    const PDFJS_VERSIE = '4.7.76';
+    const MAX_TEKST = 240000; // tekens; gelijk aan de servergrens
+    let pdfjsLib = null;
+    async function laadPdfjs() {
+      if (pdfjsLib) return pdfjsLib;
+      const base = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_VERSIE}/build/`;
+      pdfjsLib = await import(base + 'pdf.min.mjs');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = base + 'pdf.worker.min.mjs';
+      return pdfjsLib;
+    }
+    async function pdfNaarTekst(file, onVoortgang) {
+      const lib = await laadPdfjs();
+      const buf = await file.arrayBuffer();
+      const pdf = await lib.getDocument({ data: buf }).promise;
+      let tekst = '';
+      for (let p = 1; p <= pdf.numPages; p++) {
+        const page = await pdf.getPage(p);
+        const content = await page.getTextContent();
+        tekst += content.items.map(it => it.str).join(' ') + '\n\n';
+        onVoortgang && onVoortgang(p, pdf.numPages);
+        if (tekst.length > MAX_TEKST) break;
+      }
+      return tekst.slice(0, MAX_TEKST);
+    }
+
+    // ---------- EPUB → tekst (JSZip via CDN, alles lokaal in de browser) ----------
+    let jszipLib = null;
+    async function laadJszip() {
+      if (jszipLib) return jszipLib;
+      const mod = await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm');
+      jszipLib = mod.default || mod;
+      return jszipLib;
+    }
+    async function epubNaarTekst(file, onVoortgang) {
+      const JSZip = await laadJszip();
+      const zip = await JSZip.loadAsync(file);
+      const containerEntry = zip.file('META-INF/container.xml');
+      if (!containerEntry) throw new Error('Geen geldig EPUB-bestand (container.xml ontbreekt).');
+      const containerXml = await containerEntry.async('string');
+      const containerDoc = new DOMParser().parseFromString(containerXml, 'application/xml');
+      const rootfilePath = containerDoc.querySelector('rootfile').getAttribute('full-path');
+      const opfEntry = zip.file(rootfilePath);
+      const opfXml = await opfEntry.async('string');
+      const opfDoc = new DOMParser().parseFromString(opfXml, 'application/xml');
+      const basisPad = rootfilePath.includes('/') ? rootfilePath.slice(0, rootfilePath.lastIndexOf('/') + 1) : '';
+      const items = {};
+      opfDoc.querySelectorAll('manifest > item').forEach(el => { items[el.getAttribute('id')] = el.getAttribute('href'); });
+      const spineIds = Array.from(opfDoc.querySelectorAll('spine > itemref')).map(el => el.getAttribute('idref'));
+
+      let tekst = '';
+      let i = 0;
+      for (const id of spineIds) {
+        const href = items[id];
+        if (!href) continue;
+        const entry = zip.file(decodeURIComponent(basisPad + href));
+        if (!entry) continue;
+        const html = await entry.async('string');
+        // text/html-parser is coulant voor de HTML-entiteiten die in kranttekst voorkomen.
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const stuk = (doc.body ? doc.body.textContent : '').replace(/\s+/g, ' ').trim();
+        if (stuk) tekst += stuk + '\n\n';
+        i++;
+        onVoortgang && onVoortgang(i, spineIds.length);
+        if (tekst.length > MAX_TEKST) break;
+      }
+      return tekst.slice(0, MAX_TEKST);
+    }
+    async function krantNaarTekst(file, onVoortgang) {
+      const naam = (file.name || '').toLowerCase();
+      if (naam.endsWith('.epub') || file.type === 'application/epub+zip') return epubNaarTekst(file, onVoortgang);
+      return pdfNaarTekst(file, onVoortgang);
+    }
+
+    // ---------- vragen laten genereren door de server (Claude) ----------
+    async function genereerVragen(tekst, aantal) {
+      const res = await fetch('/api/triviant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tekst, aantal, categorieen: CATS }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || ('Serverfout ' + res.status));
+      return data.vragen || [];
+    }
+
+    // ---------- gamification ----------
+    const XP = { editie: 5, vraag: 3, quizGoed: 2, quizBonus: 10, potjeVraagGoed: 3, potjeWinst: 25 };
+    const niveauVan = (xp) => Math.floor(xp / 100) + 1;
+    const xpInNiveau = (xp) => xp % 100;
+    function markActief(game) {
+      const t = todayStr();
+      if (game.lastActive === t) return game;
+      const gisteren = addDaysStr(t, -1);
+      const streak = game.lastActive === gisteren ? (game.streak || 0) + 1 : 1;
+      return { ...game, streak, lastActive: t };
+    }
+    const BADGES = [
+      { id: 'e1',  icon: '📰', titel: 'Eerste editie',     uitleg: 'Je eerste krant geïmporteerd',      test: s => s.edities >= 1 },
+      { id: 'v25', icon: '🧠', titel: 'Vragenbank',        uitleg: '25 vragen verzameld',                test: s => s.vragen >= 25 },
+      { id: 'v100',icon: '📚', titel: 'Encyclopedie',      uitleg: '100 vragen verzameld',               test: s => s.vragen >= 100 },
+      { id: 'p1',  icon: '🎲', titel: 'Eerste potje',      uitleg: 'Een potje Triviant gespeeld',        test: s => s.potjesGespeeld >= 1 },
+      { id: 'w1',  icon: '🏆', titel: 'Alle taartpunten',  uitleg: 'Een potje uitgespeeld',              test: s => s.potjesGewonnen >= 1 },
+      { id: 'w10', icon: '👑', titel: 'Triviant-kenner',   uitleg: '10 potjes uitgespeeld',              test: s => s.potjesGewonnen >= 10 },
+      { id: 'q100',icon: '🎯', titel: 'Quizmeester',       uitleg: 'Een snelle quiz foutloos',            test: s => s.quizPerfect },
+      { id: 's7',  icon: '🔥', titel: 'Week-streak',       uitleg: '7 dagen op rij gespeeld',            test: s => s.streak >= 7 },
+    ];
+
+    // ---------- het speelbord: 24 vakjes, 6 gelijk verdeelde HQ-vakjes (één per categorie) ----------
+    const RING_SIZE = 24;
+    const HQ_POSITIES = [0, 4, 8, 12, 16, 20];
+    function bouwBord() {
+      const vakjes = [];
+      let hq = 0, gewoon = 0;
+      for (let i = 0; i < RING_SIZE; i++) {
+        if (HQ_POSITIES.includes(i)) { vakjes.push({ i, type: 'hq', categorie: CATS[hq % CATS.length].id }); hq++; }
+        else { vakjes.push({ i, type: 'vraag', categorie: CATS[gewoon % CATS.length].id }); gewoon++; }
+      }
+      return vakjes;
+    }
+    const BORD = bouwBord();
+    function bordPositie(i, radius) {
+      const hoek = (i / RING_SIZE) * 2 * Math.PI - Math.PI / 2;
+      return { left: (50 + radius * Math.cos(hoek)) + '%', top: (50 + radius * Math.sin(hoek)) + '%' };
+    }
+    const AVATARS = ['🦊', '🐸', '🐧', '🐢', '🦁', '🐻'];
+
+    // ---------- opslag ----------
+    function seedVragen() {
+      const e = CONFIG.seedEditie;
+      return e.vragen.map(v => ({ id: uid(), ...v, editieDatum: e.datum, stats: { gezien: 0, goed: 0 } }));
+    }
+    function laadState() {
+      let opg = null;
+      try { opg = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) {}
+      if (opg && Array.isArray(opg.vragen)) {
+        return {
+          vragen: opg.vragen, edities: opg.edities || [],
+          game: opg.game || leegGame(),
+        };
+      }
+      const e = CONFIG.seedEditie;
+      return {
+        vragen: seedVragen(),
+        edities: [{ datum: e.datum, titel: e.titel, aantal: e.vragen.length }],
+        game: leegGame(),
+      };
+    }
+    function leegGame() {
+      return {
+        xp: 0, streak: 0, lastActive: null, quizzenGespeeld: 0, quizPerfect: false,
+        potjesGespeeld: 0, potjesGewonnen: 0, laatsteImport: null,
+      };
+    }
+    function bewaarState(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+
+    // ---------- kleine UI-bouwstenen ----------
+    function Ring({ pct, kleur, groot }) {
+      const r = groot ? 34 : 16, c = 2 * Math.PI * r, off = c * (1 - Math.min(1, pct) / 100);
+      const size = (r + 6) * 2;
+      return (
+        <svg width={size} height={size} className="-rotate-90">
+          <circle cx={size/2} cy={size/2} r={r} stroke="#e5e7eb" strokeWidth="6" fill="none" />
+          <circle cx={size/2} cy={size/2} r={r} stroke={kleur} strokeWidth="6" fill="none"
+            strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" style={{ transition: 'stroke-dashoffset .5s ease' }} />
+        </svg>
+      );
+    }
+    function Confetti() {
+      const emojis = ['🎉', '✨', '🟥', '⭐', '🟩', '🎊', '🏆'];
+      return (
+        <div className="pieces fixed inset-0 z-[70] pointer-events-none">
+          {Array.from({ length: 26 }).map((_, i) => (
+            <span key={i} style={{ left: Math.random()*100+'%', top: '-5%', animationDelay: (Math.random()*.4)+'s' }}>
+              {emojis[i % emojis.length]}
+            </span>
+          ))}
+        </div>
+      );
+    }
+    function WedgeTracker({ bezit, groot }) {
+      // Klein taartwiel dat toont welke categorieën een speler al heeft (net als het echte bordspel).
+      const size = groot ? 40 : 24;
+      return (
+        <svg width={size} height={size} viewBox="0 0 100 100">
+          {CATS.map((c, i) => {
+            const a0 = (i / 6) * 2 * Math.PI - Math.PI / 2, a1 = ((i + 1) / 6) * 2 * Math.PI - Math.PI / 2;
+            const x0 = 50 + 48 * Math.cos(a0), y0 = 50 + 48 * Math.sin(a0);
+            const x1 = 50 + 48 * Math.cos(a1), y1 = 50 + 48 * Math.sin(a1);
+            const heeft = bezit.includes(c.id);
+            return (
+              <path key={c.id} d={`M50,50 L${x0},${y0} A48,48 0 0,1 ${x1},${y1} Z`}
+                fill={heeft ? c.kleur : '#e5e7eb'} stroke="#fff" strokeWidth="2" />
+            );
+          })}
+          <circle cx="50" cy="50" r="16" fill="#fff" />
+        </svg>
+      );
+    }
+
+    // ---------- hoofd-app ----------
+    function App() {
+      const [state, setState] = useState(laadState);
+      const [tab, setTab] = useState('vandaag');
+      const [toast, setToast] = useState(null);
+      const [confetti, setConfetti] = useState(false);
+      const toastTimer = useRef(null);
+      const prevNiveau = useRef(null);
+
+      useEffect(() => { bewaarState(state); }, [state]);
+
+      function melding(tekst) {
+        setToast(tekst);
+        clearTimeout(toastTimer.current);
+        toastTimer.current = setTimeout(() => setToast(null), 2200);
+      }
+      function vier() { setConfetti(true); setTimeout(() => setConfetti(false), 1300); }
+      function update(fn) { setState(prev => fn(structuredClone(prev))); }
+
+      function voegVragenToe(lijst, editieMeta) {
+        if (!lijst.length) return;
+        update(s => {
+          for (const v of lijst) {
+            s.vragen.push({ id: uid(), ...v, editieDatum: editieMeta.datum, stats: { gezien: 0, goed: 0 } });
+          }
+          s.edities.push({ datum: editieMeta.datum, titel: editieMeta.titel, aantal: lijst.length });
+          s.game = markActief(s.game);
+          s.game.xp += XP.editie + XP.vraag * lijst.length;
+          s.game.laatsteImport = todayStr();
+          return s;
+        });
+        melding(lijst.length + ' vragen toegevoegd aan de bank 📰');
+        vier();
+      }
+      function verwijderVraag(id) { update(s => { s.vragen = s.vragen.filter(v => v.id !== id); return s; }); }
+      function bewerkVraag(id, patch) {
+        update(s => { const v = s.vragen.find(x => x.id === id); if (v) Object.assign(v, patch); return s; });
+      }
+      function registreerAntwoord(id, correct) {
+        update(s => {
+          const v = s.vragen.find(x => x.id === id);
+          if (v) { v.stats.gezien += 1; if (correct) v.stats.goed += 1; }
+          return s;
+        });
+      }
+      function quizKlaar(score, totaal) {
+        update(s => {
+          s.game = markActief(s.game);
+          s.game.quizzenGespeeld = (s.game.quizzenGespeeld || 0) + 1;
+          s.game.xp += score * XP.quizGoed + (totaal > 0 ? XP.quizBonus : 0);
+          if (totaal > 0 && score === totaal) s.game.quizPerfect = true;
+          return s;
+        });
+      }
+      function potjeKlaar(aantalGoed) {
+        update(s => {
+          s.game = markActief(s.game);
+          s.game.potjesGespeeld = (s.game.potjesGespeeld || 0) + 1;
+          s.game.potjesGewonnen = (s.game.potjesGewonnen || 0) + 1;
+          s.game.xp += aantalGoed * XP.potjeVraagGoed + XP.potjeWinst;
+          return s;
+        });
+        vier();
+      }
+      function importeer(data) {
+        if (!data || !Array.isArray(data.vragen)) { melding('Ongeldig back-upbestand'); return; }
+        update(() => ({ vragen: data.vragen, edities: data.edities || [], game: data.game || leegGame() }));
+        melding('Back-up hersteld ✅');
+      }
+      function resetAlles() {
+        localStorage.removeItem(STORE_KEY);
+        setState(laadState());
+        melding('Opnieuw begonnen');
+      }
+
+      const game = state.game;
+      useEffect(() => {
+        const n = niveauVan(game.xp);
+        if (prevNiveau.current !== null && n > prevNiveau.current) { melding('Niveau ' + n + ' bereikt! 🎉'); vier(); }
+        prevNiveau.current = n;
+      }, [game.xp]);
+
+      return (
+        <div className="max-w-xl mx-auto min-h-screen pb-24 bg-[#f7f7f7]">
+          <TopBar game={game} />
+
+          <div className="px-4">
+            {tab === 'vandaag' && (
+              <VandaagView state={state} game={game}
+                onQuiz={() => setTab('quiz')} onPotje={() => setTab('potje')} onImport={() => setTab('import')} />
+            )}
+            {tab === 'bank' && (
+              <BankView vragen={state.vragen} edities={state.edities}
+                onVerwijder={verwijderVraag} onBewerk={bewerkVraag} onImport={() => setTab('import')} />
+            )}
+            {tab === 'ik' && (
+              <ProfielView state={state} game={game} onImport={importeer} onReset={resetAlles} />
+            )}
+          </div>
+
+          {tab === 'potje' && (
+            <PotjeView vragen={state.vragen} onRegistreer={registreerAntwoord}
+              onSluiten={() => setTab('vandaag')} onKlaar={potjeKlaar} />
+          )}
+          {tab === 'quiz' && (
+            <QuizView vragen={state.vragen} onRegistreer={registreerAntwoord} onSluiten={() => setTab('vandaag')}
+              onKlaar={(score, totaal) => { quizKlaar(score, totaal); if (totaal && score === totaal) vier(); }} />
+          )}
+          {tab === 'import' && (
+            <ImportView onToevoegen={voegVragenToe} onSluiten={() => setTab('vandaag')} />
+          )}
+
+          {tab !== 'potje' && tab !== 'quiz' && tab !== 'import' && <NavBalk tab={tab} setTab={setTab} />}
+
+          {toast && (
+            <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-[#1f2937] text-white text-sm font-bold px-5 py-3 rounded-2xl shadow-xl toast-in">
+              {toast}
+            </div>
+          )}
+          {confetti && <Confetti />}
+        </div>
+      );
+    }
+
+    // ---------- bovenbalk ----------
+    function TopBar({ game }) {
+      return (
+        <div className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+          <div className="font-extrabold text-lg flex items-center gap-1.5" style={{ color: INKT }}>
+            <span>🎲</span> Triviant
+          </div>
+          <div className="flex items-center gap-3 text-sm font-extrabold">
+            <span title="Streak" className="flex items-center gap-1 text-orange-500">🔥 {game.streak || 0}</span>
+            <span title="Niveau" className="flex items-center gap-1" style={{ color: INKT }}>⭐ {niveauVan(game.xp)}</span>
+            <span title="XP" className="text-gray-500">{game.xp} XP</span>
+          </div>
+        </div>
+      );
+    }
+
+    // ---------- Vandaag ----------
+    function VandaagView({ state, game, onQuiz, onPotje, onImport }) {
+      const uur = new Date().getHours();
+      const groet = uur < 6 ? 'Goedenacht' : uur < 12 ? 'Goedemorgen' : uur < 18 ? 'Goedemiddag' : 'Goedenavond';
+      const alGedaan = game.laatsteImport === todayStr();
+      const genoegVoorPotje = state.vragen.length >= 12;
+
+      return (
+        <div className="py-4 space-y-4">
+          <div className="text-gray-500 text-sm font-bold">{groet} · {fmtLang(todayStr())}</div>
+
+          <button onClick={onImport}
+            className="w-full text-left rounded-3xl p-5 shadow-sm text-white active:translate-y-px"
+            style={{ background: alGedaan ? 'linear-gradient(135deg,#58cc02,#3a9e00)' : 'linear-gradient(135deg,#1f2937,#111827)' }}>
+            <div className="flex items-center gap-3">
+              <div className="text-3xl">{alGedaan ? '✅' : '📰'}</div>
+              <div className="flex-1">
+                <div className="font-extrabold text-lg leading-tight">
+                  {alGedaan ? 'Krant van vandaag verwerkt' : 'Krant van vandaag toevoegen'}
+                </div>
+                <div className="text-sm text-white/90">
+                  {alGedaan ? 'Nog een editie toevoegen? Tik hier.' : 'Kies de NRC-PDF of -EPUB → automatisch quizvragen'}
+                </div>
+              </div>
+              <span className="text-2xl">›</span>
+            </div>
+          </button>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button onClick={onPotje} disabled={!genoegVoorPotje}
+              className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 text-left active:translate-y-px disabled:opacity-40">
+              <div className="text-2xl">🎲</div>
+              <div className="font-extrabold mt-1">Triviant potje</div>
+              <div className="text-xs text-gray-500">{genoegVoorPotje ? '2–6 spelers, om de beurt' : 'Importeer eerst meer edities'}</div>
+            </button>
+            <button onClick={onQuiz} disabled={state.vragen.length < 4}
+              className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 text-left active:translate-y-px disabled:opacity-40">
+              <div className="text-2xl">⚡</div>
+              <div className="font-extrabold mt-1">Snelle quiz</div>
+              <div className="text-xs text-gray-500">10 vragen, alleen of samen</div>
+            </button>
+          </div>
+
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="font-extrabold mb-3">📊 Jouw vragenbank</div>
+            <div className="grid grid-cols-3 gap-3 text-center mb-3">
+              <Stat icon="🧠" waarde={state.vragen.length} label="vragen" />
+              <Stat icon="📰" waarde={state.edities.length} label="edities" />
+              <Stat icon="🏆" waarde={game.potjesGewonnen || 0} label="potjes" />
+            </div>
+            <div className="space-y-1.5">
+              {CATS.map(c => {
+                const n = state.vragen.filter(v => v.categorie === c.id).length;
+                const pct = state.vragen.length ? (n / state.vragen.length) * 100 : 0;
+                return (
+                  <div key={c.id} className="flex items-center gap-2 text-xs">
+                    <span className="w-24 shrink-0 font-bold text-gray-600 truncate">{c.icon} {c.naam}</span>
+                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: pct + '%', background: c.kleur }} />
+                    </div>
+                    <span className="w-5 text-right text-gray-400">{n}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    function Stat({ icon, waarde, label }) {
+      return (
+        <div className="bg-gray-50 rounded-2xl p-3">
+          <div className="text-xl">{icon}</div>
+          <div className="font-extrabold text-lg">{waarde}</div>
+          <div className="text-[11px] text-gray-400">{label}</div>
+        </div>
+      );
+    }
+
+    // ---------- Vragenbank ----------
+    function BankView({ vragen, edities, onVerwijder, onBewerk, onImport }) {
+      const [open, setOpen] = useState(null);
+      const [zoek, setZoek] = useState('');
+
+      const treffers = useMemo(() => {
+        const q = zoek.trim().toLowerCase();
+        if (!q) return null;
+        return vragen.filter(v => (v.vraag + ' ' + v.opties.join(' ') + ' ' + (v.bron || '')).toLowerCase().includes(q));
+      }, [zoek, vragen]);
+
+      return (
+        <div className="py-4 space-y-3">
+          <div className="font-extrabold text-xl">🧠 Vragenbank</div>
+          <input value={zoek} onChange={e => setZoek(e.target.value)} placeholder="🔍 Zoek in al je vragen…"
+            className="w-full border border-gray-200 rounded-2xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#111827]/20" />
+
+          {treffers !== null ? (
+            <div className="space-y-2">
+              <div className="text-xs text-gray-500">{treffers.length} vraag/vragen gevonden</div>
+              {treffers.map(v => (
+                <div key={v.id} className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
+                  <VraagBewerker vraag={v} onBewerk={onBewerk} onVerwijder={onVerwijder} />
+                </div>
+              ))}
+              {treffers.length === 0 && <div className="text-center text-gray-400 text-sm py-8">Niets gevonden.</div>}
+            </div>
+          ) : (
+            <>
+              <button onClick={onImport}
+                className="w-full rounded-2xl border-2 border-dashed border-gray-300 text-gray-600 font-extrabold py-3 active:translate-y-px">
+                📰 Nog een editie toevoegen
+              </button>
+              <div className="text-xs text-gray-500 -mt-1">
+                {edities.length} editie{edities.length === 1 ? '' : 's'} geïmporteerd · tik een categorie voor de vragen
+              </div>
+              {CATS.map(c => {
+                const lijst = vragen.filter(v => v.categorie === c.id);
+                return (
+                  <button key={c.id} onClick={() => setOpen(c)}
+                    className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-3 text-left active:translate-y-px">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0" style={{ background: c.kleur + '22' }}>{c.icon}</div>
+                    <div className="flex-1">
+                      <div className="font-extrabold">{c.naam}</div>
+                      <div className="text-xs text-gray-500">{lijst.length} vraag{lijst.length === 1 ? '' : 'en'}</div>
+                    </div>
+                    <span className="text-gray-300 text-xl">›</span>
+                  </button>
+                );
+              })}
+            </>
+          )}
+
+          {open && (
+            <Overlay titel={open.icon + ' ' + open.naam} onSluiten={() => setOpen(null)}>
+              <div className="space-y-3">
+                {vragen.filter(v => v.categorie === open.id).length === 0 && (
+                  <div className="text-center text-gray-400 text-sm py-8">Nog geen vragen in deze categorie.</div>
+                )}
+                {vragen.filter(v => v.categorie === open.id).map(v => (
+                  <div key={v.id} className="bg-white rounded-2xl p-3 border border-gray-100">
+                    <VraagBewerker vraag={v} onBewerk={onBewerk} onVerwijder={onVerwijder} />
+                  </div>
+                ))}
+              </div>
+            </Overlay>
+          )}
+        </div>
+      );
+    }
+    function VraagBewerker({ vraag, onBewerk, onVerwijder }) {
+      const [edit, setEdit] = useState(false);
+      const [v, setV] = useState(vraag.vraag);
+      const [opties, setOpties] = useState(vraag.opties);
+      const [juist, setJuist] = useState(vraag.antwoordIndex);
+      const c = catById(vraag.categorie);
+      const pct = vraag.stats && vraag.stats.gezien ? Math.round((vraag.stats.goed / vraag.stats.gezien) * 100) : null;
+
+      if (edit) {
+        return (
+          <div className="space-y-2">
+            <textarea value={v} onChange={e => setV(e.target.value)} rows={2} className="w-full text-sm font-bold border border-gray-200 rounded-xl p-2" />
+            {opties.map((o, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input type="radio" checked={juist === i} onChange={() => setJuist(i)} className="accent-[#58cc02]" />
+                <input value={o} onChange={e => setOpties(opties.map((x, idx) => idx === i ? e.target.value : x))}
+                  className="flex-1 text-sm border border-gray-200 rounded-lg p-1.5" />
+              </div>
+            ))}
+            <div className="flex gap-2">
+              <button onClick={() => { onBewerk(vraag.id, { vraag: v.trim() || vraag.vraag, opties, antwoordIndex: juist }); setEdit(false); }}
+                className="rounded-xl px-3 py-1.5 text-white font-extrabold text-xs" style={{ background: '#58cc02' }}>Opslaan</button>
+              <button onClick={() => { setEdit(false); setV(vraag.vraag); setOpties(vraag.opties); setJuist(vraag.antwoordIndex); }}
+                className="rounded-xl px-3 py-1.5 font-extrabold text-xs text-gray-500 border border-gray-200">Annuleer</button>
+            </div>
+          </div>
+        );
+      }
+      return (
+        <div>
+          <div className="font-bold text-sm">{vraag.vraag}</div>
+          <div className="text-xs text-gray-500 mt-1">✓ {vraag.opties[vraag.antwoordIndex]}</div>
+          <div className="flex items-center gap-3 mt-1.5 text-[11px] font-bold flex-wrap">
+            <span className="px-2 py-0.5 rounded-full" style={{ background: c.kleur + '22', color: c.kleur }}>{c.icon} {c.naam}</span>
+            <span className="text-gray-400">{vraag.moeilijkheid}</span>
+            {pct !== null && <span className="text-gray-400">{pct}% goed ({vraag.stats.gezien}×)</span>}
+            <button onClick={() => setEdit(true)} className="text-[#1cb0f6]">✎ bewerken</button>
+            <button onClick={() => onVerwijder(vraag.id)} className="text-gray-300">✕</button>
+          </div>
+        </div>
+      );
+    }
+
+    function Overlay({ titel, onSluiten, children }) {
+      return (
+        <div className="fixed inset-0 z-50 bg-white max-w-xl mx-auto flex flex-col">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+            <div className="font-extrabold">{titel}</div>
+            <button onClick={onSluiten} className="text-gray-400 text-xl">✕</button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">{children}</div>
+        </div>
+      );
+    }
+
+    // ---------- Snelle quiz ----------
+    function QuizView({ vragen, onRegistreer, onSluiten, onKlaar }) {
+      const ronde = useMemo(() => shuffle(vragen).slice(0, 10).map(v => ({ vraag: v, opties: geschudOpties(v) })), []);
+      const [i, setI] = useState(0);
+      const [score, setScore] = useState(0);
+      const [gekozen, setGekozen] = useState(null);
+      const [klaar, setKlaar] = useState(false);
+      const gerapporteerd = useRef(false);
+
+      if (vragen.length < 4) {
+        return <Overlay onSluiten={onSluiten} titel="Snelle quiz">
+          <div className="text-center text-gray-500 py-8">Importeer eerst een editie — dan kun je quizzen. 📰</div>
+        </Overlay>;
+      }
+      if (klaar) {
+        if (!gerapporteerd.current) { gerapporteerd.current = true; onKlaar(score, ronde.length); }
+        const perfect = score === ronde.length;
+        return <Overlay onSluiten={onSluiten} titel="Snelle quiz">
+          <div className="text-center py-6 space-y-3">
+            <div className="text-6xl">{perfect ? '🏆' : score >= ronde.length / 2 ? '👏' : '💪'}</div>
+            <div className="font-extrabold text-2xl">{score} / {ronde.length} goed</div>
+            <div className="text-gray-500 text-sm">{perfect ? 'Foutloos! Badge verdiend.' : 'Mooi geprobeerd — volgende keer beter.'}</div>
+            <button onClick={onSluiten} className="rounded-2xl px-6 py-3 font-extrabold text-white" style={{ background: INKT }}>Klaar</button>
+          </div>
+        </Overlay>;
+      }
+
+      const v = ronde[i];
+      const c = catById(v.vraag.categorie);
+      function kies(optie) {
+        if (gekozen) return;
+        setGekozen(optie);
+        onRegistreer(v.vraag.id, optie.juist);
+        if (optie.juist) setScore(s => s + 1);
+        setTimeout(() => {
+          if (i + 1 >= ronde.length) setKlaar(true);
+          else { setI(i + 1); setGekozen(null); }
+        }, 1100);
+      }
+
+      return (
+        <Overlay onSluiten={onSluiten} titel={`Vraag ${i + 1}/${ronde.length}`}>
+          <div className="space-y-4">
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-full rounded-full transition-all" style={{ width: (i / ronde.length * 100) + '%', background: INKT }} />
+            </div>
+            <span className="inline-block text-xs font-extrabold px-2.5 py-1 rounded-full" style={{ background: c.kleur + '22', color: c.kleur }}>{c.icon} {c.naam}</span>
+            <div className="font-extrabold text-lg">{v.vraag.vraag}</div>
+            <div className="space-y-2">
+              {v.opties.map((o, idx) => {
+                let cls = 'bg-white border-gray-200';
+                if (gekozen) {
+                  if (o.juist) cls = 'bg-[#e8f9d6] border-[#58cc02]';
+                  else if (o === gekozen) cls = 'bg-[#ffe3e3] border-[#ff4b4b]';
+                }
+                return (
+                  <button key={idx} onClick={() => kies(o)} disabled={!!gekozen}
+                    className={'w-full text-left border-2 rounded-2xl p-3 text-sm font-medium active:translate-y-px ' + cls}>
+                    {o.tekst}
+                  </button>
+                );
+              })}
+            </div>
+            {gekozen && v.vraag.uitleg && <div className="text-xs text-gray-500 pt-1">💡 {v.vraag.uitleg}</div>}
+          </div>
+        </Overlay>
+      );
+    }
+
+    // ---------- Triviant potje (het bordspel) ----------
+    function PotjeView({ vragen, onRegistreer, onSluiten, onKlaar }) {
+      const [fase, setFase] = useState('setup'); // setup | spelen | klaar
+      const [spelers, setSpelers] = useState([{ naam: '', avatar: AVATARS[0] }, { naam: '', avatar: AVATARS[1] }]);
+      const [posities, setPosities] = useState([]);
+      const [wedges, setWedges] = useState([]);
+      const [beurt, setBeurt] = useState(0);
+      const [worp, setWorp] = useState(null);
+      const [vraagActief, setVraagActief] = useState(null); // { vraag, opties, categorie, isHq, magWedge, isEind }
+      const [boodschap, setBoodschap] = useState('Rol de dobbelsteen 🎲');
+      const [winnaar, setWinnaar] = useState(null);
+      const gebruikteVragen = useRef(new Set());
+      const goedBeantwoord = useRef(0);
+
+      function wijzigSpeler(i, patch) { setSpelers(s => s.map((sp, idx) => idx === i ? { ...sp, ...patch } : sp)); }
+      function voegSpelerToe() { if (spelers.length < 6) setSpelers(s => [...s, { naam: '', avatar: AVATARS[s.length % AVATARS.length] }]); }
+      function verwijderSpeler(i) { if (spelers.length > 2) setSpelers(s => s.filter((_, idx) => idx !== i)); }
+
+      function start() {
+        const namen = spelers.map((s, i) => ({ ...s, naam: s.naam.trim() || `Speler ${i + 1}` }));
+        setSpelers(namen);
+        setPosities(namen.map(() => 0));
+        setWedges(namen.map(() => []));
+        setBeurt(0); setWinnaar(null); goedBeantwoord.current = 0; gebruikteVragen.current = new Set();
+        setBoodschap(`${namen[0].naam} mag beginnen — rol de dobbelsteen 🎲`);
+        setFase('spelen');
+      }
+
+      function kiesVraag(categorieId) {
+        const gebruikt = gebruikteVragen.current;
+        let poel = vragen.filter(v => v.categorie === categorieId && !gebruikt.has(v.id));
+        if (!poel.length) poel = vragen.filter(v => v.categorie === categorieId);
+        if (!poel.length) poel = vragen.filter(v => !gebruikt.has(v.id));
+        if (!poel.length) poel = vragen;
+        return poel[Math.floor(Math.random() * poel.length)];
+      }
+
+      function rol() {
+        if (vraagActief || winnaar) return;
+        const w = 1 + Math.floor(Math.random() * 6);
+        setWorp(w);
+        const huidige = posities[beurt];
+        const nieuw = (huidige + w) % RING_SIZE;
+        setPosities(p => p.map((pos, idx) => idx === beurt ? nieuw : pos));
+        const vak = BORD[nieuw];
+        const heeftAlAlles = wedges[beurt].length >= 6;
+
+        if (vak.type === 'hq' && heeftAlAlles) {
+          const catRandom = CATS[Math.floor(Math.random() * CATS.length)].id;
+          const vraag = kiesVraag(catRandom);
+          setVraagActief({ vraag, opties: geschudOpties(vraag), categorie: catRandom, isEind: true });
+          setBoodschap('🏁 Eindvraag! Goed antwoord = winst.');
+          return;
+        }
+        const magWedge = vak.type === 'hq' && !wedges[beurt].includes(vak.categorie);
+        const vraag = kiesVraag(vak.categorie);
+        setVraagActief({ vraag, opties: geschudOpties(vraag), categorie: vak.categorie, isHq: vak.type === 'hq', magWedge });
+        setBoodschap(magWedge ? '👑 HQ-vakje! Goed antwoord wint deze taartpunt.' : 'Beantwoord de vraag →');
+      }
+
+      function beantwoord(optie) {
+        const v = vraagActief;
+        onRegistreer(v.vraag.id, optie.juist);
+        gebruikteVragen.current.add(v.vraag.id);
+        if (optie.juist) goedBeantwoord.current += 1;
+
+        setTimeout(() => {
+          if (v.isEind) {
+            if (optie.juist) {
+              setWinnaar(beurt);
+              setBoodschap(`🏆 ${spelers[beurt].naam} wint het potje!`);
+              setVraagActief(null);
+              setFase('klaar');
+              onKlaar(goedBeantwoord.current);
+              return;
+            }
+            setVraagActief(null);
+            volgendeBeurt('Helaas, fout! Beurt gaat door naar de volgende speler.');
+            return;
+          }
+          if (optie.juist) {
+            if (v.magWedge) {
+              setWedges(w => w.map((lijst, idx) => idx === beurt ? [...lijst, v.categorie] : lijst));
+              setVraagActief(null);
+              setBoodschap(`🎉 ${spelers[beurt].naam} wint de taartpunt ${catById(v.categorie).icon} ${catById(v.categorie).naam}! Rol nogmaals.`);
+            } else {
+              setVraagActief(null);
+              setBoodschap(`Goed! ${spelers[beurt].naam} mag nog een keer rollen 🎲`);
+            }
+          } else {
+            setVraagActief(null);
+            volgendeBeurt('Helaas, fout antwoord! Beurt gaat door.');
+          }
+        }, 1400);
+      }
+      function volgendeBeurt(bericht) {
+        setBeurt(b => {
+          const next = (b + 1) % spelers.length;
+          setBoodschap(`${bericht} ${spelers[next].naam} is aan de beurt.`);
+          return next;
+        });
+      }
+
+      // ---------- setup-scherm ----------
+      if (fase === 'setup') {
+        const genoeg = vragen.length >= 12;
+        return (
+          <Overlay titel="🎲 Triviant potje" onSluiten={onSluiten}>
+            <div className="space-y-4">
+              {!genoeg && (
+                <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-2xl p-3">
+                  Je hebt nog maar {vragen.length} vragen. Het spel werkt het leukst met minstens 12 (2 per categorie) — importeer gerust nog een editie.
+                </div>
+              )}
+              <div className="text-sm text-gray-600">Om de beurt dobbelstenen, landen op een categorie-vakje en de vraag goed beantwoorden. Win alle 6 taartpunten door op een HQ-vakje 👑 goed te antwoorden, en land daarna nog eens op een HQ voor de eindvraag.</div>
+              <div className="space-y-2">
+                {spelers.map((s, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <select value={s.avatar} onChange={e => wijzigSpeler(i, { avatar: e.target.value })}
+                      className="border border-gray-200 rounded-xl p-2 text-lg bg-white">
+                      {AVATARS.map(a => <option key={a} value={a}>{a}</option>)}
+                    </select>
+                    <input value={s.naam} onChange={e => wijzigSpeler(i, { naam: e.target.value })}
+                      placeholder={`Speler ${i + 1}`} className="flex-1 border border-gray-200 rounded-xl p-2 text-sm" />
+                    {spelers.length > 2 && (
+                      <button onClick={() => verwijderSpeler(i)} className="text-gray-300 px-2">✕</button>
+                    )}
+                  </div>
+                ))}
+                {spelers.length < 6 && (
+                  <button onClick={voegSpelerToe} className="text-sm font-bold text-[#1cb0f6]">+ speler toevoegen</button>
+                )}
+              </div>
+              <button onClick={start}
+                className="w-full rounded-2xl py-4 font-extrabold text-white text-lg active:translate-y-px" style={{ background: INKT }}>
+                Start het potje
+              </button>
+            </div>
+          </Overlay>
+        );
+      }
+
+      // ---------- speel- / eindscherm ----------
+      return (
+        <div className="fixed inset-0 z-50 bg-[#f7f7f7] max-w-xl mx-auto flex flex-col">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-white">
+            <div className="font-extrabold">🎲 Triviant potje</div>
+            <button onClick={onSluiten} className="text-gray-400 text-xl">✕</button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* het bord */}
+            <div className="relative w-full aspect-square max-w-sm mx-auto">
+              {BORD.map(vak => {
+                const c = catById(vak.categorie);
+                const pos = bordPositie(vak.i, 44);
+                const isHq = vak.type === 'hq';
+                return (
+                  <div key={vak.i} title={c.naam}
+                    className={'absolute -translate-x-1/2 -translate-y-1/2 flex items-center justify-center rounded-full ' + (isHq ? 'w-9 h-9 text-base ring-2 ring-yellow-400' : 'w-6 h-6 text-[10px]')}
+                    style={{ ...pos, background: c.kleur, color: '#fff' }}>
+                    {isHq ? '👑' : ''}
+                  </div>
+                );
+              })}
+              {spelers.map((s, idx) => {
+                const pos = bordPositie(posities[idx] ?? 0, 44);
+                // meerdere spelers op hetzelfde vakje verspreiden we een beetje
+                const offset = (idx - (spelers.length - 1) / 2) * 10;
+                return (
+                  <div key={idx}
+                    className={'absolute -translate-x-1/2 -translate-y-1/2 text-2xl transition-all duration-500 ' + (idx === beurt && !winnaar ? 'pop' : '')}
+                    style={{ left: pos.left, top: pos.top, marginLeft: offset }}>
+                    {s.avatar}
+                  </div>
+                );
+              })}
+              <div className="absolute inset-[30%] rounded-full bg-white shadow-inner flex items-center justify-center text-3xl">
+                {worp || '🎲'}
+              </div>
+            </div>
+
+            {/* spelersoverzicht + taartwielen */}
+            <div className="grid grid-cols-2 gap-2">
+              {spelers.map((s, idx) => (
+                <div key={idx} className={'rounded-2xl p-2.5 border flex items-center gap-2 ' + (idx === beurt && !winnaar ? 'border-[#111827] bg-white' : 'border-gray-100 bg-white/60')}>
+                  <WedgeTracker bezit={wedges[idx] || []} />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-extrabold text-sm truncate">{s.avatar} {s.naam}</div>
+                    <div className="text-[10px] text-gray-400">{(wedges[idx] || []).length}/6 taartpunten</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center text-sm font-bold text-gray-700 min-h-[2.5em]">{boodschap}</div>
+
+            {fase === 'spelen' && !vraagActief && !winnaar && (
+              <button onClick={rol}
+                className={'w-full rounded-2xl py-4 font-extrabold text-white text-lg active:translate-y-px ' + (worp ? 'dobbel' : '')}
+                style={{ background: INKT }}>
+                🎲 Rol de dobbelsteen
+              </button>
+            )}
+
+            {winnaar !== null && (
+              <div className="text-center space-y-3 py-4">
+                <div className="text-6xl">🏆</div>
+                <div className="font-extrabold text-2xl">{spelers[winnaar].avatar} {spelers[winnaar].naam} wint!</div>
+                <div className="flex gap-2">
+                  <button onClick={() => setFase('setup')} className="flex-1 rounded-2xl py-3 font-extrabold text-white" style={{ background: INKT }}>Nog een potje</button>
+                  <button onClick={onSluiten} className="flex-1 rounded-2xl py-3 font-extrabold text-gray-600 border-2 border-gray-200">Sluiten</button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {vraagActief && (
+            <div className="fixed inset-0 z-[60] bg-black/40 flex items-end sm:items-center justify-center p-0 sm:p-4">
+              <div className="bg-white w-full max-w-xl rounded-t-3xl sm:rounded-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+                <span className="inline-block text-xs font-extrabold px-2.5 py-1 rounded-full"
+                  style={{ background: catById(vraagActief.categorie).kleur + '22', color: catById(vraagActief.categorie).kleur }}>
+                  {vraagActief.isEind ? '🏁 Eindvraag' : (catById(vraagActief.categorie).icon + ' ' + catById(vraagActief.categorie).naam)}
+                </span>
+                <div className="font-extrabold text-lg">{vraagActief.vraag.vraag}</div>
+                <div className="space-y-2">
+                  {vraagActief.opties.map((o, idx) => (
+                    <VraagOptieKnop key={idx} optie={o} onKies={beantwoord} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+    // Losse component zodat elke optie zijn eigen 'gekozen'-status kan tonen na een klik.
+    function VraagOptieKnop({ optie, onKies }) {
+      const [gekozen, setGekozen] = useState(false);
+      const [toonAntwoord, setToonAntwoord] = useState(false);
+      useEffect(() => {
+        if (!gekozen) return;
+        const t = setTimeout(() => setToonAntwoord(true), 30);
+        return () => clearTimeout(t);
+      }, [gekozen]);
+      let cls = 'bg-gray-50 border-gray-200';
+      if (toonAntwoord) cls = optie.juist ? 'bg-[#e8f9d6] border-[#58cc02]' : (gekozen ? 'bg-[#ffe3e3] border-[#ff4b4b]' : 'bg-gray-50 border-gray-200 opacity-50');
+      return (
+        <button disabled={gekozen} onClick={() => { setGekozen(true); onKies(optie); }}
+          className={'w-full text-left border-2 rounded-2xl p-3 text-sm font-medium active:translate-y-px ' + cls}>
+          {optie.tekst}
+        </button>
+      );
+    }
+
+    // ---------- Krant importeren ----------
+    function ImportView({ onToevoegen, onSluiten }) {
+      const [fase, setFase] = useState('kies'); // kies | lezen | genereren | review | fout
+      const [fout, setFout] = useState('');
+      const [voortgang, setVoortgang] = useState({ p: 0, n: 0 });
+      const [aantal, setAantal] = useState(18);
+      const [datum, setDatum] = useState(todayStr());
+      const [suggesties, setSuggesties] = useState([]);
+      const fileRef = useRef(null);
+
+      async function verwerk(file) {
+        if (!file) return;
+        setFout('');
+        try {
+          setFase('lezen');
+          const tekst = await krantNaarTekst(file, (p, n) => setVoortgang({ p, n }));
+          if (tekst.trim().length < 200) {
+            setFout('Er kwam nauwelijks tekst uit dit bestand. Is het een gescande (afbeelding-)PDF, of een leeg EPUB?');
+            setFase('fout'); return;
+          }
+          setFase('genereren');
+          const vragen = await genereerVragen(tekst, aantal);
+          if (!vragen.length) {
+            setFout('Geen vragen teruggekregen. Probeer het opnieuw of met een andere editie.');
+            setFase('fout'); return;
+          }
+          setSuggesties(vragen.map(v => ({ ...v, keep: true })));
+          setFase('review');
+        } catch (e) {
+          setFout(e.message || 'Er ging iets mis.');
+          setFase('fout');
+        }
+      }
+      function wijzig(i, veld, waarde) { setSuggesties(s => s.map((v, idx) => idx === i ? { ...v, [veld]: waarde } : v)); }
+      const geselecteerd = suggesties.filter(v => v.keep && v.vraag.trim());
+
+      return (
+        <Overlay titel="📰 Editie toevoegen" onSluiten={onSluiten}>
+          {fase === 'kies' && (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Kies de PDF of het EPUB-bestand van een NRC-editie. De app leest de tekst lokaal uit en laat
+                er Triviant-vragen van maken — die jij daarna goedkeurt.
+              </p>
+              <div>
+                <div className="text-xs font-extrabold text-gray-500 mb-2 uppercase">Datum van de editie</div>
+                <input type="date" value={datum} onChange={e => setDatum(e.target.value)}
+                  className="w-full border border-gray-200 rounded-2xl p-3 text-sm" />
+              </div>
+              <div>
+                <div className="text-xs font-extrabold text-gray-500 mb-2 uppercase">Aantal vragen</div>
+                <div className="flex gap-2">
+                  {[12, 18, 24, 30].map(n => (
+                    <button key={n} onClick={() => setAantal(n)}
+                      className={'flex-1 rounded-2xl py-2 font-extrabold border-2 ' + (aantal === n ? 'text-white' : 'text-gray-600 border-gray-200')}
+                      style={aantal === n ? { background: INKT, borderColor: INKT } : {}}>{n}</button>
+                  ))}
+                </div>
+              </div>
+              <input ref={fileRef} type="file" accept=".pdf,.epub,application/pdf,application/epub+zip" className="hidden"
+                onChange={e => verwerk(e.target.files[0])} />
+              <button onClick={() => fileRef.current.click()}
+                className="w-full rounded-2xl py-4 font-extrabold text-white text-lg active:translate-y-px" style={{ background: INKT }}>
+                📄 Kies PDF of EPUB
+              </button>
+              <p className="text-[11px] text-gray-400 text-center">
+                De krant wordt lokaal tot tekst verwerkt; alleen die tekst gaat naar je eigen server-functie die
+                Claude aanroept. Vereist een ingestelde API-sleutel (zie TRIVIANT.md).
+              </p>
+            </div>
+          )}
+
+          {(fase === 'lezen' || fase === 'genereren') && (
+            <div className="py-16 text-center space-y-3">
+              <div className="text-5xl animate-pulse">{fase === 'lezen' ? '📖' : '🧠'}</div>
+              <div className="font-extrabold">
+                {fase === 'lezen'
+                  ? `Bestand lezen…${voortgang.n ? ` (${voortgang.p}/${voortgang.n})` : ''}`
+                  : 'Claude maakt quizvragen…'}
+              </div>
+              <div className="text-sm text-gray-500">{fase === 'genereren' ? 'Dit duurt meestal 10–30 seconden.' : 'Even geduld.'}</div>
+            </div>
+          )}
+
+          {fase === 'fout' && (
+            <div className="py-12 text-center space-y-4">
+              <div className="text-5xl">😕</div>
+              <div className="font-extrabold">Het lukte niet</div>
+              <div className="text-sm text-gray-500">{fout}</div>
+              <button onClick={() => { setFase('kies'); setFout(''); }}
+                className="rounded-2xl px-5 py-3 font-extrabold text-white" style={{ background: INKT }}>Opnieuw</button>
+            </div>
+          )}
+
+          {fase === 'review' && (
+            <div className="space-y-3">
+              <div className="text-sm text-gray-600">
+                {suggesties.length} voorstellen. Vink uit wat je niet wilt en voeg de rest toe aan je bank.
+              </div>
+              {suggesties.map((v, i) => {
+                const c = catById(v.categorie);
+                return (
+                  <div key={i} className={'rounded-2xl border p-3 ' + (v.keep ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100 opacity-60')}>
+                    <div className="flex items-start gap-2">
+                      <input type="checkbox" checked={v.keep} onChange={e => wijzig(i, 'keep', e.target.checked)} className="mt-1 w-5 h-5 accent-[#111827]" />
+                      <div className="flex-1 space-y-1.5">
+                        <div className="text-sm font-bold">{v.vraag}</div>
+                        <div className="text-xs text-gray-500">✓ {v.opties[v.antwoordIndex]}</div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full" style={{ background: c.kleur + '22', color: c.kleur }}>{c.icon} {c.naam}</span>
+                          <span className="text-[11px] text-gray-400 truncate">{v.bron}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="sticky bottom-0 bg-white pt-2 pb-1">
+                <button onClick={() => { onToevoegen(geselecteerd, { datum, titel: 'NRC — ' + fmtLang(datum) }); onSluiten(); }}
+                  disabled={geselecteerd.length === 0}
+                  className="w-full rounded-2xl py-4 font-extrabold text-white text-lg disabled:opacity-40 active:translate-y-px" style={{ background: '#58cc02' }}>
+                  ✓ {geselecteerd.length} vraag/vragen toevoegen
+                </button>
+              </div>
+            </div>
+          )}
+        </Overlay>
+      );
+    }
+
+    // ---------- Profiel ----------
+    function ProfielView({ state, game, onImport, onReset }) {
+      const stats = useMemo(() => ({
+        vragen: state.vragen.length, edities: state.edities.length,
+        potjesGespeeld: game.potjesGespeeld || 0, potjesGewonnen: game.potjesGewonnen || 0,
+        streak: game.streak || 0, quizPerfect: !!game.quizPerfect,
+      }), [state, game]);
+      const fileRef = useRef(null);
+
+      function exporteer() {
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'triviant-backup-' + todayStr() + '.json';
+        a.click(); URL.revokeObjectURL(url);
+      }
+      function kiesBestand(e) {
+        const f = e.target.files[0]; if (!f) return;
+        const r = new FileReader();
+        r.onload = () => { try { onImport(JSON.parse(r.result)); } catch { onImport(null); } };
+        r.readAsText(f);
+      }
+
+      return (
+        <div className="py-4 space-y-4">
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="relative shrink-0">
+              <Ring pct={xpInNiveau(game.xp)} kleur={INKT} groot />
+              <div className="absolute inset-0 flex items-center justify-center text-2xl font-extrabold">{niveauVan(game.xp)}</div>
+            </div>
+            <div>
+              <div className="font-extrabold text-lg">Niveau {niveauVan(game.xp)}</div>
+              <div className="text-sm text-gray-500">{game.xp} XP · nog {100 - xpInNiveau(game.xp)} tot volgend niveau</div>
+              <div className="text-sm text-orange-500 font-bold mt-1">🔥 {game.streak || 0} dagen streak</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <Stat icon="🧠" waarde={stats.vragen} label="vragen" />
+            <Stat icon="📰" waarde={stats.edities} label="edities" />
+            <Stat icon="🏆" waarde={stats.potjesGewonnen} label="potjes" />
+          </div>
+
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="font-extrabold mb-3">🏅 Badges</div>
+            <div className="grid grid-cols-4 gap-3">
+              {BADGES.map(b => {
+                const behaald = b.test(stats);
+                return (
+                  <div key={b.id} title={b.uitleg} className={'flex flex-col items-center text-center ' + (behaald ? '' : 'opacity-30 grayscale')}>
+                    <div className="text-3xl">{b.icon}</div>
+                    <div className="text-[10px] font-bold mt-1 leading-tight">{b.titel}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 space-y-2">
+            <div className="font-extrabold mb-1">💾 Jouw data (blijft van jou)</div>
+            <div className="text-xs text-gray-500 mb-2">Alles staat lokaal in deze browser. Maak een back-up of zet 'm op een ander apparaat.</div>
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={exporteer} className="rounded-2xl py-2.5 font-extrabold border-2 border-gray-200 text-gray-700">⬇️ Exporteren</button>
+              <button onClick={() => fileRef.current.click()} className="rounded-2xl py-2.5 font-extrabold border-2 border-gray-200 text-gray-700">⬆️ Importeren</button>
+              <input ref={fileRef} type="file" accept="application/json" className="hidden" onChange={kiesBestand} />
+            </div>
+            <button onClick={() => { if (confirm('Alles wissen en opnieuw beginnen?')) onReset(); }}
+              className="w-full rounded-2xl py-2.5 font-extrabold text-[#ff4b4b] border-2 border-[#ffd5d5] mt-1">Opnieuw beginnen</button>
+          </div>
+
+          <div className="text-center text-xs text-gray-400 pt-2">
+            <a href="/" className="underline">← Nieuwsticker</a> · <a href="/geheugen/" className="underline">Nieuwsgeheugen</a>
+          </div>
+        </div>
+      );
+    }
+
+    // ---------- onderbalk ----------
+    function NavBalk({ tab, setTab }) {
+      const items = [
+        { id: 'vandaag', icon: '🏠', label: 'Vandaag' },
+        { id: 'bank', icon: '🧠', label: 'Bank' },
+        { id: 'ik', icon: '🏅', label: 'Ik' },
+      ];
+      return (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 safe-bottom">
+          <div className="max-w-xl mx-auto grid grid-cols-3">
+            {items.map(it => (
+              <button key={it.id} onClick={() => setTab(it.id)}
+                className={'py-2.5 flex flex-col items-center text-[11px] font-bold ' + (tab === it.id ? '' : 'text-gray-400')}
+                style={tab === it.id ? { color: INKT } : {}}>
+                <span className="text-xl">{it.icon}</span>
+                {it.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

@@ -16,6 +16,10 @@
       "memory": 1024,
       "maxDuration": 60
     },
+    "api/triviant.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
     "api/denktanks-rss.js": {
       "memory": 1024,
       "maxDuration": 15
