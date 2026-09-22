@@ -84,6 +84,17 @@
     function geschudOpties(vraag) {
       return shuffle(vraag.opties.map((tekst, i) => ({ tekst, juist: i === vraag.antwoordIndex })));
     }
+    // Bot kiest een optie: met kans 'botKans' het juiste antwoord, anders een willekeurig fout antwoord.
+    function botKiesOptie(opties, botKans) {
+      if (Math.random() < botKans) return opties.find(o => o.juist) || opties[0];
+      const fout = opties.filter(o => !o.juist);
+      return fout[Math.floor(Math.random() * fout.length)] || opties[0];
+    }
+    const BOT_NIVEAUS = [
+      { kans: 0.4, label: 'Makkelijk' },
+      { kans: 0.6, label: 'Gemiddeld' },
+      { kans: 0.8, label: 'Moeilijk' },
+    ];
 
     // ---------- PDF → tekst (pdf.js via CDN) ----------
     const PDFJS_VERSIE = '4.7.76';
@@ -458,7 +469,7 @@
               className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 text-left active:translate-y-px disabled:opacity-40">
               <div className="text-2xl">🎲</div>
               <div className="font-extrabold mt-1">Triviant potje</div>
-              <div className="text-xs text-gray-500">{genoegVoorPotje ? '2–6 spelers, om de beurt' : 'Importeer eerst meer edities'}</div>
+              <div className="text-xs text-gray-500">{genoegVoorPotje ? '2–6 spelers of bots, om de beurt' : 'Importeer eerst meer edities'}</div>
             </button>
             <button onClick={onQuiz} disabled={state.vragen.length < 4}
               className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 text-left active:translate-y-px disabled:opacity-40">
@@ -701,7 +712,7 @@
     // ---------- Triviant potje (het bordspel) ----------
     function PotjeView({ vragen, onRegistreer, onSluiten, onKlaar }) {
       const [fase, setFase] = useState('setup'); // setup | spelen | klaar
-      const [spelers, setSpelers] = useState([{ naam: '', avatar: AVATARS[0] }, { naam: '', avatar: AVATARS[1] }]);
+      const [spelers, setSpelers] = useState([{ naam: '', avatar: AVATARS[0], bot: false }, { naam: '', avatar: AVATARS[1], bot: false }]);
       const [posities, setPosities] = useState([]);
       const [wedges, setWedges] = useState([]);
       const [beurt, setBeurt] = useState(0);
@@ -713,11 +724,19 @@
       const goedBeantwoord = useRef(0);
 
       function wijzigSpeler(i, patch) { setSpelers(s => s.map((sp, idx) => idx === i ? { ...sp, ...patch } : sp)); }
-      function voegSpelerToe() { if (spelers.length < 6) setSpelers(s => [...s, { naam: '', avatar: AVATARS[s.length % AVATARS.length] }]); }
+      function voegSpelerToe() { if (spelers.length < 6) setSpelers(s => [...s, { naam: '', avatar: AVATARS[s.length % AVATARS.length], bot: false }]); }
       function verwijderSpeler(i) { if (spelers.length > 2) setSpelers(s => s.filter((_, idx) => idx !== i)); }
+      function wisselBot(i) {
+        setSpelers(s => s.map((sp, idx) => {
+          if (idx !== i) return sp;
+          return sp.bot
+            ? { ...sp, bot: false, avatar: AVATARS[i % AVATARS.length] }
+            : { ...sp, bot: true, avatar: '🤖', botKans: sp.botKans ?? 0.6 };
+        }));
+      }
 
       function start() {
-        const namen = spelers.map((s, i) => ({ ...s, naam: s.naam.trim() || `Speler ${i + 1}` }));
+        const namen = spelers.map((s, i) => ({ ...s, naam: s.naam.trim() || (s.bot ? `Bot ${i + 1}` : `Speler ${i + 1}`) }));
         setSpelers(namen);
         setPosities(namen.map(() => 0));
         setWedges(namen.map(() => []));
@@ -801,6 +820,27 @@
         });
       }
 
+      // Bot rolt automatisch zodra hij aan de beurt is.
+      useEffect(() => {
+        if (fase !== 'spelen' || vraagActief || winnaar !== null) return;
+        const speler = spelers[beurt];
+        if (!speler || !speler.bot) return;
+        const t = setTimeout(() => rol(), 900);
+        return () => clearTimeout(t);
+      }, [fase, beurt, vraagActief, winnaar]);
+
+      // Bot beantwoordt automatisch een vraag die hij zelf getriggerd heeft.
+      useEffect(() => {
+        if (!vraagActief) return;
+        const speler = spelers[beurt];
+        if (!speler || !speler.bot) return;
+        const t = setTimeout(() => {
+          const optie = botKiesOptie(vraagActief.opties, speler.botKans ?? 0.6);
+          beantwoord(optie);
+        }, 1300);
+        return () => clearTimeout(t);
+      }, [vraagActief]);
+
       // ---------- setup-scherm ----------
       if (fase === 'setup') {
         const genoeg = vragen.length >= 12;
@@ -815,15 +855,33 @@
               <div className="text-sm text-gray-600">Om de beurt dobbelstenen, landen op een categorie-vakje en de vraag goed beantwoorden. Win alle 6 taartpunten door op een HQ-vakje 👑 goed te antwoorden, en land daarna nog eens op een HQ voor de eindvraag.</div>
               <div className="space-y-2">
                 {spelers.map((s, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <select value={s.avatar} onChange={e => wijzigSpeler(i, { avatar: e.target.value })}
-                      className="border border-gray-200 rounded-xl p-2 text-lg bg-white">
-                      {AVATARS.map(a => <option key={a} value={a}>{a}</option>)}
-                    </select>
-                    <input value={s.naam} onChange={e => wijzigSpeler(i, { naam: e.target.value })}
-                      placeholder={`Speler ${i + 1}`} className="flex-1 border border-gray-200 rounded-xl p-2 text-sm" />
-                    {spelers.length > 2 && (
-                      <button onClick={() => verwijderSpeler(i)} className="text-gray-300 px-2">✕</button>
+                  <div key={i} className="space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <select value={s.avatar} onChange={e => wijzigSpeler(i, { avatar: e.target.value })}
+                        className="border border-gray-200 rounded-xl p-2 text-lg bg-white">
+                        {(s.bot ? ['🤖', ...AVATARS] : AVATARS).map(a => <option key={a} value={a}>{a}</option>)}
+                      </select>
+                      <input value={s.naam} onChange={e => wijzigSpeler(i, { naam: e.target.value })}
+                        placeholder={s.bot ? `Bot ${i + 1}` : `Speler ${i + 1}`} className="flex-1 border border-gray-200 rounded-xl p-2 text-sm" />
+                      <button onClick={() => wisselBot(i)} title="Wissel tussen mens en bot"
+                        className={'px-3 py-2 rounded-xl border-2 font-bold text-sm ' + (s.bot ? 'text-white border-transparent' : 'text-gray-500 border-gray-200')}
+                        style={s.bot ? { background: INKT } : {}}>
+                        {s.bot ? '🤖 Bot' : '🧑 Mens'}
+                      </button>
+                      {spelers.length > 2 && (
+                        <button onClick={() => verwijderSpeler(i)} className="text-gray-300 px-2">✕</button>
+                      )}
+                    </div>
+                    {s.bot && (
+                      <div className="flex gap-1.5 pl-1">
+                        {BOT_NIVEAUS.map(n => (
+                          <button key={n.kans} onClick={() => wijzigSpeler(i, { botKans: n.kans })}
+                            className={'text-[11px] font-bold px-2.5 py-1 rounded-full border-2 ' + ((s.botKans ?? 0.6) === n.kans ? 'text-white border-transparent' : 'text-gray-500 border-gray-200')}
+                            style={(s.botKans ?? 0.6) === n.kans ? { background: INKT } : {}}>
+                            {n.label}
+                          </button>
+                        ))}
+                      </div>
                     )}
                   </div>
                 ))}
@@ -886,7 +944,7 @@
                 <div key={idx} className={'rounded-2xl p-2.5 border flex items-center gap-2 ' + (idx === beurt && !winnaar ? 'border-[#111827] bg-white' : 'border-gray-100 bg-white/60')}>
                   <WedgeTracker bezit={wedges[idx] || []} />
                   <div className="flex-1 min-w-0">
-                    <div className="font-extrabold text-sm truncate">{s.avatar} {s.naam}</div>
+                    <div className="font-extrabold text-sm truncate">{s.avatar} {s.naam}{s.bot ? ' 🤖' : ''}</div>
                     <div className="text-[10px] text-gray-400">{(wedges[idx] || []).length}/6 taartpunten</div>
                   </div>
                 </div>
@@ -895,12 +953,18 @@
 
             <div className="text-center text-sm font-bold text-gray-700 min-h-[2.5em]">{boodschap}</div>
 
-            {fase === 'spelen' && !vraagActief && !winnaar && (
-              <button onClick={rol}
-                className={'w-full rounded-2xl py-4 font-extrabold text-white text-lg active:translate-y-px ' + (worp ? 'dobbel' : '')}
-                style={{ background: INKT }}>
-                🎲 Rol de dobbelsteen
-              </button>
+            {fase === 'spelen' && !vraagActief && winnaar === null && (
+              spelers[beurt] && spelers[beurt].bot ? (
+                <div className="w-full rounded-2xl py-4 font-extrabold text-center text-gray-400 border-2 border-dashed border-gray-200 animate-pulse">
+                  🤖 {spelers[beurt].naam} rolt zo...
+                </div>
+              ) : (
+                <button onClick={rol}
+                  className={'w-full rounded-2xl py-4 font-extrabold text-white text-lg active:translate-y-px ' + (worp ? 'dobbel' : '')}
+                  style={{ background: INKT }}>
+                  🎲 Rol de dobbelsteen
+                </button>
+              )
             )}
 
             {winnaar !== null && (
@@ -923,11 +987,22 @@
                   {vraagActief.isEind ? '🏁 Eindvraag' : (catById(vraagActief.categorie).icon + ' ' + catById(vraagActief.categorie).naam)}
                 </span>
                 <div className="font-extrabold text-lg">{vraagActief.vraag.vraag}</div>
-                <div className="space-y-2">
-                  {vraagActief.opties.map((o, idx) => (
-                    <VraagOptieKnop key={idx} optie={o} onKies={beantwoord} />
-                  ))}
-                </div>
+                {spelers[beurt] && spelers[beurt].bot ? (
+                  <div className="space-y-2">
+                    {vraagActief.opties.map((o, idx) => (
+                      <div key={idx} className="w-full text-left border-2 rounded-2xl p-3 text-sm font-medium bg-gray-50 border-gray-100 text-gray-400">
+                        {o.tekst}
+                      </div>
+                    ))}
+                    <div className="text-center text-sm font-bold text-gray-400 animate-pulse">🤖 {spelers[beurt].naam} denkt na...</div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {vraagActief.opties.map((o, idx) => (
+                      <VraagOptieKnop key={idx} optie={o} onKies={beantwoord} />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
