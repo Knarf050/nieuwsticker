@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 21 september 2026',
-  updatedAt: '21-09-2026, 07:14',
+  dateLabel: 'Dinsdag 22 september 2026',
+  updatedAt: '22-09-2026, 07:14',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,24 +14,25 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '12:30', title: 'Klassiek concert', loc: 'Nieuwe Kerk', tag: 'Muziek', highlight: true },
-        { time: '17:00–18:30', title: 'Cultureel evenement', loc: 'Amare', tag: 'Cultuur' },
-        { time: '19:30', title: 'Stand-up comedy', loc: "O'Casey's Irish Pub & Restaurant", tag: 'Comedy' },
+        { time: 'vandaag', title: 'Gratis avond met het beste van Nederlandse livemuziek', loc: 'PAARD', tag: 'Muziek', highlight: true },
       ],
     },
     {
       id: 'rotterdam',
       name: 'Rotterdam',
       accent: 'rt',
-      items: [],
+      items: [
+        { time: 'vandaag', title: 'Cesar Zuiderwijk', loc: 'De Doelen', tag: 'Muziek', highlight: true },
+        { time: '16:00–17:00', title: 'Kinderyoga (eerste les gratis)', loc: 'Huis van de Wijk De Focus', tag: 'Familie' },
+      ],
     },
     {
       id: 'regio',
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'vandaag', title: 'Blokarts (zeilwagens)', loc: 'Ouddorp — met Natural High', tag: 'Actief', highlight: true },
-        { time: 'doorlopend', title: 'GlowGolf', loc: 'Capelle aan den IJssel — 3D-minigolf', tag: 'Familie' },
+        { time: 'doorlopend', title: 'CORPUS', loc: 'Oegstgeest — reis door het menselijk lichaam', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Rijksmuseum van Oudheden', loc: 'Leiden — mummies en farao\'s', tag: 'Expo' },
       ],
     },
   ],
