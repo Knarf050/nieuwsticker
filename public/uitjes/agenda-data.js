@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Dinsdag 22 september 2026',
-  updatedAt: '22-09-2026, 07:14',
+  dateLabel: 'Woensdag 23 september 2026',
+  updatedAt: '23-09-2026, 07:15',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,7 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vandaag', title: 'Gratis avond met het beste van Nederlandse livemuziek', loc: 'PAARD', tag: 'Muziek', highlight: true },
+        { time: 'vandaag', title: '"Kleine wasjes, grote wasjes!"', loc: 'Den Haag', tag: 'Cultuur', highlight: true },
+        { time: 'vandaag', title: 'Markt', loc: 'Grote Markt', tag: 'Markt' },
       ],
     },
     {
@@ -22,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vandaag', title: 'Cesar Zuiderwijk', loc: 'De Doelen', tag: 'Muziek', highlight: true },
-        { time: '16:00–17:00', title: 'Kinderyoga (eerste les gratis)', loc: 'Huis van de Wijk De Focus', tag: 'Familie' },
+        { time: '23–27 sep (start vandaag)', title: 'CAMERA JAPAN Festival', loc: 'LantarenVenster / Fenix Plein', tag: 'Film', highlight: true },
+        { time: '21–27 sep', title: 'Conflux Festival', loc: 'Audiovisueel festival op diverse locaties', tag: 'Festival' },
       ],
     },
     {
@@ -31,8 +32,7 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'CORPUS', loc: 'Oegstgeest — reis door het menselijk lichaam', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Rijksmuseum van Oudheden', loc: 'Leiden — mummies en farao\'s', tag: 'Expo' },
+        { time: 'doorlopend', title: 'Kinderdijk (UNESCO Werelderfgoed)', loc: '19 historische molens', tag: 'Natuur', highlight: true },
       ],
     },
   ],
