@@ -35,6 +35,11 @@ export default async function handler(req, res) {
     ? body.categorieen.filter(c => c && c.id && c.naam)
     : [{ id: 'overig', naam: 'Overig' }];
   const categorieIds = categorieen.map(c => c.id);
+  // Vragen uit eerdere porties van dezelfde editie (de client knipt grote aanvragen op)
+  // zodat Claude geen inhoudelijke overlap genereert met wat al gemaakt is.
+  const nietOpnieuw = Array.isArray(body.nietOpnieuw)
+    ? body.nietOpnieuw.filter(v => typeof v === 'string' && v.trim()).slice(0, 150).map(v => v.trim().slice(0, 200))
+    : [];
 
   if (tekst.length < 200) {
     return res.status(400).json({ error: 'Te weinig leesbare tekst uit de krant gehaald.' });
@@ -82,22 +87,30 @@ export default async function handler(req, res) {
     '  nadat je hebt geantwoord.\n' +
     '- "bron" is de titel (of een korte omschrijving) van het artikel.\n' +
     '- Negeer advertenties, kolofon, tv-gids, weerbericht, puzzels en pure opmaak/ruis uit de tekst.\n' +
-    '- Schrijf in het Nederlands.';
+    '- Schrijf in het Nederlands.' +
+    (nietOpnieuw.length
+      ? '\n- Er zijn al vragen gemaakt over deze editie (zie de lijst hieronder in het bericht). Maak geen ' +
+        'vragen die hetzelfde feit of onderwerp herhalen — kies andere artikelen, feiten of invalshoeken.'
+      : '');
 
   try {
     const client = new Anthropic({ apiKey });
     const model = process.env.TRIVIANT_MODEL || process.env.KAARTEN_MODEL || 'claude-opus-4-8';
 
+    const nietOpnieuwBlok = nietOpnieuw.length
+      ? '\n\n=== AL GEMAAKTE VRAGEN (niet herhalen) ===\n' + nietOpnieuw.map(v => '- ' + v).join('\n')
+      : '';
+
     const message = await client.messages.create({
       model,
-      max_tokens: 8000,
+      max_tokens: 10000,
       output_config: { effort: 'low', format: { type: 'json_schema', schema } },
       system: systemPrompt,
       messages: [{
         role: 'user',
         content:
           `Hieronder staat de (ruwe) tekst van een NRC-editie. Maak er ${aantal} Triviant-vragen van.\n\n` +
-          '=== KRANTTEKST ===\n' + tekst,
+          '=== KRANTTEKST ===\n' + tekst + nietOpnieuwBlok,
       }],
     });
 

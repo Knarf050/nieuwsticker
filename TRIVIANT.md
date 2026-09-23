@@ -53,15 +53,16 @@ gebruikt — zo hoef je het maar op één plek in te stellen.)
 - Land je op het HQ-vakje van een categorie die je nog niet hebt: goed
   antwoord wint die **taartpunt**. Heb je hem al, dan telt het als een
   gewone vraag.
-- Heb je alle 6 taartpunten? Dan geeft het eerstvolgende HQ-vakje een
-  **eindvraag**. Goed antwoord = potje gewonnen.
+- Heb je alle 6 taartpunten? Dan is het potje meteen gewonnen.
 
 ## Aantal vragen per import
 
-In het importscherm kies je hoeveel vragen je wilt (12/18/24/30), verdeeld
-over de 6 categorieën. Voor een goed gevulde vragenbank en genoeg variatie
-in het bordspel is het fijn om na een paar edities ruim boven de 30 vragen
-te zitten.
+In het importscherm kies je hoeveel vragen je wilt (40/60/80/100), verdeeld
+over de 6 categorieën. Een aanvraag van 100 vragen wordt achter de schermen
+in porties van 25 aan Claude gevraagd (anders duurt één serverfunctie-aanroep
+te lang), en elke portie krijgt de al gemaakte vraagteksten mee zodat er
+geen inhoudelijke overlap ontstaat. Hoe meer vragen per editie, hoe minder
+snel je in het bordspel dezelfde vraag terugziet.
 
 ## Privacy & techniek
 
