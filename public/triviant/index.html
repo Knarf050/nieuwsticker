@@ -717,10 +717,12 @@
       const [wedges, setWedges] = useState([]);
       const [beurt, setBeurt] = useState(0);
       const [worp, setWorp] = useState(null);
-      const [vraagActief, setVraagActief] = useState(null); // { vraag, opties, categorie, isHq, magWedge, isEind }
+      const [vraagActief, setVraagActief] = useState(null); // { vraag, opties, categorie, isHq, magWedge }
       const [boodschap, setBoodschap] = useState('Rol de dobbelsteen 🎲');
       const [winnaar, setWinnaar] = useState(null);
-      const gebruikteVragen = useRef(new Set());
+      const categorieBags = useRef({}); // per categorie: geschudde rij vraag-ids, leegtrekken vóór herhaling
+      const categorieHistorie = useRef({}); // per categorie: laatst gestelde vraag-ids (kleine ringbuffer)
+      const laatsteVraagId = useRef(null);
       const goedBeantwoord = useRef(0);
 
       function wijzigSpeler(i, patch) { setSpelers(s => s.map((sp, idx) => idx === i ? { ...sp, ...patch } : sp)); }
@@ -740,18 +742,42 @@
         setSpelers(namen);
         setPosities(namen.map(() => 0));
         setWedges(namen.map(() => []));
-        setBeurt(0); setWinnaar(null); goedBeantwoord.current = 0; gebruikteVragen.current = new Set();
+        setBeurt(0); setWinnaar(null); goedBeantwoord.current = 0;
+        categorieBags.current = {}; categorieHistorie.current = {}; laatsteVraagId.current = null;
         setBoodschap(`${namen[0].naam} mag beginnen — rol de dobbelsteen 🎲`);
         setFase('spelen');
       }
 
+      // Trekt een vraag uit een geschudde 'tas' per categorie: elke vraag in die categorie
+      // komt precies één keer aan bod voor er herhaald wordt. Bij het vullen van een nieuwe
+      // tas zetten we de laatst-geziene vragen (categorieHistorie) achteraan de nieuwe schudding
+      // in plaats van ergens willekeurig — zo krijgt een net gestelde vraag altijd de maximale
+      // afstand tot z'n volgende beurt, ook aan het begin van een nieuwe cyclus.
       function kiesVraag(categorieId) {
-        const gebruikt = gebruikteVragen.current;
-        let poel = vragen.filter(v => v.categorie === categorieId && !gebruikt.has(v.id));
-        if (!poel.length) poel = vragen.filter(v => v.categorie === categorieId);
-        if (!poel.length) poel = vragen.filter(v => !gebruikt.has(v.id));
-        if (!poel.length) poel = vragen;
-        return poel[Math.floor(Math.random() * poel.length)];
+        let bag = categorieBags.current[categorieId];
+        if (!bag || !bag.length) {
+          const poel = vragen.filter(v => v.categorie === categorieId);
+          if (!poel.length) {
+            let alt = vragen.filter(v => v.id !== laatsteVraagId.current);
+            if (!alt.length) alt = vragen;
+            const gekozen = alt[Math.floor(Math.random() * alt.length)];
+            laatsteVraagId.current = gekozen.id;
+            return gekozen;
+          }
+          const historie = new Set(categorieHistorie.current[categorieId] || []);
+          const vers = shuffle(poel.filter(v => !historie.has(v.id)).map(v => v.id));
+          const recent = shuffle(poel.filter(v => historie.has(v.id)).map(v => v.id));
+          bag = [...vers, ...recent];
+          // Veiligheidsnetje voor piepkleine categorieën (2-3 vragen over): voorkom in elk
+          // geval dat de zojuist gestelde vraag letterlijk de allereerstvolgende is.
+          if (bag.length > 1 && bag[0] === laatsteVraagId.current) [bag[0], bag[1]] = [bag[1], bag[0]];
+          categorieBags.current[categorieId] = bag;
+        }
+        const id = bag.shift();
+        laatsteVraagId.current = id;
+        const h = categorieHistorie.current[categorieId] || [];
+        categorieHistorie.current[categorieId] = [...h, id].slice(-3);
+        return vragen.find(v => v.id === id);
       }
 
       function rol() {
@@ -762,15 +788,7 @@
         const nieuw = (huidige + w) % RING_SIZE;
         setPosities(p => p.map((pos, idx) => idx === beurt ? nieuw : pos));
         const vak = BORD[nieuw];
-        const heeftAlAlles = wedges[beurt].length >= 6;
 
-        if (vak.type === 'hq' && heeftAlAlles) {
-          const catRandom = CATS[Math.floor(Math.random() * CATS.length)].id;
-          const vraag = kiesVraag(catRandom);
-          setVraagActief({ vraag, opties: geschudOpties(vraag), categorie: catRandom, isEind: true });
-          setBoodschap('🏁 Eindvraag! Goed antwoord = winst.');
-          return;
-        }
         const magWedge = vak.type === 'hq' && !wedges[beurt].includes(vak.categorie);
         const vraag = kiesVraag(vak.categorie);
         setVraagActief({ vraag, opties: geschudOpties(vraag), categorie: vak.categorie, isHq: vak.type === 'hq', magWedge });
@@ -780,27 +798,23 @@
       function beantwoord(optie) {
         const v = vraagActief;
         onRegistreer(v.vraag.id, optie.juist);
-        gebruikteVragen.current.add(v.vraag.id);
         if (optie.juist) goedBeantwoord.current += 1;
 
         setTimeout(() => {
-          if (v.isEind) {
-            if (optie.juist) {
-              setWinnaar(beurt);
-              setBoodschap(`🏆 ${spelers[beurt].naam} wint het potje!`);
-              setVraagActief(null);
-              setFase('klaar');
-              onKlaar(goedBeantwoord.current);
-              return;
-            }
-            setVraagActief(null);
-            volgendeBeurt('Helaas, fout! Beurt gaat door naar de volgende speler.');
-            return;
-          }
           if (optie.juist) {
             if (v.magWedge) {
-              setWedges(w => w.map((lijst, idx) => idx === beurt ? [...lijst, v.categorie] : lijst));
+              const nieuweWedges = [...wedges[beurt], v.categorie];
+              setWedges(w => w.map((lijst, idx) => idx === beurt ? nieuweWedges : lijst));
               setVraagActief(null);
+              // Alle 6 taartpunten binnen? Dan is het potje meteen gewonnen — geen aparte
+              // eindvraag meer nodig, dat voelde alsof het spel maar niet wilde stoppen.
+              if (nieuweWedges.length >= 6) {
+                setWinnaar(beurt);
+                setBoodschap(`🏆 ${spelers[beurt].naam} wint het potje!`);
+                setFase('klaar');
+                onKlaar(goedBeantwoord.current);
+                return;
+              }
               setBoodschap(`🎉 ${spelers[beurt].naam} wint de taartpunt ${catById(v.categorie).icon} ${catById(v.categorie).naam}! Rol nogmaals.`);
             } else {
               setVraagActief(null);
@@ -852,7 +866,7 @@
                   Je hebt nog maar {vragen.length} vragen. Het spel werkt het leukst met minstens 12 (2 per categorie) — importeer gerust nog een editie.
                 </div>
               )}
-              <div className="text-sm text-gray-600">Om de beurt dobbelstenen, landen op een categorie-vakje en de vraag goed beantwoorden. Win alle 6 taartpunten door op een HQ-vakje 👑 goed te antwoorden, en land daarna nog eens op een HQ voor de eindvraag.</div>
+              <div className="text-sm text-gray-600">Om de beurt dobbelstenen, landen op een categorie-vakje en de vraag goed beantwoorden. Win een taartpunt door op een HQ-vakje 👑 goed te antwoorden — wie alle 6 taartpunten heeft, wint meteen het potje.</div>
               <div className="space-y-2">
                 {spelers.map((s, i) => (
                   <div key={i} className="space-y-1.5">
@@ -984,7 +998,7 @@
               <div className="bg-white w-full max-w-xl rounded-t-3xl sm:rounded-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto">
                 <span className="inline-block text-xs font-extrabold px-2.5 py-1 rounded-full"
                   style={{ background: catById(vraagActief.categorie).kleur + '22', color: catById(vraagActief.categorie).kleur }}>
-                  {vraagActief.isEind ? '🏁 Eindvraag' : (catById(vraagActief.categorie).icon + ' ' + catById(vraagActief.categorie).naam)}
+                  {catById(vraagActief.categorie).icon + ' ' + catById(vraagActief.categorie).naam}
                 </span>
                 <div className="font-extrabold text-lg">{vraagActief.vraag.vraag}</div>
                 {spelers[beurt] && spelers[beurt].bot ? (
