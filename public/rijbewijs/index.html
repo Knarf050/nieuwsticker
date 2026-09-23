@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>RijTheorie — oefenen voor het theorie-examen</title>
+  <link rel="manifest" href="/rijbewijs/manifest.webmanifest">
+  <meta name="theme-color" content="#d7263d">
+  <link rel="icon" href="/rijbewijs/icon-192.png">
+  <link rel="apple-touch-icon" href="/rijbewijs/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="RijTheorie">
+  <meta name="description" content="Oefen gratis voor het Nederlandse theorie-examen rijbewijs B: voorrang, verkeersborden, snelheid, alcohol &amp; meer.">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/rijbewijs/rijbewijs-data.js"></script>
+  <style>
+    body { font-family: 'Nunito', system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+    .pop { animation: pop .3s ease; }
+    @keyframes pop { 0% { transform: scale(.92); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+    .shake { animation: shake .35s ease; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+    .toast-in { animation: toastin .3s ease; }
+    @keyframes toastin { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .pieces span { position: absolute; font-size: 22px; animation: fall 1.2s ease-out forwards; }
+    @keyframes fall { 0% { transform: translateY(-10px) rotate(0); opacity: 1; } 100% { transform: translateY(160px) rotate(360deg); opacity: 0; } }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 6px; }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  </style>
+</head>
+<body class="bg-[#f7f7f7]">
+  <div id="root"></div>
+
+  <button id="installBtn" style="display:none"
+    class="fixed bottom-24 left-5 z-40 bg-white text-[#d7263d] font-extrabold text-sm px-4 py-3 rounded-2xl shadow-lg border-2 border-[#d7263d]">
+    ⬇️ Installeer app
+  </button>
+
+  <script>
+    let deferredPrompt = null;
+    const installBtn = document.getElementById('installBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block';
+    });
+    installBtn.addEventListener('click', async () => {
+      installBtn.style.display = 'none';
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null;
+    });
+    window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/rijbewijs/sw.js').catch(() => {}));
+    }
+  </script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    const CONFIG = window.RIJBEWIJS_CONFIG;
+    const STORE_KEY = 'rijtheorie.v1';
+    const ACCENT = '#d7263d';
+    const RED = '#d7263d';
+    const YELLOW = '#f4c33b';
+    const BLUE = '#1d6fd9';
+    const BLACK = '#1a1a1a';
+    const GREEN = '#2f9e44';
+
+    const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    const todayStr = () => new Date().toISOString().slice(0, 10);
+    const DAY = 86400000;
+    const parseDate = (s) => new Date(s + 'T00:00:00');
+    const addDaysStr = (s, n) => new Date(parseDate(s).getTime() + n * DAY).toISOString().slice(0, 10);
+    const fmtLang = (s) => s ? parseDate(s).toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'long' }) : '';
+    const fmtKort = (s) => s ? parseDate(s).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : '';
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    function sample(arr, n) { return shuffle(arr).slice(0, n); }
+
+    const catById = (id) => CONFIG.categorieen.find(c => c.id === id) || { naam: 'Overig', kleur: '#9aa0a6', icoon: '❓' };
+
+    // ---------------- gamification ----------------
+    const XP = { goed: 5, fout: 1, examenGedaan: 15, examenGeslaagd: 40, bordGoed: 4, bordFout: 1 };
+    const niveauVan = (xp) => Math.floor(xp / 150) + 1;
+    const xpInNiveau = (xp) => xp % 150;
+    const DAGDOEL = 15;
+
+    function markActief(game) {
+      const t = todayStr();
+      if (game.lastActive === t) return game;
+      const gisteren = addDaysStr(t, -1);
+      const streak = game.lastActive === gisteren ? (game.streak || 0) + 1 : 1;
+      return { ...game, streak, lastActive: t };
+    }
+    function resetDagteller(game) {
+      if (!game.vandaag || game.vandaag.datum !== todayStr()) {
+        return { ...game, vandaag: { datum: todayStr(), aantal: 0 } };
+      }
+      return game;
+    }
+
+    const BADGES = [
+      { id: 'eerste', icon: '🚗', titel: 'Eerste rijles', uitleg: 'Je eerste vraag beantwoord', test: (s) => s.beantwoord >= 1 },
+      { id: 'v25', icon: '📘', titel: 'Vlijtig', uitleg: '25 vragen geoefend', test: (s) => s.beantwoord >= 25 },
+      { id: 'v100', icon: '🎓', titel: 'Theorieknobbel', uitleg: '100 vragen geoefend', test: (s) => s.beantwoord >= 100 },
+      { id: 'allecats', icon: '🧭', titel: 'Allrounder', uitleg: 'In elke categorie geoefend', test: (s) => s.categorieenAangeraakt >= CONFIG.categorieen.length },
+      { id: 'streak3', icon: '🔥', titel: 'Streak 3', uitleg: '3 dagen op rij geoefend', test: (s) => s.streak >= 3 },
+      { id: 'streak7', icon: '🌟', titel: 'Week-streak', uitleg: '7 dagen op rij geoefend', test: (s) => s.streak >= 7 },
+      { id: 'streak30', icon: '👑', titel: 'Maand-streak', uitleg: '30 dagen op rij geoefend', test: (s) => s.streak >= 30 },
+      { id: 'geslaagd', icon: '🏆', titel: 'Geslaagd!', uitleg: 'Een oefenexamen gehaald', test: (s) => s.examensGeslaagd >= 1 },
+      { id: 'perfect', icon: '💯', titel: 'Foutloos', uitleg: 'Een oefenexamen zonder fouten', test: (s) => s.examenPerfect },
+      { id: 'bordenkenner', icon: '🪧', titel: 'Bordenkenner', uitleg: 'Alle verkeersborden bekeken', test: (s) => s.bekekenBorden >= CONFIG.borden.length },
+    ];
+
+    // ---------------- opslag ----------------
+    function nieuweState() {
+      return {
+        antwoorden: {}, bordStats: {}, bekekenBorden: [],
+        game: { xp: 0, streak: 0, lastActive: null, vandaag: { datum: todayStr(), aantal: 0 }, examens: [] },
+      };
+    }
+    function laadState() {
+      try {
+        const opg = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+        if (opg && opg.antwoorden) return { ...nieuweState(), ...opg };
+      } catch (e) {}
+      return nieuweState();
+    }
+    function bewaarState(s) { try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {} }
+
+    function samengevat(state) {
+      const beantwoord = Object.keys(state.antwoorden).length;
+      const totaalGoed = Object.values(state.antwoorden).reduce((a, x) => a + (x.goed || 0), 0);
+      const totaalPogingen = Object.values(state.antwoorden).reduce((a, x) => a + (x.pogingen || 0), 0);
+      const catsAangeraakt = new Set(
+        Object.keys(state.antwoorden).map(id => (CONFIG.vragen.find(q => q.id === id) || {}).cat).filter(Boolean)
+      ).size;
+      const examens = state.game.examens || [];
+      return {
+        beantwoord, totaalGoed, totaalPogingen,
+        categorieenAangeraakt: catsAangeraakt,
+        examensGeslaagd: examens.filter(e => e.geslaagd).length,
+        examenPerfect: examens.some(e => e.score === e.totaal),
+        bekekenBorden: (state.bekekenBorden || []).length,
+        streak: state.game.streak || 0,
+      };
+    }
+
+    function verdiendeBadges(state) {
+      const s = samengevat(state);
+      return BADGES.filter(b => b.test(s));
+    }
+
+    // ---------------- Bord-tekening (SVG, geen losse afbeeldingen) ----------------
+    function octPoints() {
+      return '32,6 68,6 94,32 94,68 68,94 32,94 6,68 6,32';
+    }
+    function iconKleur(vorm) {
+      if (vorm === 'rond-blauw' || vorm === 'vierkant-blauw' || vorm === 'achthoek') return '#ffffff';
+      return BLACK;
+    }
+    function ShapeBg({ bord }) {
+      switch (bord.vorm) {
+        case 'rond':
+          return <circle cx="50" cy="50" r="44" fill="#fff" stroke={RED} strokeWidth="10" />;
+        case 'rond-blauw':
+          return <circle cx="50" cy="50" r="44" fill={BLUE} stroke="#fff" strokeWidth="3" />;
+        case 'driehoek':
+          return <polygon points="50,6 94,90 6,90" fill="#fff" stroke={RED} strokeWidth="8" strokeLinejoin="round" />;
+        case 'driehoek-omgekeerd':
+          return <polygon points="6,14 94,14 50,92" fill="#fff" stroke={RED} strokeWidth="8" strokeLinejoin="round" />;
+        case 'ruit':
+          return <>
+            <polygon points="50,4 96,50 50,96 4,50" fill="#fff" />
+            <polygon points="50,15 85,50 50,85 15,50" fill={YELLOW} />
+          </>;
+        case 'achthoek':
+          return <polygon points={octPoints()} fill={RED} stroke="#fff" strokeWidth="4" />;
+        case 'vierkant-geel':
+          return <>
+            <polygon points="50,4 96,50 50,96 4,50" fill="#fff" />
+            <polygon points="50,15 85,50 50,85 15,50" fill={YELLOW} stroke={BLACK} strokeWidth="1" />
+          </>;
+        case 'vierkant-blauw':
+          return <rect x="8" y="8" width="84" height="84" rx="12" fill={BLUE} />;
+        case 'rechthoek':
+          return <rect x="6" y="20" width="88" height="60" rx="4" fill="#fff" stroke={BLACK} strokeWidth="4" />;
+        default:
+          return <rect x="8" y="8" width="84" height="84" fill="#eee" />;
+      }
+    }
+    function IconFg({ bord }) {
+      const kleur = iconKleur(bord.vorm);
+      const rood = RED;
+      switch (bord.icoon) {
+        case 'tekst':
+          return <text x="50" y="63" fontSize={bord.tekst && bord.tekst.length > 3 ? 24 : 34} fontWeight="800" textAnchor="middle" fill={bord.vorm === 'achthoek' ? '#fff' : BLACK}>{bord.tekst}</text>;
+        case 'tekst-streep':
+          return <>
+            <text x="50" y="63" fontSize="30" fontWeight="800" textAnchor="middle" fill={BLACK}>{bord.tekst}</text>
+            <line x1="14" y1="86" x2="86" y2="14" stroke="#9aa0a6" strokeWidth="8" strokeLinecap="round" />
+          </>;
+        case 'tekst-klein':
+          return <text x="50" y="58" fontSize="16" fontWeight="800" textAnchor="middle" fill="#fff">{bord.tekst}</text>;
+        case 'leeg':
+        case 'leeg-rood':
+          return null;
+        case 'streep':
+          return <line x1="16" y1="84" x2="84" y2="16" stroke={rood} strokeWidth="9" strokeLinecap="round" />;
+        case 'kruis':
+          return <>
+            <line x1="18" y1="18" x2="82" y2="82" stroke={rood} strokeWidth="8" strokeLinecap="round" />
+            <line x1="82" y1="18" x2="18" y2="82" stroke={rood} strokeWidth="8" strokeLinecap="round" />
+          </>;
+        case 'kruis-dik-dun':
+          return <>
+            <line x1="50" y1="15" x2="50" y2="85" stroke={BLACK} strokeWidth="9" />
+            <line x1="18" y1="50" x2="82" y2="50" stroke={BLACK} strokeWidth="4" />
+          </>;
+        case 'auto':
+          return <>
+            <rect x="16" y="55" width="42" height="20" rx="6" fill={BLACK} transform="rotate(-8 37 65)" />
+            <rect x="42" y="30" width="42" height="20" rx="6" fill={rood} transform="rotate(-8 63 40)" />
+          </>;
+        case 'auto-streep':
+          return <>
+            <rect x="16" y="55" width="42" height="20" rx="6" fill={BLACK} transform="rotate(-8 37 65)" />
+            <rect x="42" y="30" width="42" height="20" rx="6" fill={rood} transform="rotate(-8 63 40)" />
+            <line x1="14" y1="86" x2="86" y2="14" stroke="#9aa0a6" strokeWidth="7" strokeLinecap="round" />
+          </>;
+        case 'fiets':
+          return <>
+            <circle cx="32" cy="66" r="13" fill="none" stroke={kleur} strokeWidth="5" />
+            <circle cx="68" cy="66" r="13" fill="none" stroke={kleur} strokeWidth="5" />
+            <path d="M32 66 L48 36 L68 66 M40 50 L60 50 M48 36 L44 30 L36 30" fill="none" stroke={kleur} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+          </>;
+        case 'pijl-rechtdoor':
+          return <path d="M50 20 L68 42 L57 42 L57 80 L43 80 L43 42 L32 42 Z" fill={kleur} />;
+        case 'pijl-rond':
+          return <>
+            <path d="M50 20 A30 30 0 1 1 22 45" fill="none" stroke={kleur} strokeWidth="8" strokeLinecap="round" />
+            <polygon points="22,45 14,34 34,32" fill={kleur} />
+          </>;
+        case 'pijl-bocht':
+          return <path d="M25 80 C25 40, 55 25, 82 30 L82 18 L94 38 L78 54 L78 42 C60 40, 38 50, 38 80 Z" fill={kleur} />;
+        case 'kind':
+          return <>
+            <circle cx="36" cy="34" r="8" fill={kleur} />
+            <path d="M36 42 L36 62 M28 50 L44 50 M36 62 L28 78 M36 62 L44 78" stroke={kleur} strokeWidth="5" strokeLinecap="round" />
+            <circle cx="66" cy="42" r="7" fill={kleur} />
+            <path d="M66 49 L66 66 M59 56 L73 56 M66 66 L59 80 M66 66 L73 80" stroke={kleur} strokeWidth="4.5" strokeLinecap="round" />
+          </>;
+        case 'rails':
+          return <>
+            <line x1="20" y1="30" x2="80" y2="70" stroke={kleur} strokeWidth="6" strokeLinecap="round" />
+            <line x1="80" y1="30" x2="20" y2="70" stroke={kleur} strokeWidth="6" strokeLinecap="round" />
+            <line x1="22" y1="50" x2="78" y2="50" stroke={kleur} strokeWidth="5" />
+          </>;
+        case 'voetganger':
+          return <>
+            <circle cx="50" cy="28" r="9" fill={kleur} />
+            <path d="M50 38 L50 62 M38 48 L62 46 M50 62 L38 82 M50 62 L60 84" stroke={kleur} strokeWidth="6" strokeLinecap="round" fill="none" />
+          </>;
+        case 'huis':
+          return <path d="M50 20 L82 46 L82 82 L18 82 L18 46 Z M32 82 L32 62 L50 62 L50 82" fill={kleur} />;
+        default:
+          return <circle cx="50" cy="50" r="6" fill={kleur} />;
+      }
+    }
+    function BordSVG({ bord, size }) {
+      size = size || 84;
+      return (
+        <svg viewBox="0 0 100 100" width={size} height={size}>
+          <ShapeBg bord={bord} />
+          <IconFg bord={bord} />
+        </svg>
+      );
+    }
+
+    // ---------------- kleine UI-bouwstenen ----------------
+    function Ring({ pct, kleur, groot }) {
+      const r = groot ? 34 : 16, c = 2 * Math.PI * r, off = c * (1 - Math.min(1, pct) / 100);
+      const size = (r + 6) * 2;
+      return (
+        <svg width={size} height={size} className="-rotate-90">
+          <circle cx={size / 2} cy={size / 2} r={r} stroke="#e5e7eb" strokeWidth="6" fill="none" />
+          <circle cx={size / 2} cy={size / 2} r={r} stroke={kleur} strokeWidth="6" fill="none"
+            strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" style={{ transition: 'stroke-dashoffset .5s ease' }} />
+        </svg>
+      );
+    }
+    function Confetti() {
+      const emojis = ['🎉', '✨', '🚗', '⭐', '🟩', '🎊', '💪'];
+      return (
+        <div className="pieces fixed inset-0 z-[60] pointer-events-none">
+          {Array.from({ length: 26 }).map((_, i) => (
+            <span key={i} style={{ left: Math.random() * 100 + '%', top: '-5%', animationDelay: (Math.random() * .4) + 's' }}>
+              {emojis[i % emojis.length]}
+            </span>
+          ))}
+        </div>
+      );
+    }
+    function Overlay({ titel, onSluiten, children }) {
+      return (
+        <div className="fixed inset-0 z-50 bg-white max-w-xl mx-auto flex flex-col">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 shrink-0">
+            <div className="font-extrabold">{titel}</div>
+            <button onClick={onSluiten} className="text-gray-400 text-xl leading-none">✕</button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">{children}</div>
+        </div>
+      );
+    }
+
+    // ---------------- Oefensessie (meerkeuze, met directe feedback) ----------------
+    function QuizSession({ items, renderVraag, opties, onAfgerond, onSluiten, accent }) {
+      // items: array van { key, opties: [str,...], juistIdx, uitleg, render }
+      const [i, setI] = useState(0);
+      const [gekozen, setGekozen] = useState(null);
+      const [score, setScore] = useState(0);
+      const [foutKeys, setFoutKeys] = useState([]);
+      const kleur = accent || ACCENT;
+
+      const item = items[i];
+      function kies(idx) {
+        if (gekozen !== null) return;
+        setGekozen(idx);
+        const juist = idx === item.juistIdx;
+        if (juist) setScore(s => s + 1); else setFoutKeys(k => [...k, item.key]);
+        if (navigator.vibrate) navigator.vibrate(juist ? 10 : [12, 30, 12]);
+        opties.onAntwoord && opties.onAntwoord(item, juist);
+      }
+      function volgende() {
+        if (i + 1 >= items.length) { onAfgerond(score, items.length, foutKeys); return; }
+        setI(i + 1); setGekozen(null);
+      }
+
+      if (!item) return null;
+      return (
+        <div className="fixed inset-0 z-50 bg-white max-w-xl mx-auto flex flex-col safe-bottom">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 shrink-0">
+            <button onClick={onSluiten} className="text-gray-400 text-sm font-bold">✕ Stoppen</button>
+            <div className="text-xs font-extrabold text-gray-400">Vraag {i + 1}/{items.length}</div>
+          </div>
+          <div className="h-1.5 bg-gray-100 shrink-0">
+            <div className="h-full transition-all" style={{ width: (i / items.length * 100) + '%', background: kleur }} />
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            {renderVraag(item)}
+            <div className="mt-4 space-y-2">
+              {item.opties.map((o, idx) => {
+                let cls = 'bg-white border-gray-200';
+                if (gekozen !== null) {
+                  if (idx === item.juistIdx) cls = 'bg-[#e8f9d6] border-[#2f9e44]';
+                  else if (idx === gekozen) cls = 'bg-[#ffe3e3] border-[#d7263d]';
+                }
+                return (
+                  <button key={idx} onClick={() => kies(idx)} disabled={gekozen !== null}
+                    className={'w-full text-left border-2 rounded-2xl p-3 text-sm font-medium active:translate-y-px ' + cls}>
+                    {o}
+                  </button>
+                );
+              })}
+            </div>
+            {gekozen !== null && (
+              <div className={'mt-4 rounded-2xl p-4 pop ' + (gekozen === item.juistIdx ? 'bg-[#e8f9d6]' : 'bg-[#ffe3e3]')}>
+                <div className="font-extrabold text-sm mb-1">{gekozen === item.juistIdx ? '✅ Goed!' : '❌ Niet helemaal'}</div>
+                {item.uitleg && <div className="text-sm text-gray-700">{item.uitleg}</div>}
+              </div>
+            )}
+          </div>
+          {gekozen !== null && (
+            <div className="p-4 border-t border-gray-100 shrink-0">
+              <button onClick={volgende} className="w-full rounded-2xl py-3.5 font-extrabold text-white text-lg active:translate-y-px" style={{ background: kleur }}>
+                {i + 1 >= items.length ? 'Resultaat bekijken' : 'Volgende'}
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function vraagItem(q) {
+      return { key: q.id, opties: q.o, juistIdx: q.a, uitleg: q.u, vraag: q };
+    }
+    function VraagKaart({ item }) {
+      const c = catById(item.vraag.cat);
+      return (
+        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+          <span className="inline-block text-xs font-extrabold px-2.5 py-1 rounded-full mb-3" style={{ background: c.kleur + '1e', color: c.kleur }}>
+            {c.icoon} {c.naam}
+          </span>
+          <div className="text-lg font-extrabold leading-snug">{item.vraag.v}</div>
+        </div>
+      );
+    }
+    function bordItem(bord, alleNamen) {
+      const distractors = sample(alleNamen.filter(n => n !== bord.naam), 3);
+      const opties = shuffle([bord.naam, ...distractors]);
+      return { key: bord.id, opties, juistIdx: opties.indexOf(bord.naam), uitleg: bord.uitleg, bord };
+    }
+    function BordKaart({ item }) {
+      return (
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col items-center">
+          <BordSVG bord={item.bord} size={110} />
+          <div className="mt-3 text-sm text-gray-500 font-bold">Wat betekent dit bord?</div>
+        </div>
+      );
+    }
+
+    // ---------------- App ----------------
+    function App() {
+      const [state, setState] = useState(laadState);
+      const [tab, setTab] = useState('start');
+      const [sessie, setSessie] = useState(null); // { type, items, titel }
+      const [toast, setToast] = useState(null);
+      const [confetti, setConfetti] = useState(false);
+      const toastTimer = useRef(null);
+      const prevNiveau = useRef(null);
+      const prevBadgeCount = useRef(null);
+
+      useEffect(() => { bewaarState(state); }, [state]);
+
+      function melding(tekst) {
+        setToast(tekst);
+        clearTimeout(toastTimer.current);
+        toastTimer.current = setTimeout(() => setToast(null), 2200);
+      }
+      function vier() { setConfetti(true); setTimeout(() => setConfetti(false), 1300); }
+      function update(fn) { setState(prev => fn(structuredClone(prev))); }
+
+      const game = resetDagteller(state.game);
+      const badges = useMemo(() => verdiendeBadges(state), [state]);
+
+      useEffect(() => {
+        const n = niveauVan(game.xp);
+        if (prevNiveau.current !== null && n > prevNiveau.current) { melding('Niveau ' + n + ' bereikt! 🎉'); vier(); }
+        prevNiveau.current = n;
+      }, [game.xp]);
+      useEffect(() => {
+        if (prevBadgeCount.current !== null && badges.length > prevBadgeCount.current) {
+          melding('Nieuwe badge verdiend! 🏅'); vier();
+        }
+        prevBadgeCount.current = badges.length;
+      }, [badges.length]);
+
+      function registreerAntwoord(vraagId, juist) {
+        update(s => {
+          const huidig = s.antwoorden[vraagId] || { pogingen: 0, goed: 0 };
+          s.antwoorden[vraagId] = {
+            pogingen: huidig.pogingen + 1,
+            goed: huidig.goed + (juist ? 1 : 0),
+            laatstFout: !juist,
+            laatstOp: todayStr(),
+          };
+          s.game = markActief(resetDagteller(s.game));
+          s.game.vandaag.aantal += 1;
+          s.game.xp += juist ? XP.goed : XP.fout;
+          return s;
+        });
+      }
+      function registreerBordAntwoord(bordId, juist) {
+        update(s => {
+          const huidig = s.bordStats[bordId] || { pogingen: 0, goed: 0 };
+          s.bordStats[bordId] = { pogingen: huidig.pogingen + 1, goed: huidig.goed + (juist ? 1 : 0) };
+          if (!s.bekekenBorden.includes(bordId)) s.bekekenBorden.push(bordId);
+          s.game = markActief(resetDagteller(s.game));
+          s.game.xp += juist ? XP.bordGoed : XP.bordFout;
+          return s;
+        });
+      }
+      function bekijkBord(bordId) {
+        update(s => {
+          if (!s.bekekenBorden.includes(bordId)) s.bekekenBorden.push(bordId);
+          return s;
+        });
+      }
+      function registreerExamen(score, totaal, foutCats) {
+        const geslaagd = score / totaal >= 0.8;
+        update(s => {
+          s.game = markActief(resetDagteller(s.game));
+          s.game.xp += XP.examenGedaan + (geslaagd ? XP.examenGeslaagd : 0);
+          s.game.examens = s.game.examens || [];
+          s.game.examens.unshift({ datum: todayStr(), score, totaal, geslaagd });
+          s.game.examens = s.game.examens.slice(0, 20);
+          return s;
+        });
+        if (geslaagd) { melding(score === totaal ? 'Foutloos geslaagd! 🏆' : 'Geslaagd voor het oefenexamen! 🎉'); vier(); }
+        else melding('Nog niet geslaagd — blijf oefenen 💪');
+      }
+      function resetAlles() {
+        localStorage.removeItem(STORE_KEY);
+        setState(nieuweState());
+        melding('Voortgang gewist');
+      }
+
+      // --- sessies starten ---
+      function startCategorie(catId) {
+        const pool = CONFIG.vragen.filter(q => q.cat === catId);
+        const items = sample(pool, Math.min(10, pool.length)).map(vraagItem);
+        setSessie({ type: 'vraag', items, titel: catById(catId).naam });
+      }
+      function startWillekeurig() {
+        const items = sample(CONFIG.vragen, Math.min(12, CONFIG.vragen.length)).map(vraagItem);
+        setSessie({ type: 'vraag', items, titel: 'Willekeurig oefenen' });
+      }
+      function startMoeilijk() {
+        const lijst = CONFIG.vragen
+          .map(q => ({ q, st: state.antwoorden[q.id] }))
+          .filter(x => x.st && (x.st.laatstFout || (x.st.pogingen > 0 && x.st.goed / x.st.pogingen < 0.6)))
+          .sort((a, b) => (a.st.goed / a.st.pogingen) - (b.st.goed / b.st.pogingen))
+          .map(x => x.q);
+        if (lijst.length === 0) { melding('Geen moeilijke vragen — goed bezig! 🎉'); return; }
+        const items = lijst.slice(0, 15).map(vraagItem);
+        setSessie({ type: 'vraag', items, titel: 'Moeilijke vragen' });
+      }
+      function startBordenquiz() {
+        const namen = CONFIG.borden.map(b => b.naam);
+        const items = sample(CONFIG.borden, Math.min(12, CONFIG.borden.length)).map(b => bordItem(b, namen));
+        setSessie({ type: 'bord', items, titel: 'Bordenquiz' });
+      }
+      function startExamen() {
+        const items = sample(CONFIG.vragen, Math.min(50, CONFIG.vragen.length)).map(vraagItem);
+        setSessie({ type: 'examen', items, titel: 'Oefenexamen' });
+      }
+
+      function sluitSessie() { setSessie(null); }
+      function sessieKlaar(score, totaal, foutKeys) {
+        if (sessie.type === 'examen') { registreerExamen(score, totaal); }
+        setSessie(null);
+        if (sessie.type !== 'examen') {
+          melding(`Sessie klaar: ${score}/${totaal} goed`);
+          if (score === totaal) vier();
+        }
+      }
+
+      const perCategorie = useMemo(() => CONFIG.categorieen.map(cat => {
+        const vragenInCat = CONFIG.vragen.filter(q => q.cat === cat.id);
+        const beantwoord = vragenInCat.filter(q => state.antwoorden[q.id]);
+        const goedLaatst = beantwoord.filter(q => !state.antwoorden[q.id].laatstFout).length;
+        return { cat, totaal: vragenInCat.length, beantwoord: beantwoord.length, pct: vragenInCat.length ? Math.round(goedLaatst / vragenInCat.length * 100) : 0 };
+      }), [state.antwoorden]);
+
+      const stats = samengevat(state);
+      const dagPct = DAGDOEL ? (game.vandaag.aantal / DAGDOEL) * 100 : 0;
+
+      useEffect(() => {
+        document.title = 'RijTheorie';
+      }, []);
+
+      return (
+        <div className="max-w-xl mx-auto min-h-screen pb-24 bg-[#f7f7f7]">
+          <TopBar game={game} />
+          <div className="px-4">
+            {tab === 'start' && (
+              <StartView state={state} game={game} dagPct={dagPct} stats={stats}
+                onWillekeurig={startWillekeurig} onExamen={startExamen} onMoeilijk={startMoeilijk} onBorden={startBordenquiz}
+                onOefenen={() => setTab('oefenen')} />
+            )}
+            {tab === 'oefenen' && (
+              <OefenenView perCategorie={perCategorie} onKies={startCategorie} onWillekeurig={startWillekeurig} onMoeilijk={startMoeilijk} />
+            )}
+            {tab === 'borden' && (
+              <BordenView state={state} onBekijk={bekijkBord} onQuiz={startBordenquiz} />
+            )}
+            {tab === 'examen' && (
+              <ExamenView game={game} onStart={startExamen} />
+            )}
+            {tab === 'voortgang' && (
+              <VoortgangView state={state} game={game} stats={stats} badges={badges} perCategorie={perCategorie} onReset={resetAlles} />
+            )}
+          </div>
+
+          {sessie && sessie.type === 'vraag' && (
+            <QuizSession items={sessie.items} renderVraag={(item) => <VraagKaart item={item} />}
+              opties={{ onAntwoord: (item, juist) => registreerAntwoord(item.key, juist) }}
+              onAfgerond={sessieKlaar} onSluiten={sluitSessie} accent={ACCENT} />
+          )}
+          {sessie && sessie.type === 'bord' && (
+            <QuizSession items={sessie.items} renderVraag={(item) => <BordKaart item={item} />}
+              opties={{ onAntwoord: (item, juist) => registreerBordAntwoord(item.key, juist) }}
+              onAfgerond={sessieKlaar} onSluiten={sluitSessie} accent={BLUE} />
+          )}
+          {sessie && sessie.type === 'examen' && (
+            <ExamenSessie items={sessie.items} onKlaar={sessieKlaar} onSluiten={sluitSessie}
+              onAntwoord={(item, juist) => registreerAntwoord(item.key, juist)} />
+          )}
+
+          <NavBalk tab={tab} setTab={setTab} />
+
+          {toast && (
+            <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-[#1f2937] text-white text-sm font-bold px-5 py-3 rounded-2xl shadow-xl toast-in">
+              {toast}
+            </div>
+          )}
+          {confetti && <Confetti />}
+        </div>
+      );
+    }
+
+    // ---------------- Examen (geen directe feedback, met overzicht achteraf) ----------------
+    function ExamenSessie({ items, onKlaar, onSluiten, onAntwoord }) {
+      const [antwoorden, setAntwoorden] = useState(() => Array(items.length).fill(null));
+      const [i, setI] = useState(0);
+      const [klaar, setKlaar] = useState(false);
+      const start = useRef(Date.now());
+      const gerapporteerd = useRef(false);
+
+      function kies(idx) {
+        setAntwoorden(a => { const n = a.slice(); n[i] = idx; return n; });
+      }
+      function ga(delta) {
+        const n = i + delta;
+        if (n < 0) return;
+        if (n >= items.length) { afronden(); return; }
+        setI(n);
+      }
+      function afronden() {
+        setKlaar(true);
+      }
+
+      if (klaar) {
+        if (!gerapporteerd.current) {
+          gerapporteerd.current = true;
+          items.forEach((item, idx) => { if (antwoorden[idx] !== null) onAntwoord(item, antwoorden[idx] === item.juistIdx); });
+        }
+        const score = items.reduce((acc, item, idx) => acc + (antwoorden[idx] === item.juistIdx ? 1 : 0), 0);
+        const pct = Math.round(score / items.length * 100);
+        const geslaagd = pct >= 80;
+        const duurSec = Math.round((Date.now() - start.current) / 1000);
+        const minuten = Math.floor(duurSec / 60), seconden = duurSec % 60;
+        const perCat = {};
+        items.forEach((item, idx) => {
+          const cat = item.vraag.cat;
+          perCat[cat] = perCat[cat] || { goed: 0, totaal: 0 };
+          perCat[cat].totaal += 1;
+          if (antwoorden[idx] === item.juistIdx) perCat[cat].goed += 1;
+        });
+        return (
+          <Overlay titel="Resultaat oefenexamen" onSluiten={() => onKlaar(score, items.length)}>
+            <div className="text-center py-4 space-y-2">
+              <div className="text-6xl">{geslaagd ? '🏆' : '💪'}</div>
+              <div className="font-extrabold text-3xl">{score} / {items.length}</div>
+              <div className="text-sm text-gray-500">{pct}% goed · {minuten}m {seconden}s</div>
+              <div className={'inline-block px-4 py-1.5 rounded-full font-extrabold text-sm text-white ' } style={{ background: geslaagd ? GREEN : RED }}>
+                {geslaagd ? 'Geslaagd (oefenresultaat)' : 'Nog niet geslaagd'}
+              </div>
+              <div className="text-xs text-gray-400 pt-1">Norm in deze oefenapp: minimaal 80% goed. Dit is géén officiële CBR-afname.</div>
+            </div>
+            <div className="mt-4 space-y-2">
+              {Object.entries(perCat).map(([catId, v]) => {
+                const c = catById(catId);
+                const p = Math.round(v.goed / v.totaal * 100);
+                return (
+                  <div key={catId} className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
+                    <div className="flex justify-between items-center text-sm font-bold mb-1">
+                      <span>{c.icoon} {c.naam}</span>
+                      <span className="text-gray-500">{v.goed}/{v.totaal}</span>
+                    </div>
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: p + '%', background: c.kleur }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <button onClick={() => onKlaar(score, items.length)}
+              className="mt-5 w-full rounded-2xl py-3.5 font-extrabold text-white text-lg active:translate-y-px" style={{ background: ACCENT }}>
+              Klaar
+            </button>
+          </Overlay>
+        );
+      }
+
+      const item = items[i];
+      const c = catById(item.vraag.cat);
+      return (
+        <div className="fixed inset-0 z-50 bg-white max-w-xl mx-auto flex flex-col safe-bottom">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 shrink-0">
+            <button onClick={onSluiten} className="text-gray-400 text-sm font-bold">✕ Stoppen</button>
+            <div className="text-xs font-extrabold text-gray-400">Vraag {i + 1}/{items.length}</div>
+          </div>
+          <div className="h-1.5 bg-gray-100 shrink-0">
+            <div className="h-full transition-all" style={{ width: (i / items.length * 100) + '%', background: ACCENT }} />
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            <span className="inline-block text-xs font-extrabold px-2.5 py-1 rounded-full mb-3" style={{ background: c.kleur + '1e', color: c.kleur }}>
+              {c.icoon} {c.naam}
+            </span>
+            <div className="text-lg font-extrabold leading-snug mb-4">{item.vraag.v}</div>
+            <div className="space-y-2">
+              {item.opties.map((o, idx) => (
+                <button key={idx} onClick={() => kies(idx)}
+                  className={'w-full text-left border-2 rounded-2xl p-3 text-sm font-medium active:translate-y-px ' +
+                    (antwoorden[i] === idx ? 'bg-[#fde8ea] border-[#d7263d]' : 'bg-white border-gray-200')}>
+                  {o}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="p-4 border-t border-gray-100 shrink-0 flex gap-2">
+            <button onClick={() => ga(-1)} disabled={i === 0}
+              className="flex-1 rounded-2xl py-3.5 font-extrabold text-gray-500 border border-gray-200 disabled:opacity-30">Vorige</button>
+            <button onClick={() => ga(1)}
+              className="flex-[2] rounded-2xl py-3.5 font-extrabold text-white text-lg active:translate-y-px" style={{ background: ACCENT }}>
+              {i + 1 >= items.length ? 'Afronden' : 'Volgende'}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // ---------------- TopBar ----------------
+    function TopBar({ game }) {
+      return (
+        <div className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+          <div className="font-extrabold text-lg" style={{ color: ACCENT }}>🚗 RijTheorie</div>
+          <div className="flex items-center gap-3 text-sm font-extrabold">
+            <span title="Streak" className="flex items-center gap-1 text-orange-500">🔥 {game.streak || 0}</span>
+            <span title="Niveau" className="flex items-center gap-1" style={{ color: ACCENT }}>⭐ {niveauVan(game.xp)}</span>
+            <span title="XP" className="text-gray-500">{game.xp} XP</span>
+          </div>
+        </div>
+      );
+    }
+
+    // ---------------- Start ----------------
+    function StartView({ state, game, dagPct, stats, onWillekeurig, onExamen, onMoeilijk, onBorden, onOefenen }) {
+      const uur = new Date().getHours();
+      const groet = uur < 6 ? 'Goedenacht' : uur < 12 ? 'Goedemorgen' : uur < 18 ? 'Goedemiddag' : 'Goedenavond';
+      const moeilijkeCount = CONFIG.vragen.filter(q => {
+        const st = state.antwoorden[q.id];
+        return st && (st.laatstFout || (st.pogingen > 0 && st.goed / st.pogingen < 0.6));
+      }).length;
+      const klaarMetDoel = game.vandaag.aantal >= DAGDOEL;
+
+      return (
+        <div className="py-4 space-y-4">
+          <div className="text-gray-500 text-sm font-bold">{groet} · {fmtLang(todayStr())}</div>
+
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="relative shrink-0">
+              <Ring pct={dagPct} kleur={klaarMetDoel ? GREEN : ACCENT} groot />
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-xl font-extrabold">{game.vandaag.aantal}</span>
+                <span className="text-[10px] text-gray-400 -mt-1">/ {DAGDOEL}</span>
+              </div>
+            </div>
+            <div className="flex-1">
+              <div className="font-extrabold text-lg">{klaarMetDoel ? 'Dagdoel gehaald! 🎉' : 'Dagdoel'}</div>
+              <div className="text-sm text-gray-500 mb-2">Beantwoord {DAGDOEL} vragen per dag om scherp te blijven.</div>
+              <button onClick={onWillekeurig} className="w-full rounded-2xl py-2.5 font-extrabold text-white shadow active:translate-y-px" style={{ background: ACCENT }}>
+                Start oefenen
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button onClick={onExamen} className="rounded-3xl p-5 shadow-sm text-left text-white active:translate-y-px" style={{ background: 'linear-gradient(135deg,#d7263d,#a11729)' }}>
+              <div className="text-2xl">📝</div>
+              <div className="font-extrabold mt-1">Oefenexamen</div>
+              <div className="text-xs text-white/85">50 vragen, zoals bij het echte examen</div>
+            </button>
+            <button onClick={onMoeilijk} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 text-left active:translate-y-px">
+              <div className="text-2xl">🎯</div>
+              <div className="font-extrabold mt-1">Moeilijke vragen</div>
+              <div className="text-xs text-gray-500">{moeilijkeCount} vraag{moeilijkeCount === 1 ? '' : 'en'} om te herhalen</div>
+            </button>
+            <button onClick={onBorden} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 text-left active:translate-y-px">
+              <div className="text-2xl">🪧</div>
+              <div className="font-extrabold mt-1">Bordenquiz</div>
+              <div className="text-xs text-gray-500">Herken verkeersborden</div>
+            </button>
+            <button onClick={onOefenen} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 text-left active:translate-y-px">
+              <div className="text-2xl">📚</div>
+              <div className="font-extrabold mt-1">Per onderwerp</div>
+              <div className="text-xs text-gray-500">Kies een categorie</div>
+            </button>
+          </div>
+
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="font-extrabold mb-1">📈 Jouw voortgang</div>
+            <div className="text-sm text-gray-500">
+              {stats.beantwoord} van de {CONFIG.vragen.length} vragen geoefend
+              {stats.totaalPogingen > 0 && <> · {Math.round(stats.totaalGoed / stats.totaalPogingen * 100)}% goed beantwoord</>}
+            </div>
+          </div>
+
+          <div className="text-center text-[11px] text-gray-400 leading-relaxed px-2">
+            RijTheorie is gratis oefenmateriaal op basis van algemene Nederlandse verkeersregels — geen officiële CBR-vragen en geen actuele juridische bron.
+          </div>
+        </div>
+      );
+    }
+
+    // ---------------- Oefenen (per categorie) ----------------
+    function OefenenView({ perCategorie, onKies, onWillekeurig, onMoeilijk }) {
+      return (
+        <div className="py-4 space-y-3">
+          <div className="font-extrabold text-xl">📚 Oefenen per onderwerp</div>
+          <div className="text-xs text-gray-500 -mt-1">Kies een categorie voor een sessie van 10 vragen.</div>
+
+          <div className="grid grid-cols-2 gap-3 mb-1">
+            <button onClick={onWillekeurig} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-left active:translate-y-px">
+              <div className="text-xl">🎲</div>
+              <div className="font-extrabold text-sm mt-1">Alles door elkaar</div>
+            </button>
+            <button onClick={onMoeilijk} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-left active:translate-y-px">
+              <div className="text-xl">🎯</div>
+              <div className="font-extrabold text-sm mt-1">Moeilijke vragen</div>
+            </button>
+          </div>
+
+          {perCategorie.map(({ cat, totaal, beantwoord, pct }) => (
+            <button key={cat.id} onClick={() => onKies(cat.id)}
+              className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-3 text-left active:translate-y-px">
+              <div className="text-2xl">{cat.icoon}</div>
+              <div className="flex-1">
+                <div className="font-extrabold">{cat.naam}</div>
+                <div className="text-xs text-gray-500 mb-1.5">{beantwoord}/{totaal} geoefend</div>
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full" style={{ width: pct + '%', background: cat.kleur }} />
+                </div>
+              </div>
+              <span className="text-gray-300 text-xl">›</span>
+            </button>
+          ))}
+        </div>
+      );
+    }
+
+    // ---------------- Borden ----------------
+    function BordenView({ state, onBekijk, onQuiz }) {
+      const [open, setOpen] = useState(null);
+      const groepen = useMemo(() => {
+        const bij = {};
+        CONFIG.borden.forEach(b => { (bij[b.categorie] = bij[b.categorie] || []).push(b); });
+        return bij;
+      }, []);
+      const labels = { gevaar: '⚠️ Gevaarborden', voorrang: '🚦 Voorrang', verbod: '🚫 Verbodsborden', gebod: '➡️ Gebodsborden', informatie: 'ℹ️ Informatieborden' };
+      const bekeken = new Set(state.bekekenBorden || []);
+
+      return (
+        <div className="py-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="font-extrabold text-xl">🪧 Verkeersborden</div>
+            <button onClick={onQuiz} className="text-sm font-extrabold px-3 py-1.5 rounded-full text-white" style={{ background: BLUE }}>Quiz</button>
+          </div>
+          <div className="text-xs text-gray-500 -mt-2">{bekeken.size}/{CONFIG.borden.length} borden bekeken</div>
+
+          {Object.keys(labels).map(cat => groepen[cat] && (
+            <div key={cat}>
+              <div className="text-xs font-extrabold text-gray-500 uppercase tracking-wide mb-2">{labels[cat]}</div>
+              <div className="grid grid-cols-3 gap-3">
+                {groepen[cat].map(b => (
+                  <button key={b.id} onClick={() => { setOpen(b); onBekijk(b.id); }}
+                    className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col items-center gap-1 active:translate-y-px relative">
+                    {bekeken.has(b.id) && <span className="absolute top-1.5 right-1.5 text-[10px]">✓</span>}
+                    <BordSVG bord={b} size={56} />
+                    <span className="text-[10px] font-bold text-gray-600 text-center leading-tight">{b.naam}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {open && (
+            <Overlay titel={open.naam} onSluiten={() => setOpen(null)}>
+              <div className="flex flex-col items-center gap-4 py-4">
+                <BordSVG bord={open} size={140} />
+                <div className="text-center text-gray-700">{open.uitleg}</div>
+              </div>
+            </Overlay>
+          )}
+        </div>
+      );
+    }
+
+    // ---------------- Examen (tab) ----------------
+    function ExamenView({ game, onStart }) {
+      const examens = game.examens || [];
+      return (
+        <div className="py-4 space-y-4">
+          <div className="font-extrabold text-xl">📝 Oefenexamen</div>
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 space-y-3">
+            <div className="text-sm text-gray-700">
+              Een volledige sessie van <b>50 vragen</b> door elkaar uit alle categorieën, net als bij het echte theorie-examen.
+              Je ziet je antwoorden pas na afloop. In deze app geldt <b>80% goed</b> als "geslaagd".
+            </div>
+            <div className="text-xs text-gray-400">Let op: dit is oefenmateriaal, geen officiële CBR-afname en geen exacte nabootsing van het echte examenformat.</div>
+            <button onClick={onStart} className="w-full rounded-2xl py-3.5 font-extrabold text-white text-lg active:translate-y-px" style={{ background: ACCENT }}>
+              Start oefenexamen
+            </button>
+          </div>
+
+          {examens.length > 0 && (
+            <div>
+              <div className="text-xs font-extrabold text-gray-500 uppercase tracking-wide mb-2">Eerdere pogingen</div>
+              <div className="space-y-2">
+                {examens.map((e, idx) => (
+                  <div key={idx} className="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                      <div className="font-extrabold text-sm">{e.score}/{e.totaal} <span className="text-gray-400 font-bold">· {Math.round(e.score / e.totaal * 100)}%</span></div>
+                      <div className="text-xs text-gray-400">{fmtKort(e.datum)}</div>
+                    </div>
+                    <span className={'text-xs font-extrabold px-3 py-1 rounded-full text-white'} style={{ background: e.geslaagd ? GREEN : '#9aa0a6' }}>
+                      {e.geslaagd ? 'Geslaagd' : 'Niet geslaagd'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ---------------- Voortgang ----------------
+    function VoortgangView({ state, game, stats, badges, perCategorie, onReset }) {
+      const [bevestig, setBevestig] = useState(false);
+      const pctGoed = stats.totaalPogingen > 0 ? Math.round(stats.totaalGoed / stats.totaalPogingen * 100) : 0;
+      return (
+        <div className="py-4 space-y-4">
+          <div className="font-extrabold text-xl">👤 Jouw voortgang</div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 text-center">
+              <div className="text-xl font-extrabold" style={{ color: ACCENT }}>{niveauVan(game.xp)}</div>
+              <div className="text-[11px] text-gray-500 font-bold">Niveau</div>
+            </div>
+            <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 text-center">
+              <div className="text-xl font-extrabold text-orange-500">{game.streak || 0}</div>
+              <div className="text-[11px] text-gray-500 font-bold">Dagen streak</div>
+            </div>
+            <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 text-center">
+              <div className="text-xl font-extrabold text-gray-700">{pctGoed}%</div>
+              <div className="text-[11px] text-gray-500 font-bold">Score</div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="font-extrabold mb-3">Per categorie</div>
+            <div className="space-y-3">
+              {perCategorie.map(({ cat, totaal, beantwoord, pct }) => (
+                <div key={cat.id}>
+                  <div className="flex justify-between text-xs font-bold mb-1">
+                    <span>{cat.icoon} {cat.naam}</span>
+                    <span className="text-gray-400">{beantwoord}/{totaal}</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full" style={{ width: pct + '%', background: cat.kleur }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="font-extrabold mb-3">Badges ({badges.length}/{BADGES.length})</div>
+            <div className="grid grid-cols-4 gap-3">
+              {BADGES.map(b => {
+                const behaald = badges.some(x => x.id === b.id);
+                return (
+                  <div key={b.id} title={b.uitleg} className={'flex flex-col items-center gap-1 ' + (behaald ? '' : 'opacity-25 grayscale')}>
+                    <div className="text-2xl">{b.icon}</div>
+                    <div className="text-[9px] text-center font-bold text-gray-600 leading-tight">{b.titel}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+            <div className="font-extrabold mb-2">Gegevens</div>
+            <div className="text-xs text-gray-500 mb-3">Al je voortgang staat lokaal op dit apparaat opgeslagen.</div>
+            {!bevestig ? (
+              <button onClick={() => setBevestig(true)} className="text-sm font-extrabold text-red-500">Voortgang wissen</button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">Zeker weten?</span>
+                <button onClick={onReset} className="text-xs font-extrabold text-white px-3 py-1.5 rounded-full" style={{ background: RED }}>Ja, wissen</button>
+                <button onClick={() => setBevestig(false)} className="text-xs font-extrabold text-gray-500">Annuleer</button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ---------------- Navigatie ----------------
+    function NavBalk({ tab, setTab }) {
+      const items = [
+        { id: 'start', label: 'Start', icon: '🏠' },
+        { id: 'oefenen', label: 'Oefenen', icon: '📚' },
+        { id: 'borden', label: 'Borden', icon: '🪧' },
+        { id: 'examen', label: 'Examen', icon: '📝' },
+        { id: 'voortgang', label: 'Ik', icon: '👤' },
+      ];
+      return (
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 safe-bottom">
+          <div className="max-w-xl mx-auto grid grid-cols-5">
+            {items.map(it => (
+              <button key={it.id} onClick={() => setTab(it.id)}
+                className={'py-2.5 flex flex-col items-center gap-0.5 text-[11px] font-bold ' + (tab === it.id ? '' : 'text-gray-400')}
+                style={tab === it.id ? { color: ACCENT } : {}}>
+                <span className="text-xl leading-none">{it.icon}</span>
+                {it.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
