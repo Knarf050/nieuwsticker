@@ -231,13 +231,24 @@
     function laadState() {
       let opg = null;
       try { opg = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) {}
+      const e = CONFIG.seedEditie;
       if (opg && Array.isArray(opg.vragen)) {
+        // Als er sinds de vorige keer nieuwe vragen aan de meegeleverde eerste editie zijn
+        // toegevoegd (een update van de app), voegen we die alsnog toe aan een bestaande
+        // spelstand — anders blijft een terugkerende speler op het oude, kleinere aantal
+        // steken. Vraagtekst is hier de sleutel: die is binnen de seed altijd uniek.
+        const bekend = new Set(opg.vragen.map(v => v.vraag));
+        const nieuw = e.vragen.filter(v => !bekend.has(v.vraag));
+        if (nieuw.length) {
+          opg.vragen = [...opg.vragen, ...nieuw.map(v => ({ id: uid(), ...v, editieDatum: e.datum, stats: { gezien: 0, goed: 0 } }))];
+          const eersteEditie = (opg.edities || [])[0];
+          if (eersteEditie && eersteEditie.datum === e.datum) eersteEditie.aantal = (eersteEditie.aantal || 0) + nieuw.length;
+        }
         return {
           vragen: opg.vragen, edities: opg.edities || [],
           game: opg.game || leegGame(),
         };
       }
-      const e = CONFIG.seedEditie;
       return {
         vragen: seedVragen(),
         edities: [{ datum: e.datum, titel: e.titel, aantal: e.vragen.length }],
