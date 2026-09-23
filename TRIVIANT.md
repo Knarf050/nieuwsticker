@@ -53,15 +53,43 @@ gebruikt — zo hoef je het maar op één plek in te stellen.)
 - Land je op het HQ-vakje van een categorie die je nog niet hebt: goed
   antwoord wint die **taartpunt**. Heb je hem al, dan telt het als een
   gewone vraag.
-- Heb je alle 6 taartpunten? Dan geeft het eerstvolgende HQ-vakje een
-  **eindvraag**. Goed antwoord = potje gewonnen.
+- Heb je alle 6 taartpunten? Dan is het potje meteen gewonnen.
+- Elke menselijke speler heeft twee **jokers**, eenmalig per potje: een
+  **50/50-joker** 🃏 (verbergt 2 van de 3 foute opties) en een
+  **extra-worp-joker** 🔁 (gezet vóór het rollen: een fout antwoord op de
+  daaropvolgende vraag kost die beurt niet — je rolt gewoon nog eens).
+  Bots gebruiken geen jokers.
+
+## Snelvuur en Terugblik
+
+Naast het potje en de snelle quiz van 10 vragen zijn er twee kortere
+modi op het "Vandaag"-scherm:
+
+- **⏱️ Snelvuur** — 5 vragen tegen de klok (10 seconden per vraag), met
+  een combo-bonus voor opeenvolgende goede antwoorden.
+- **📼 Terugblik** — een quiz die alleen vragen uit *oudere* edities
+  gebruikt (niet de laatst geïmporteerde), voor wie het nieuws van een
+  tijdje terug wil ophalen. Verschijnt pas zodra er minstens 2 edities
+  zijn geïmporteerd.
+
+## Score delen & categoriebadges
+
+- Na een potje, snelle quiz, Snelvuur-ronde of Terugblik kun je met
+  **"📤 Deel je score"** een korte, Wordle-achtige samenvatting (🟩⬜️) delen
+  via het systeem-deelvenster, of naar het klembord kopiëren als delen niet
+  beschikbaar is (bijv. op desktop).
+- Op het **Ik**-tabblad, onder "📚 Categoriebadges", zie je per categorie
+  een 🥉/🥈/🥇-badge op basis van je slagingspercentage — pas zichtbaar
+  na minstens 5 beantwoorde vragen in die categorie.
 
 ## Aantal vragen per import
 
-In het importscherm kies je hoeveel vragen je wilt (12/18/24/30), verdeeld
-over de 6 categorieën. Voor een goed gevulde vragenbank en genoeg variatie
-in het bordspel is het fijn om na een paar edities ruim boven de 30 vragen
-te zitten.
+In het importscherm kies je hoeveel vragen je wilt (40/60/80/100), verdeeld
+over de 6 categorieën. Een aanvraag van 100 vragen wordt achter de schermen
+in porties van 25 aan Claude gevraagd (anders duurt één serverfunctie-aanroep
+te lang), en elke portie krijgt de al gemaakte vraagteksten mee zodat er
+geen inhoudelijke overlap ontstaat. Hoe meer vragen per editie, hoe minder
+snel je in het bordspel dezelfde vraag terugziet.
 
 ## Privacy & techniek
 
