@@ -1036,6 +1036,39 @@
         setBoodschap('🔁 Extra-worp-joker actief: een fout antwoord kost je deze beurt niet. Rol de dobbelsteen!');
       }
 
+      // Verwerkt het gevolg van een antwoord (taartpunt/beurt door/winst). Losgetrokken van
+      // beantwoord() zodat een mens zelf op 'Verder' kan tikken zodra die klaar is met lezen,
+      // in plaats van dat de uitleg na een vaste (te korte) tijd alweer verdwijnt.
+      function verwerkAntwoord(v, optie) {
+        if (optie.juist) {
+          if (v.magWedge) {
+            const nieuweWedges = [...wedges[beurt], v.categorie];
+            setWedges(w => w.map((lijst, idx) => idx === beurt ? nieuweWedges : lijst));
+            setVraagActief(null);
+            // Alle 6 taartpunten binnen? Dan is het potje meteen gewonnen — geen aparte
+            // eindvraag meer nodig, dat voelde alsof het spel maar niet wilde stoppen.
+            if (nieuweWedges.length >= 6) {
+              setWinnaar(beurt);
+              setBoodschap(`🏆 ${spelers[beurt].naam} wint het potje!`);
+              setFase('klaar');
+              onKlaar(goedBeantwoord.current);
+              return;
+            }
+            setBoodschap(`🎉 ${spelers[beurt].naam} wint de taartpunt ${catById(v.categorie).icon} ${catById(v.categorie).naam}! Rol nogmaals.`);
+          } else {
+            setVraagActief(null);
+            setBoodschap(`Goed! ${spelers[beurt].naam} mag nog een keer rollen 🎲`);
+          }
+        } else {
+          setVraagActief(null);
+          if (extraWorpDitBeurt.current) {
+            extraWorpDitBeurt.current = false;
+            setBoodschap(`Helaas fout — maar je extra-worp-joker redt je! ${spelers[beurt].naam} mag opnieuw rollen 🎲`);
+          } else {
+            volgendeBeurt('Helaas, fout antwoord! Beurt gaat door.');
+          }
+        }
+      }
       function beantwoord(optie) {
         const v = vraagActief;
         if (gekozenOptie) return; // al beantwoord — voorkom dubbel verwerken van dezelfde vraag
@@ -1043,36 +1076,12 @@
         onRegistreer(v.vraag.id, optie.juist);
         if (optie.juist) goedBeantwoord.current += 1;
 
-        setTimeout(() => {
-          if (optie.juist) {
-            if (v.magWedge) {
-              const nieuweWedges = [...wedges[beurt], v.categorie];
-              setWedges(w => w.map((lijst, idx) => idx === beurt ? nieuweWedges : lijst));
-              setVraagActief(null);
-              // Alle 6 taartpunten binnen? Dan is het potje meteen gewonnen — geen aparte
-              // eindvraag meer nodig, dat voelde alsof het spel maar niet wilde stoppen.
-              if (nieuweWedges.length >= 6) {
-                setWinnaar(beurt);
-                setBoodschap(`🏆 ${spelers[beurt].naam} wint het potje!`);
-                setFase('klaar');
-                onKlaar(goedBeantwoord.current);
-                return;
-              }
-              setBoodschap(`🎉 ${spelers[beurt].naam} wint de taartpunt ${catById(v.categorie).icon} ${catById(v.categorie).naam}! Rol nogmaals.`);
-            } else {
-              setVraagActief(null);
-              setBoodschap(`Goed! ${spelers[beurt].naam} mag nog een keer rollen 🎲`);
-            }
-          } else {
-            setVraagActief(null);
-            if (extraWorpDitBeurt.current) {
-              extraWorpDitBeurt.current = false;
-              setBoodschap(`Helaas fout — maar je extra-worp-joker redt je! ${spelers[beurt].naam} mag opnieuw rollen 🎲`);
-            } else {
-              volgendeBeurt('Helaas, fout antwoord! Beurt gaat door.');
-            }
-          }
-        }, 1400);
+        // Een bot hoeft nergens op te wachten — die gaat na een korte pauze vanzelf door.
+        // Een mens krijgt zelf de regie: geen automatische timer, maar de 'Verder'-knop
+        // hieronder in de JSX, zodat er alle tijd is om het antwoord en de uitleg te lezen.
+        if (spelers[beurt] && spelers[beurt].bot) {
+          setTimeout(() => verwerkAntwoord(v, optie), 1400);
+        }
       }
       function volgendeBeurt(bericht) {
         extraWorpDitBeurt.current = false;
@@ -1307,6 +1316,12 @@
                 )}
                 {gekozenOptie && vraagActief.vraag.uitleg && (
                   <div className="text-xs text-gray-500 pt-1">💡 {vraagActief.vraag.uitleg}</div>
+                )}
+                {gekozenOptie && spelers[beurt] && !spelers[beurt].bot && (
+                  <button onClick={() => verwerkAntwoord(vraagActief, gekozenOptie)}
+                    className="w-full rounded-2xl py-3 font-extrabold text-white active:translate-y-px" style={{ background: INKT }}>
+                    Verder →
+                  </button>
                 )}
               </div>
             </div>
