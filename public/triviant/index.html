@@ -717,7 +717,7 @@
       const [wedges, setWedges] = useState([]);
       const [beurt, setBeurt] = useState(0);
       const [worp, setWorp] = useState(null);
-      const [vraagActief, setVraagActief] = useState(null); // { vraag, opties, categorie, isHq, magWedge, isEind }
+      const [vraagActief, setVraagActief] = useState(null); // { vraag, opties, categorie, isHq, magWedge }
       const [boodschap, setBoodschap] = useState('Rol de dobbelsteen 🎲');
       const [winnaar, setWinnaar] = useState(null);
       const categorieBags = useRef({}); // per categorie: geschudde rij vraag-ids, leegtrekken vóór herhaling
@@ -788,15 +788,7 @@
         const nieuw = (huidige + w) % RING_SIZE;
         setPosities(p => p.map((pos, idx) => idx === beurt ? nieuw : pos));
         const vak = BORD[nieuw];
-        const heeftAlAlles = wedges[beurt].length >= 6;
 
-        if (vak.type === 'hq' && heeftAlAlles) {
-          const catRandom = CATS[Math.floor(Math.random() * CATS.length)].id;
-          const vraag = kiesVraag(catRandom);
-          setVraagActief({ vraag, opties: geschudOpties(vraag), categorie: catRandom, isEind: true });
-          setBoodschap('🏁 Eindvraag! Goed antwoord = winst.');
-          return;
-        }
         const magWedge = vak.type === 'hq' && !wedges[beurt].includes(vak.categorie);
         const vraag = kiesVraag(vak.categorie);
         setVraagActief({ vraag, opties: geschudOpties(vraag), categorie: vak.categorie, isHq: vak.type === 'hq', magWedge });
@@ -809,23 +801,20 @@
         if (optie.juist) goedBeantwoord.current += 1;
 
         setTimeout(() => {
-          if (v.isEind) {
-            if (optie.juist) {
-              setWinnaar(beurt);
-              setBoodschap(`🏆 ${spelers[beurt].naam} wint het potje!`);
-              setVraagActief(null);
-              setFase('klaar');
-              onKlaar(goedBeantwoord.current);
-              return;
-            }
-            setVraagActief(null);
-            volgendeBeurt('Helaas, fout! Beurt gaat door naar de volgende speler.');
-            return;
-          }
           if (optie.juist) {
             if (v.magWedge) {
-              setWedges(w => w.map((lijst, idx) => idx === beurt ? [...lijst, v.categorie] : lijst));
+              const nieuweWedges = [...wedges[beurt], v.categorie];
+              setWedges(w => w.map((lijst, idx) => idx === beurt ? nieuweWedges : lijst));
               setVraagActief(null);
+              // Alle 6 taartpunten binnen? Dan is het potje meteen gewonnen — geen aparte
+              // eindvraag meer nodig, dat voelde alsof het spel maar niet wilde stoppen.
+              if (nieuweWedges.length >= 6) {
+                setWinnaar(beurt);
+                setBoodschap(`🏆 ${spelers[beurt].naam} wint het potje!`);
+                setFase('klaar');
+                onKlaar(goedBeantwoord.current);
+                return;
+              }
               setBoodschap(`🎉 ${spelers[beurt].naam} wint de taartpunt ${catById(v.categorie).icon} ${catById(v.categorie).naam}! Rol nogmaals.`);
             } else {
               setVraagActief(null);
@@ -877,7 +866,7 @@
                   Je hebt nog maar {vragen.length} vragen. Het spel werkt het leukst met minstens 12 (2 per categorie) — importeer gerust nog een editie.
                 </div>
               )}
-              <div className="text-sm text-gray-600">Om de beurt dobbelstenen, landen op een categorie-vakje en de vraag goed beantwoorden. Win alle 6 taartpunten door op een HQ-vakje 👑 goed te antwoorden, en land daarna nog eens op een HQ voor de eindvraag.</div>
+              <div className="text-sm text-gray-600">Om de beurt dobbelstenen, landen op een categorie-vakje en de vraag goed beantwoorden. Win een taartpunt door op een HQ-vakje 👑 goed te antwoorden — wie alle 6 taartpunten heeft, wint meteen het potje.</div>
               <div className="space-y-2">
                 {spelers.map((s, i) => (
                   <div key={i} className="space-y-1.5">
@@ -1009,7 +998,7 @@
               <div className="bg-white w-full max-w-xl rounded-t-3xl sm:rounded-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto">
                 <span className="inline-block text-xs font-extrabold px-2.5 py-1 rounded-full"
                   style={{ background: catById(vraagActief.categorie).kleur + '22', color: catById(vraagActief.categorie).kleur }}>
-                  {vraagActief.isEind ? '🏁 Eindvraag' : (catById(vraagActief.categorie).icon + ' ' + catById(vraagActief.categorie).naam)}
+                  {catById(vraagActief.categorie).icon + ' ' + catById(vraagActief.categorie).naam}
                 </span>
                 <div className="font-extrabold text-lg">{vraagActief.vraag.vraag}</div>
                 {spelers[beurt] && spelers[beurt].bot ? (
