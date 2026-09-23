@@ -931,10 +931,10 @@
       const [vraagActief, setVraagActief] = useState(null); // { vraag, opties, categorie, isHq, magWedge }
       const [boodschap, setBoodschap] = useState('Rol de dobbelsteen 🎲');
       const [winnaar, setWinnaar] = useState(null);
-      const [antwoordGegeven, setAntwoordGegeven] = useState(false); // voor het tonen/verbergen van de 50/50-joker
-      const categorieBags = useRef({}); // per categorie: geschudde rij vraag-ids, leegtrekken vóór herhaling
-      const categorieHistorie = useRef({}); // per categorie: laatst gestelde vraag-ids (kleine ringbuffer)
-      const laatsteVraagId = useRef(null);
+      const [gekozenOptie, setGekozenOptie] = useState(null); // welke optie deze vraag is aangeklikt (of null)
+      const categorieGebruikt = useRef({}); // per categorie: Set van al gestelde vraag-ids déze potje
+      const laatsteVraagId = useRef(null); // globaal laatst gekozen vraag-id (fallback als een categorie leeg is)
+      const recentePerCategorie = useRef({}); // per categorie: laatste (tot 3) gestelde vraag-ids, voor de reset-veiligheidsnet
       const goedBeantwoord = useRef(0);
       const extraWorpDitBeurt = useRef(false); // ingezet vóór het rollen: een fout antwoord kost deze beurt niet
 
@@ -959,41 +959,45 @@
         setPosities(namen.map(() => 0));
         setWedges(namen.map(() => []));
         setBeurt(0); setWinnaar(null); goedBeantwoord.current = 0; extraWorpDitBeurt.current = false;
-        categorieBags.current = {}; categorieHistorie.current = {}; laatsteVraagId.current = null;
+        categorieGebruikt.current = {}; laatsteVraagId.current = null; recentePerCategorie.current = {};
         setBoodschap(`${namen[0].naam} mag beginnen — rol de dobbelsteen 🎲`);
         setFase('spelen');
       }
 
-      // Trekt een vraag uit een geschudde 'tas' per categorie: elke vraag in die categorie
-      // komt precies één keer aan bod voor er herhaald wordt. Bij het vullen van een nieuwe
-      // tas zetten we de laatst-geziene vragen (categorieHistorie) achteraan de nieuwe schudding
-      // in plaats van ergens willekeurig — zo krijgt een net gestelde vraag altijd de maximale
-      // afstand tot z'n volgende beurt, ook aan het begin van een nieuwe cyclus.
+      // Kiest een vraag uit een categorie en garandeert dat er binnen dit ene potje geen
+      // vraag herhaald wordt: elke vraag in die categorie moet minstens één keer aan bod
+      // zijn geweest voor er opnieuw uit diezelfde categorie herhaald mag worden.
       function kiesVraag(categorieId) {
-        let bag = categorieBags.current[categorieId];
-        if (!bag || !bag.length) {
-          const poel = vragen.filter(v => v.categorie === categorieId);
-          if (!poel.length) {
-            let alt = vragen.filter(v => v.id !== laatsteVraagId.current);
-            if (!alt.length) alt = vragen;
-            const gekozen = alt[Math.floor(Math.random() * alt.length)];
-            laatsteVraagId.current = gekozen.id;
-            return gekozen;
-          }
-          const historie = new Set(categorieHistorie.current[categorieId] || []);
-          const vers = shuffle(poel.filter(v => !historie.has(v.id)).map(v => v.id));
-          const recent = shuffle(poel.filter(v => historie.has(v.id)).map(v => v.id));
-          bag = [...vers, ...recent];
-          // Veiligheidsnetje voor piepkleine categorieën (2-3 vragen over): voorkom in elk
-          // geval dat de zojuist gestelde vraag letterlijk de allereerstvolgende is.
-          if (bag.length > 1 && bag[0] === laatsteVraagId.current) [bag[0], bag[1]] = [bag[1], bag[0]];
-          categorieBags.current[categorieId] = bag;
+        const poel = vragen.filter(v => v.categorie === categorieId);
+        if (!poel.length) {
+          let alt = vragen.filter(v => v.id !== laatsteVraagId.current);
+          if (!alt.length) alt = vragen;
+          const gekozen = alt[Math.floor(Math.random() * alt.length)];
+          laatsteVraagId.current = gekozen.id;
+          return gekozen;
         }
-        const id = bag.shift();
-        laatsteVraagId.current = id;
-        const h = categorieHistorie.current[categorieId] || [];
-        categorieHistorie.current[categorieId] = [...h, id].slice(-3);
-        return vragen.find(v => v.id === id);
+        let gebruikt = categorieGebruikt.current[categorieId];
+        let kandidaten = gebruikt ? poel.filter(v => !gebruikt.has(v.id)) : poel;
+        if (!kandidaten.length) {
+          // Deze categorie is binnen dit potje volledig doorgevraagd — begin een nieuwe
+          // ronde, maar sluit de laatste (tot 3) vragen ÍN DEZE categorie nog even uit,
+          // zodat een net gestelde vraag niet meteen weer als eerste van de nieuwe ronde
+          // kan verschijnen. (Moet per categorie bijgehouden worden — de laatst gestelde
+          // vraag over ALLE categorieën heen werkt niet zodra er tussendoor uit een andere
+          // categorie is getrokken, wat in de praktijk vrijwel altijd het geval is.)
+          gebruikt = new Set();
+          const recent = new Set(recentePerCategorie.current[categorieId] || []);
+          kandidaten = poel.filter(v => !recent.has(v.id));
+          if (!kandidaten.length) kandidaten = poel;
+        }
+        const gekozen = kandidaten[Math.floor(Math.random() * kandidaten.length)];
+        gebruikt = gebruikt || new Set();
+        gebruikt.add(gekozen.id);
+        categorieGebruikt.current[categorieId] = gebruikt;
+        laatsteVraagId.current = gekozen.id;
+        const recent = recentePerCategorie.current[categorieId] || [];
+        recentePerCategorie.current[categorieId] = [...recent, gekozen.id].slice(-3);
+        return gekozen;
       }
 
       function rol() {
@@ -1007,7 +1011,7 @@
 
         const magWedge = vak.type === 'hq' && !wedges[beurt].includes(vak.categorie);
         const vraag = kiesVraag(vak.categorie);
-        setAntwoordGegeven(false);
+        setGekozenOptie(null);
         setVraagActief({ vraag, opties: geschudOpties(vraag), categorie: vak.categorie, isHq: vak.type === 'hq', magWedge, verborgen: [] });
         setBoodschap(magWedge ? '👑 HQ-vakje! Goed antwoord wint deze taartpunt.' : 'Beantwoord de vraag →');
       }
@@ -1016,7 +1020,7 @@
       // vóór het antwoorden en alleen voor mensen (bots hebben geen jokers nodig).
       function gebruikVijftigVijftig() {
         const speler = spelers[beurt];
-        if (!vraagActief || antwoordGegeven || !speler || speler.bot || !speler.jokers || !speler.jokers.vijftigVijftig) return;
+        if (!vraagActief || gekozenOptie || !speler || speler.bot || !speler.jokers || !speler.jokers.vijftigVijftig) return;
         const fout = vraagActief.opties.filter(o => !o.juist);
         const teVerbergen = shuffle(fout).slice(0, 2).map(o => o.tekst);
         setVraagActief(v => ({ ...v, verborgen: teVerbergen }));
@@ -1034,7 +1038,8 @@
 
       function beantwoord(optie) {
         const v = vraagActief;
-        setAntwoordGegeven(true);
+        if (gekozenOptie) return; // al beantwoord — voorkom dubbel verwerken van dezelfde vraag
+        setGekozenOptie(optie);
         onRegistreer(v.vraag.id, optie.juist);
         if (optie.juist) goedBeantwoord.current += 1;
 
@@ -1267,29 +1272,41 @@
                   {catById(vraagActief.categorie).icon + ' ' + catById(vraagActief.categorie).naam}
                 </span>
                 <div className="font-extrabold text-lg">{vraagActief.vraag.vraag}</div>
-                {spelers[beurt] && spelers[beurt].bot ? (
-                  <div className="space-y-2">
-                    {vraagActief.opties.map((o, idx) => (
-                      <div key={idx} className="w-full text-left border-2 rounded-2xl p-3 text-sm font-medium bg-gray-50 border-gray-100 text-gray-400">
+                {spelers[beurt] && !spelers[beurt].bot && spelers[beurt].jokers && spelers[beurt].jokers.vijftigVijftig && !gekozenOptie && (
+                  <button onClick={gebruikVijftigVijftig}
+                    className="text-xs font-extrabold px-3 py-1.5 rounded-full border-2 border-gray-200 text-gray-600 active:translate-y-px">
+                    🃏 50/50-joker — verberg 2 foute opties
+                  </button>
+                )}
+                <div className="space-y-2">
+                  {vraagActief.opties.map((o, idx) => {
+                    if ((vraagActief.verborgen || []).includes(o.tekst)) {
+                      return <div key={idx} className="w-full text-left border-2 rounded-2xl p-3 text-sm font-medium bg-gray-50 border-gray-100 text-gray-300 line-through">{o.tekst}</div>;
+                    }
+                    // Zodra er een antwoord is (van mens of bot) kleuren ALLE opties — ook de
+                    // niet-aangeklikte — zodat je altijd ziet wat het juiste antwoord was.
+                    let cls = 'bg-white border-gray-200';
+                    if (gekozenOptie) cls = o.juist ? 'bg-[#e8f9d6] border-[#58cc02]' : (o === gekozenOptie ? 'bg-[#ffe3e3] border-[#ff4b4b]' : 'bg-gray-50 border-gray-100 opacity-50');
+                    if (spelers[beurt] && spelers[beurt].bot) {
+                      return (
+                        <div key={idx} className={'w-full text-left border-2 rounded-2xl p-3 text-sm font-medium ' + (gekozenOptie ? cls : 'bg-gray-50 border-gray-100 text-gray-400')}>
+                          {o.tekst}
+                        </div>
+                      );
+                    }
+                    return (
+                      <button key={idx} disabled={!!gekozenOptie} onClick={() => beantwoord(o)}
+                        className={'w-full text-left border-2 rounded-2xl p-3 text-sm font-medium active:translate-y-px ' + cls}>
                         {o.tekst}
-                      </div>
-                    ))}
-                    <div className="text-center text-sm font-bold text-gray-400 animate-pulse">🤖 {spelers[beurt].naam} denkt na...</div>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {spelers[beurt].jokers && spelers[beurt].jokers.vijftigVijftig && !antwoordGegeven && (
-                      <button onClick={gebruikVijftigVijftig}
-                        className="text-xs font-extrabold px-3 py-1.5 rounded-full border-2 border-gray-200 text-gray-600 active:translate-y-px">
-                        🃏 50/50-joker — verberg 2 foute opties
                       </button>
-                    )}
-                    {vraagActief.opties.map((o, idx) => (
-                      (vraagActief.verborgen || []).includes(o.tekst)
-                        ? <div key={idx} className="w-full text-left border-2 rounded-2xl p-3 text-sm font-medium bg-gray-50 border-gray-100 text-gray-300 line-through">{o.tekst}</div>
-                        : <VraagOptieKnop key={idx} optie={o} onKies={beantwoord} />
-                    ))}
-                  </div>
+                    );
+                  })}
+                </div>
+                {spelers[beurt] && spelers[beurt].bot && !gekozenOptie && (
+                  <div className="text-center text-sm font-bold text-gray-400 animate-pulse">🤖 {spelers[beurt].naam} denkt na...</div>
+                )}
+                {gekozenOptie && vraagActief.vraag.uitleg && (
+                  <div className="text-xs text-gray-500 pt-1">💡 {vraagActief.vraag.uitleg}</div>
                 )}
               </div>
             </div>
@@ -1297,25 +1314,6 @@
         </div>
       );
     }
-    // Losse component zodat elke optie zijn eigen 'gekozen'-status kan tonen na een klik.
-    function VraagOptieKnop({ optie, onKies }) {
-      const [gekozen, setGekozen] = useState(false);
-      const [toonAntwoord, setToonAntwoord] = useState(false);
-      useEffect(() => {
-        if (!gekozen) return;
-        const t = setTimeout(() => setToonAntwoord(true), 30);
-        return () => clearTimeout(t);
-      }, [gekozen]);
-      let cls = 'bg-gray-50 border-gray-200';
-      if (toonAntwoord) cls = optie.juist ? 'bg-[#e8f9d6] border-[#58cc02]' : (gekozen ? 'bg-[#ffe3e3] border-[#ff4b4b]' : 'bg-gray-50 border-gray-200 opacity-50');
-      return (
-        <button disabled={gekozen} onClick={() => { setGekozen(true); onKies(optie); }}
-          className={'w-full text-left border-2 rounded-2xl p-3 text-sm font-medium active:translate-y-px ' + cls}>
-          {optie.tekst}
-        </button>
-      );
-    }
-
     // ---------- Krant importeren ----------
     function ImportView({ onToevoegen, onSluiten }) {
       const [fase, setFase] = useState('kies'); // kies | lezen | genereren | review | fout
