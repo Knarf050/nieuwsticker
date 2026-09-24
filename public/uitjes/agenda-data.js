@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 23 september 2026',
-  updatedAt: '23-09-2026, 07:15',
+  dateLabel: 'Donderdag 24 september 2026',
+  updatedAt: '24-09-2026, 07:15',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vandaag', title: '"Kleine wasjes, grote wasjes!"', loc: 'Den Haag', tag: 'Cultuur', highlight: true },
-        { time: 'vandaag', title: 'Markt', loc: 'Grote Markt', tag: 'Markt' },
+        { time: '20:00', title: 'Burgers & Comedy (NL)', loc: 'ComedyCity The Hague', tag: 'Comedy', highlight: true },
+        { time: '18:30–22:00', title: 'Evenement', loc: 'The Grey Space in the Middle', tag: 'Cultuur' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '23–27 sep (start vandaag)', title: 'CAMERA JAPAN Festival', loc: 'LantarenVenster / Fenix Plein', tag: 'Film', highlight: true },
-        { time: '21–27 sep', title: 'Conflux Festival', loc: 'Audiovisueel festival op diverse locaties', tag: 'Festival' },
+        { time: 'vandaag', title: 'KOKO (NL), Loveth Besamoh e.a.', loc: 'Baroeg', tag: 'Muziek', highlight: true },
+        { time: 't/m 27 sep', title: '"Art She Crafted"', loc: '10:00–17:00', tag: 'Expo' },
       ],
     },
     {
@@ -33,6 +33,7 @@ window.AGENDA_DATA = {
       accent: 'nl',
       items: [
         { time: 'doorlopend', title: 'Kinderdijk (UNESCO Werelderfgoed)', loc: '19 historische molens', tag: 'Natuur', highlight: true },
+        { time: 'vandaag', title: 'Ed Struijlaart', loc: 'Cultureel Centrum Cascade, Hendrik-Ido-Ambacht', tag: 'Muziek' },
       ],
     },
   ],
