@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Donderdag 24 september 2026',
-  updatedAt: '24-09-2026, 07:15',
+  dateLabel: 'Vrijdag 25 september 2026',
+  updatedAt: '25-09-2026, 07:15',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '20:00', title: 'Burgers & Comedy (NL)', loc: 'ComedyCity The Hague', tag: 'Comedy', highlight: true },
-        { time: '18:30–22:00', title: 'Evenement', loc: 'The Grey Space in the Middle', tag: 'Cultuur' },
+        { time: '25–27 sep (start vandaag)', title: 'Cirque Mania', loc: 'Korzo — experimenteel circustheater: acrobatiek, jongleren, robotica', tag: 'Theater', highlight: true },
+        { time: '20:30', title: 'Prime Time Friday Comedy', loc: 'ComedyCity The Hague — met Cristian Pielich en Bert Kleiweg', tag: 'Comedy' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vandaag', title: 'KOKO (NL), Loveth Besamoh e.a.', loc: 'Baroeg', tag: 'Muziek', highlight: true },
-        { time: 't/m 27 sep', title: '"Art She Crafted"', loc: '10:00–17:00', tag: 'Expo' },
+        { time: 'vandaag', title: 'Pink Floyd Project', loc: 'RTM Stage, Ahoy', tag: 'Muziek', highlight: true },
+        { time: 'vandaag', title: 'Jesse Hoefnagels', loc: 'Rotown', tag: 'Muziek' },
       ],
     },
     {
@@ -32,8 +32,8 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Kinderdijk (UNESCO Werelderfgoed)', loc: '19 historische molens', tag: 'Natuur', highlight: true },
-        { time: 'vandaag', title: 'Ed Struijlaart', loc: 'Cultureel Centrum Cascade, Hendrik-Ido-Ambacht', tag: 'Muziek' },
+        { time: '25–27 sep (start vandaag)', title: 'Evenement historische stadskern', loc: 'Schiedam', tag: 'Cultuur', highlight: true },
+        { time: 'doorlopend', title: 'Kinderdijk (UNESCO Werelderfgoed)', loc: '19 historische molens', tag: 'Natuur' },
       ],
     },
   ],
