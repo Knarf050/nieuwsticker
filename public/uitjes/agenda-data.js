@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Vrijdag 25 september 2026',
-  updatedAt: '25-09-2026, 07:15',
+  dateLabel: 'Zaterdag 26 september 2026',
+  updatedAt: '26-09-2026, 07:15',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,9 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '25–27 sep (start vandaag)', title: 'Cirque Mania', loc: 'Korzo — experimenteel circustheater: acrobatiek, jongleren, robotica', tag: 'Theater', highlight: true },
-        { time: '20:30', title: 'Prime Time Friday Comedy', loc: 'ComedyCity The Hague — met Cristian Pielich en Bert Kleiweg', tag: 'Comedy' },
+        { time: '26–27 sep (start vandaag)', title: 'Scheveningen Beach Resort Festival', loc: '11:00–17:00', tag: 'Festival', highlight: true },
+        { time: '20:30', title: 'Prime Time Saturday Comedy', loc: 'ComedyCity The Hague — met Chris van der Ende en Mino van Nassau', tag: 'Comedy' },
+        { time: '12:00', title: 'Grote Markt Festival', loc: 'Grote Markt', tag: 'Festival' },
       ],
     },
     {
@@ -23,8 +24,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vandaag', title: 'Pink Floyd Project', loc: 'RTM Stage, Ahoy', tag: 'Muziek', highlight: true },
-        { time: 'vandaag', title: 'Jesse Hoefnagels', loc: 'Rotown', tag: 'Muziek' },
+        { time: 'vandaag', title: 'Burendag', loc: 'Rotterdam', tag: 'Familie', highlight: true },
+        { time: 'vanaf 16:00', title: 'Boiler Room Rotterdam 2026', loc: 'Maassilo', tag: 'Muziek' },
       ],
     },
     {
@@ -32,8 +33,8 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '25–27 sep (start vandaag)', title: 'Evenement historische stadskern', loc: 'Schiedam', tag: 'Cultuur', highlight: true },
-        { time: 'doorlopend', title: 'Kinderdijk (UNESCO Werelderfgoed)', loc: '19 historische molens', tag: 'Natuur' },
+        { time: 'laatste dag', title: 'Antiek- en curiosamarkt', loc: 'Delft — 120 kramen', tag: 'Markt', highlight: true },
+        { time: 'laatste dag', title: 'Dahliapluktuin', loc: 'Pluk je eigen boeket uit 500 soorten', tag: 'Natuur' },
       ],
     },
   ],
