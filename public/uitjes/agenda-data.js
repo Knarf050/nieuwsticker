@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zaterdag 26 september 2026',
-  updatedAt: '26-09-2026, 07:15',
+  dateLabel: 'Zondag 27 september 2026',
+  updatedAt: '27-09-2026, 07:14',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,9 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '26–27 sep (start vandaag)', title: 'Scheveningen Beach Resort Festival', loc: '11:00–17:00', tag: 'Festival', highlight: true },
-        { time: '20:30', title: 'Prime Time Saturday Comedy', loc: 'ComedyCity The Hague — met Chris van der Ende en Mino van Nassau', tag: 'Comedy' },
-        { time: '12:00', title: 'Grote Markt Festival', loc: 'Grote Markt', tag: 'Festival' },
+        { time: 'laatste dag', title: 'Scheveningen Beach Resort Festival', loc: '11:00–17:00', tag: 'Festival', highlight: true },
+        { time: 'laatste dag', title: 'Cirque Mania', loc: 'Korzo', tag: 'Theater' },
       ],
     },
     {
@@ -24,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vandaag', title: 'Burendag', loc: 'Rotterdam', tag: 'Familie', highlight: true },
-        { time: 'vanaf 16:00', title: 'Boiler Room Rotterdam 2026', loc: 'Maassilo', tag: 'Muziek' },
+        { time: 'vandaag', title: 'Urban Trail Rotterdam 2026', loc: 'Rotterdam', tag: 'Sport', highlight: true },
+        { time: '17:00–20:00', title: 'Surinaamse roti-dinercruise', loc: 'Over de Rotterdamse wateren', tag: 'Eten' },
       ],
     },
     {
@@ -33,8 +32,8 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'laatste dag', title: 'Antiek- en curiosamarkt', loc: 'Delft — 120 kramen', tag: 'Markt', highlight: true },
-        { time: 'laatste dag', title: 'Dahliapluktuin', loc: 'Pluk je eigen boeket uit 500 soorten', tag: 'Natuur' },
+        { time: 'laatste dag', title: 'Kunstroute Leiden', loc: '165 ateliers en galeries, gratis — 11:00–17:00', tag: 'Expo', highlight: true },
+        { time: 'laatste dag', title: 'Evenement historische stadskern', loc: 'Schiedam', tag: 'Cultuur' },
       ],
     },
   ],
