@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 27 september 2026',
-  updatedAt: '27-09-2026, 07:14',
+  dateLabel: 'Maandag 28 september 2026',
+  updatedAt: '28-09-2026, 07:15',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'laatste dag', title: 'Scheveningen Beach Resort Festival', loc: '11:00–17:00', tag: 'Festival', highlight: true },
-        { time: 'laatste dag', title: 'Cirque Mania', loc: 'Korzo', tag: 'Theater' },
+        { time: 'vandaag', title: 'Greg Shapiro: "KING ME"', loc: 'Theater Pepijn', tag: 'Comedy', highlight: true },
+        { time: 'vandaag', title: '"Feel at Home"', loc: 'The Hague International Centre', tag: 'Cultuur' },
       ],
     },
     {
@@ -23,8 +23,7 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vandaag', title: 'Urban Trail Rotterdam 2026', loc: 'Rotterdam', tag: 'Sport', highlight: true },
-        { time: '17:00–20:00', title: 'Surinaamse roti-dinercruise', loc: 'Over de Rotterdamse wateren', tag: 'Eten' },
+        { time: 'doorlopend', title: 'Adventure City Rotterdam', loc: 'Klimparcours met touwbruggen en tubingbaan', tag: 'Actief', highlight: true },
       ],
     },
     {
@@ -32,8 +31,7 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'laatste dag', title: 'Kunstroute Leiden', loc: '165 ateliers en galeries, gratis — 11:00–17:00', tag: 'Expo', highlight: true },
-        { time: 'laatste dag', title: 'Evenement historische stadskern', loc: 'Schiedam', tag: 'Cultuur' },
+        { time: 'doorlopend', title: 'Boottochtje door Leiden', loc: 'Grachten, binnenplaatsen en gezellige straatjes', tag: 'Actief', highlight: true },
       ],
     },
   ],
