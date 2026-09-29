@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 28 september 2026',
-  updatedAt: '28-09-2026, 07:15',
+  dateLabel: 'Dinsdag 29 september 2026',
+  updatedAt: '29-09-2026, 07:15',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,9 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vandaag', title: 'Greg Shapiro: "KING ME"', loc: 'Theater Pepijn', tag: 'Comedy', highlight: true },
-        { time: 'vandaag', title: '"Feel at Home"', loc: 'The Hague International Centre', tag: 'Cultuur' },
+        { time: 'vandaag', title: 'Genre-blending hiphop met Koerdische wortels', loc: 'PAARD', tag: 'Muziek', highlight: true },
+        { time: 'laatste dag', title: 'Greg Shapiro: "KING ME"', loc: 'Theater Pepijn', tag: 'Comedy' },
+        { time: 'vandaag', title: 'Democracy Drinks', loc: 'The Hague Humanity Hub', tag: 'Cultuur' },
       ],
     },
     {
@@ -23,7 +24,7 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'doorlopend', title: 'Adventure City Rotterdam', loc: 'Klimparcours met touwbruggen en tubingbaan', tag: 'Actief', highlight: true },
+        { time: 'vandaag', title: 'LSD and the Search for God, Yumi Jun', loc: 'Rotown', tag: 'Muziek', highlight: true },
       ],
     },
     {
@@ -31,7 +32,7 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Boottochtje door Leiden', loc: 'Grachten, binnenplaatsen en gezellige straatjes', tag: 'Actief', highlight: true },
+        { time: 'doorlopend', title: 'Royal Delft Museum', loc: 'Delft — Delfts Blauw en streetart', tag: 'Expo', highlight: true },
       ],
     },
   ],
