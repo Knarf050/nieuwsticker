@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 30 september 2026',
-  updatedAt: '30-09-2026, 07:15',
+  dateLabel: 'Donderdag 1 oktober 2026',
+  updatedAt: '01-10-2026, 07:15',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,7 +14,9 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vandaag', title: 'Rockavond met blues- en soulwortels', loc: 'PAARD', tag: 'Muziek', highlight: true },
+        { time: '1–31 okt (start vandaag)', title: 'Spinozamaand 2026', loc: 'Den Haag', tag: 'Cultuur', highlight: true },
+        { time: 'vandaag', title: 'Kinderboekenweek', loc: 'Bibliotheek Den Haag — zingen, dansen, spelen en voorlezen', tag: 'Familie' },
+        { time: '18:30', title: 'KATE CLOVER', loc: 'Café Paard', tag: 'Muziek' },
       ],
     },
     {
@@ -22,16 +24,18 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'laatste dag', title: 'Kaapse Kunstroute & Kunstmarkt 2026', loc: 'Katendrecht', tag: 'Expo', highlight: true },
-        { time: 'vandaag', title: 'Pleinfeest Generaal van der Heijdenplein', loc: 'Rotterdam', tag: 'Familie' },
-        { time: 'vandaag', title: 'Mamas Gun', loc: 'Annabel', tag: 'Muziek' },
+        { time: '1–11 okt (start vandaag)', title: 'Afrovibes Festival 2026', loc: 'Rotterdam', tag: 'Festival', highlight: true },
+        { time: 'vandaag', title: 'Michael Prins', loc: 'LantarenVenster — Play With Fire Tour', tag: 'Muziek' },
       ],
     },
     {
       id: 'regio',
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
-      items: [],
+      items: [
+        { time: 'doorlopend', title: 'TU Delft Science Centre', loc: "Robots besturen, technologie en plastic smelten", tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Museum De Zwarte Tulp', loc: 'Lisse — van bol tot bloem', tag: 'Expo' },
+      ],
     },
   ],
   sources: [
