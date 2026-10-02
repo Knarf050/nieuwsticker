@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Donderdag 1 oktober 2026',
-  updatedAt: '01-10-2026, 07:15',
+  dateLabel: 'Vrijdag 2 oktober 2026',
+  updatedAt: '02-10-2026, 07:15',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,9 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '1–31 okt (start vandaag)', title: 'Spinozamaand 2026', loc: 'Den Haag', tag: 'Cultuur', highlight: true },
-        { time: 'vandaag', title: 'Kinderboekenweek', loc: 'Bibliotheek Den Haag — zingen, dansen, spelen en voorlezen', tag: 'Familie' },
-        { time: '18:30', title: 'KATE CLOVER', loc: 'Café Paard', tag: 'Muziek' },
+        { time: '2–11 okt (start vandaag)', title: 'The Hague Cocktail Week', loc: 'Diverse locaties', tag: 'Cultuur', highlight: true },
+        { time: '20:00', title: 'Rewire x Korzo #25', loc: 'Korzo Theater', tag: 'Muziek' },
       ],
     },
     {
@@ -24,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '1–11 okt (start vandaag)', title: 'Afrovibes Festival 2026', loc: 'Rotterdam', tag: 'Festival', highlight: true },
-        { time: 'vandaag', title: 'Michael Prins', loc: 'LantarenVenster — Play With Fire Tour', tag: 'Muziek' },
+        { time: '19:00', title: 'Harlem Globetrotters — 100 Year Tour', loc: 'RTM Stage, Ahoy', tag: 'Sport', highlight: true },
+        { time: 'vandaag', title: 'Republica — 30 jaar debuutalbum', loc: 'Rotown', tag: 'Muziek' },
       ],
     },
     {
@@ -33,8 +32,8 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'TU Delft Science Centre', loc: "Robots besturen, technologie en plastic smelten", tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Museum De Zwarte Tulp', loc: 'Lisse — van bol tot bloem', tag: 'Expo' },
+        { time: '2–3 okt (start vandaag)', title: 'Leidens Ontzet', loc: 'Traditioneel feest in Leiden', tag: 'Festival', highlight: true },
+        { time: 't/m 4 okt', title: '"Vol van Vogels"', loc: 'Art Centre Schiedam — 13:00–17:00', tag: 'Expo' },
       ],
     },
   ],
