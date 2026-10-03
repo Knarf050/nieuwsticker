@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Vrijdag 2 oktober 2026',
-  updatedAt: '02-10-2026, 07:15',
+  dateLabel: 'Zaterdag 3 oktober 2026',
+  updatedAt: '03-10-2026, 07:15',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,9 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '2–11 okt (start vandaag)', title: 'The Hague Cocktail Week', loc: 'Diverse locaties', tag: 'Cultuur', highlight: true },
-        { time: '20:00', title: 'Rewire x Korzo #25', loc: 'Korzo Theater', tag: 'Muziek' },
+        { time: '20:30', title: 'Prime Time Saturday Comedy', loc: 'ComedyCity The Hague', tag: 'Comedy', highlight: true },
+        { time: '15:00–16:00', title: '"Dag Poes" (4+)', loc: 'Theater aan het Spui', tag: 'Familie' },
+        { time: '12:00–18:00', title: 'The Hague Cocktail Week & Open Ateliers', loc: 'Diverse locaties', tag: 'Cultuur' },
       ],
     },
     {
@@ -23,8 +24,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '19:00', title: 'Harlem Globetrotters — 100 Year Tour', loc: 'RTM Stage, Ahoy', tag: 'Sport', highlight: true },
-        { time: 'vandaag', title: 'Republica — 30 jaar debuutalbum', loc: 'Rotown', tag: 'Muziek' },
+        { time: '20:15–21:15', title: 'Afrovibes Festival', loc: 'Maaspodium', tag: 'Festival', highlight: true },
+        { time: 'vandaag', title: 'Summer of Love – Autumn Vibes', loc: 'Maassilo', tag: 'Muziek' },
       ],
     },
     {
@@ -32,8 +33,8 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '2–3 okt (start vandaag)', title: 'Leidens Ontzet', loc: 'Traditioneel feest in Leiden', tag: 'Festival', highlight: true },
-        { time: 't/m 4 okt', title: '"Vol van Vogels"', loc: 'Art Centre Schiedam — 13:00–17:00', tag: 'Expo' },
+        { time: 'hoofddag', title: 'Leidens Ontzet (3 oktoberviering)', loc: 'Leiden — live optredens, kermis en vuurwerk', tag: 'Festival', highlight: true },
+        { time: 'doorlopend', title: 'Waterspeelplaats De Watervallei', loc: 'Capelle aan den IJssel', tag: 'Familie' },
       ],
     },
   ],
