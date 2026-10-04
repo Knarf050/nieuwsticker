@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zaterdag 3 oktober 2026',
-  updatedAt: '03-10-2026, 07:15',
+  dateLabel: 'Zondag 4 oktober 2026',
+  updatedAt: '04-10-2026, 07:14',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,9 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '20:30', title: 'Prime Time Saturday Comedy', loc: 'ComedyCity The Hague', tag: 'Comedy', highlight: true },
-        { time: '15:00–16:00', title: '"Dag Poes" (4+)', loc: 'Theater aan het Spui', tag: 'Familie' },
-        { time: '12:00–18:00', title: 'The Hague Cocktail Week & Open Ateliers', loc: 'Diverse locaties', tag: 'Cultuur' },
+        { time: '13:00–17:00', title: 'Weekend van de Wetenschap', loc: 'Spui Campus — voor 8 tot 99 jaar', tag: 'Familie', highlight: true },
+        { time: '12:00–18:00', title: 'Open Ateliers Den Haag', loc: 'Diverse locaties', tag: 'Cultuur' },
       ],
     },
     {
@@ -24,8 +23,9 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '20:15–21:15', title: 'Afrovibes Festival', loc: 'Maaspodium', tag: 'Festival', highlight: true },
-        { time: 'vandaag', title: 'Summer of Love – Autumn Vibes', loc: 'Maassilo', tag: 'Muziek' },
+        { time: '11:00–15:00', title: 'Weekend van de Wetenschap bij Portlantis', loc: 'Kids workshop', tag: 'Familie', highlight: true },
+        { time: '09:00–17:00', title: 'Stoomtreindagen 2026', loc: 'SSN Museumstoomdepot', tag: 'Familie' },
+        { time: '17:00–20:00', title: 'RotiCruise Rotterdam', loc: 'Surinaamse roti-dinercruise', tag: 'Eten' },
       ],
     },
     {
@@ -33,14 +33,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'hoofddag', title: 'Leidens Ontzet (3 oktoberviering)', loc: 'Leiden — live optredens, kermis en vuurwerk', tag: 'Festival', highlight: true },
-        { time: 'doorlopend', title: 'Waterspeelplaats De Watervallei', loc: 'Capelle aan den IJssel', tag: 'Familie' },
+        { time: '13:00–16:00', title: 'Fossielenexpeditie', loc: 'Portlantis, Maasvlaktestrand — met fossielenexpert Walter Langendoen', tag: 'Natuur', highlight: true },
+        { time: '3–4 okt', title: 'Medicijnweekend', loc: 'Alphen aan den Rijn', tag: 'Markt' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
     { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
+    { label: 'DagjeWeg — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
   ],
 };
