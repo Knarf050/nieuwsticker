@@ -86,7 +86,7 @@ modi op het "Vandaag"-scherm:
 
 In het importscherm kies je hoeveel vragen je wilt (40/60/80/100), verdeeld
 over de 6 categorieën. Een aanvraag van 100 vragen wordt achter de schermen
-in porties van 25 aan Claude gevraagd (anders duurt één serverfunctie-aanroep
+in porties van 10 aan Claude gevraagd (anders duurt één serverfunctie-aanroep
 te lang), en elke portie krijgt de al gemaakte vraagteksten mee zodat er
 geen inhoudelijke overlap ontstaat. Hoe meer vragen per editie, hoe minder
 snel je in het bordspel dezelfde vraag terugziet.

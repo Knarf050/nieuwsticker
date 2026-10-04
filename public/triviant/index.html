@@ -176,7 +176,10 @@
     // Eén grote aanvraag (bijv. 100 vragen) duurt te lang voor één serverfunctie-aanroep,
     // dus knippen we op in kleinere porties. Elke portie krijgt de vraagteksten van de
     // vorige porties mee, zodat Claude geen inhoudelijke overlap genereert.
-    const GENEREER_PORTIE = 25;
+    // Klein genoeg houden dat het genereren van ÉÉN portie ruim binnen de tijdslimiet van
+    // de serverfunctie blijft (zie vercel.json) — een grotere portie liep aan tegen een
+    // 504 (serverfunctie-timeout) bij het genereren van veel vragen met een groot model.
+    const GENEREER_PORTIE = 10;
     async function genereerVragenPortie(tekst, aantal, nietOpnieuw) {
       const res = await fetch('/api/triviant', {
         method: 'POST',
@@ -198,7 +201,15 @@
       let resterend = aantal;
       while (resterend > 0) {
         const portie = Math.min(GENEREER_PORTIE, resterend);
-        const nieuw = await genereerVragenPortie(tekst, portie, alleVragen.map(v => v.vraag));
+        let nieuw;
+        try {
+          nieuw = await genereerVragenPortie(tekst, portie, alleVragen.map(v => v.vraag));
+        } catch (e) {
+          // Eén portie mislukt (bijv. een trage/timende aanvraag) hoeft niet alle al
+          // succesvol gegenereerde vragen weg te gooien — geef terug wat we al hebben.
+          if (alleVragen.length) break;
+          throw e; // nog helemaal niets gelukt: laat de fout gewoon zien
+        }
         if (!nieuw.length) break; // server gaf niets terug — stop, geef wat we al hebben
         alleVragen.push(...nieuw);
         resterend -= portie;
@@ -1416,7 +1427,7 @@
                   ? `Bestand lezen…${voortgang.n ? ` (${voortgang.p}/${voortgang.n})` : ''}`
                   : `Claude maakt quizvragen… (${voortgang.p}/${voortgang.n})`}
               </div>
-              <div className="text-sm text-gray-500">{fase === 'genereren' ? 'Dit duurt bij 100 vragen ongeveer 1–2 minuten.' : 'Even geduld.'}</div>
+              <div className="text-sm text-gray-500">{fase === 'genereren' ? 'Dit duurt bij 100 vragen ongeveer 2–4 minuten.' : 'Even geduld.'}</div>
             </div>
           )}
 
