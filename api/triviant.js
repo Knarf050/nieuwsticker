@@ -57,10 +57,17 @@ export default async function handler(req, res) {
           properties: {
             vraag: { type: 'string', description: 'Concrete, toetsbare quizvraag' },
             opties: {
-              type: 'array', items: { type: 'string' }, minItems: 4, maxItems: 4,
+              // Claude's structured-output schema's staan geen 'minItems'/'maxItems' toe behalve
+              // 0 of 1 (complexere arraybeperkingen worden geweigerd met een 400) — de "precies 4"
+              // eis staat daarom alleen in de beschrijving hier en in de systeemprompt. De server
+              // filtert hieronder sowieso elke vraag weg die toch niet op exact 4 opties uitkomt.
+              type: 'array', items: { type: 'string' },
               description: 'Precies 4 antwoordopties, in willekeurige volgorde',
             },
-            antwoordIndex: { type: 'integer', minimum: 0, maximum: 3, description: 'Index (0-3) van het juiste antwoord in opties' },
+            // Zelfde beperking als bij 'opties': numerieke grenzen (minimum/maximum) worden
+            // niet ondersteund in structured-output schema's — ook hier bewaakt de server-side
+            // filter hieronder de echte 0-3-grens.
+            antwoordIndex: { type: 'integer', description: 'Index (0-3) van het juiste antwoord in opties' },
             categorie: { type: 'string', enum: categorieIds, description: 'Een van de toegestane categorie-ids' },
             moeilijkheid: { type: 'string', enum: ['makkelijk', 'gemiddeld', 'moeilijk'] },
             uitleg: { type: 'string', description: 'Eén zin die het antwoord toelicht, te tonen ná het beantwoorden' },
