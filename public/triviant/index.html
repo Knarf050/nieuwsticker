@@ -184,7 +184,13 @@
         body: JSON.stringify({ tekst, aantal, categorieen: CATS, nietOpnieuw }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || ('Serverfout ' + res.status));
+      if (!res.ok) {
+        // 'details' bevat de technische foutmelding van de Claude API zelf (bijv. een
+        // ongeldige sleutel of een leeg tegoed) — die tonen we erbij, zodat je de echte
+        // oorzaak meteen in de app ziet en niet apart in de Vercel-logs hoeft te zoeken.
+        const basis = data.error || ('Serverfout ' + res.status);
+        throw new Error(data.details ? `${basis} — ${data.details}` : basis);
+      }
       return data.vragen || [];
     }
     async function genereerVragen(tekst, aantal, onVoortgang) {
