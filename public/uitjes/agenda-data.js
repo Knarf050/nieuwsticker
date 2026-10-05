@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 4 oktober 2026',
-  updatedAt: '04-10-2026, 07:14',
+  dateLabel: 'Maandag 5 oktober 2026',
+  updatedAt: '05-10-2026, 07:15',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,9 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '13:00–17:00', title: 'Weekend van de Wetenschap', loc: 'Spui Campus — voor 8 tot 99 jaar', tag: 'Familie', highlight: true },
-        { time: '12:00–18:00', title: 'Open Ateliers Den Haag', loc: 'Diverse locaties', tag: 'Cultuur' },
+        { time: '10:00–17:30', title: 'Hâck The Hague 2026', loc: 'Atrium Den Haag — 120 hackers', tag: 'Cultuur', highlight: true },
+        { time: '5–10 okt (start vandaag)', title: 'Blue Week', loc: 'Elsewhere The Hague', tag: 'Cultuur' },
+        { time: '5–11 okt', title: 'The Hague Cocktail Week', loc: 'Diverse locaties', tag: 'Cultuur' },
       ],
     },
     {
@@ -23,9 +24,7 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '11:00–15:00', title: 'Weekend van de Wetenschap bij Portlantis', loc: 'Kids workshop', tag: 'Familie', highlight: true },
-        { time: '09:00–17:00', title: 'Stoomtreindagen 2026', loc: 'SSN Museumstoomdepot', tag: 'Familie' },
-        { time: '17:00–20:00', title: 'RotiCruise Rotterdam', loc: 'Surinaamse roti-dinercruise', tag: 'Eten' },
+        { time: 'vanaf 08:00 (start vandaag)', title: 'FERMA Forum 2026', loc: 'Ahoy — Hal 3, 5, 6 & RACC', tag: 'Cultuur', highlight: true },
       ],
     },
     {
@@ -33,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '13:00–16:00', title: 'Fossielenexpeditie', loc: 'Portlantis, Maasvlaktestrand — met fossielenexpert Walter Langendoen', tag: 'Natuur', highlight: true },
-        { time: '3–4 okt', title: 'Medicijnweekend', loc: 'Alphen aan den Rijn', tag: 'Markt' },
+        { time: 'doorlopend', title: 'Museumpark Archeon', loc: 'Alphen aan den Rijn — zwaardvechten en boogschieten', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: '"Urban Blue — from Bricks to Tiles"', loc: 'Royal Delft Museum, Delft', tag: 'Expo' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
     { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'DagjeWeg — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
+    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
   ],
 };
