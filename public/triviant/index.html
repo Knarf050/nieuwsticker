@@ -180,11 +180,11 @@
     // de serverfunctie blijft (zie vercel.json) — een grotere portie liep aan tegen een
     // 504 (serverfunctie-timeout) bij het genereren van veel vragen met een groot model.
     const GENEREER_PORTIE = 10;
-    async function genereerVragenPortie(tekst, aantal, nietOpnieuw) {
+    async function genereerVragenPortie(tekst, aantal, nietOpnieuw, editieDatum) {
       const res = await fetch('/api/triviant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tekst, aantal, categorieen: CATS, nietOpnieuw }),
+        body: JSON.stringify({ tekst, aantal, categorieen: CATS, nietOpnieuw, datum: editieDatum }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -196,14 +196,14 @@
       }
       return data.vragen || [];
     }
-    async function genereerVragen(tekst, aantal, onVoortgang) {
+    async function genereerVragen(tekst, aantal, onVoortgang, editieDatum) {
       const alleVragen = [];
       let resterend = aantal;
       while (resterend > 0) {
         const portie = Math.min(GENEREER_PORTIE, resterend);
         let nieuw;
         try {
-          nieuw = await genereerVragenPortie(tekst, portie, alleVragen.map(v => v.vraag));
+          nieuw = await genereerVragenPortie(tekst, portie, alleVragen.map(v => v.vraag), editieDatum);
         } catch (e) {
           // Eén portie mislukt (bijv. een trage/timende aanvraag) hoeft niet alle al
           // succesvol gegenereerde vragen weg te gooien — geef terug wat we al hebben.
@@ -1368,7 +1368,7 @@
           }
           setFase('genereren');
           setVoortgang({ p: 0, n: aantal });
-          const vragen = await genereerVragen(tekst, aantal, (p, n) => setVoortgang({ p, n }));
+          const vragen = await genereerVragen(tekst, aantal, (p, n) => setVoortgang({ p, n }), datum);
           if (!vragen.length) {
             setFout('Geen vragen teruggekregen. Probeer het opnieuw of met een andere editie.');
             setFase('fout'); return;
