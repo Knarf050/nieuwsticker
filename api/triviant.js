@@ -98,7 +98,16 @@ export default async function handler(req, res) {
     '- Gebruik uitsluitend feiten die letterlijk in de tekst staan (namen, cijfers, plaatsen, uitspraken). Verzin niets.\n' +
     '- Elke vraag heeft precies 4 opties, met precies 1 duidelijk juist antwoord. De 3 afleiders moeten aannemelijk ' +
     '  zijn (bijv. andere namen/cijfers die in de krant voorkomen of vergelijkbaar plausibel zijn), niet absurd.\n' +
+    '- Alle 4 opties moeten dezelfde soort antwoord zijn, in vergelijkbare vorm en lengte (bijv. allemaal namen, ' +
+    '  allemaal getallen, allemaal plaatsen) — nooit een volledige bewering of uitleg als optie tussen kortere ' +
+    '  naam- of cijferopties door.\n' +
+    '- Lees elke vraag nog eens na voor je hem opschrijft: spreken de vraagtekst, de opties en de uitleg elkaar ' +
+    '  niet tegen (bijv. in tijdsvolgorde of in wat er precies gevraagd wordt)? Een vraag die zichzelf ' +
+    '  tegenspreekt is onbruikbaar.\n' +
     '- Varieer de moeilijkheidsgraad (makkelijk/gemiddeld/moeilijk) en het soort vraag (wie/wat/waar/hoeveel/welk jaar).\n' +
+    '- Laat de vragen binnen deze portie niet onderling over hetzelfde feit, cijfer of onderwerp gaan — kies per ' +
+    '  vraag een ander artikel of een andere invalshoek, ook als dat betekent dat je een minder voor de hand ' +
+    '  liggend detail gebruikt.\n' +
     '- Kies per vraag het best passende id uit deze categorieën:\n' + catLijst + '\n' +
     '- "uitleg" is één korte zin die het antwoord onderbouwt met een extra feit uit het artikel — leuk om te lezen ' +
     '  nadat je hebt geantwoord.\n' +
