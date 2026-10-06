@@ -91,6 +91,13 @@ te lang), en elke portie krijgt de al gemaakte vraagteksten mee zodat er
 geen inhoudelijke overlap ontstaat. Hoe meer vragen per editie, hoe minder
 snel je in het bordspel dezelfde vraag terugziet.
 
+De datum die je bij het importeren invult, gaat ook mee naar Claude. Een
+krantartikel verwijst vaak relatief naar de tijd ("dinsdag", "afgelopen
+weekend") — zonder die editiedatum zou zo'n vraag later, naast vragen uit
+andere edities in je groeiende bank, niet meer te plaatsen zijn. Claude
+vervangt dat soort aanduidingen daarom tijdens het genereren door een
+concrete datum of periode.
+
 ## Privacy & techniek
 
 - De PDF/EPUB wordt **lokaal** tot tekst verwerkt; alleen de tekst gaat

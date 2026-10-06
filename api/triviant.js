@@ -40,6 +40,12 @@ export default async function handler(req, res) {
   const nietOpnieuw = Array.isArray(body.nietOpnieuw)
     ? body.nietOpnieuw.filter(v => typeof v === 'string' && v.trim()).slice(0, 150).map(v => v.trim().slice(0, 200))
     : [];
+  // Publicatiedatum van de editie: zonder deze context weet Claude niet welke dag
+  // 'dinsdag' of 'gisteren' in het krantartikel precies is, en wordt dat onherkenbaar
+  // zodra de vraag later naast vragen uit andere edities in de bank staat.
+  const editieDatum = /^\d{4}-\d{2}-\d{2}$/.test(body.datum) && !isNaN(new Date(body.datum))
+    ? body.datum
+    : null;
 
   if (tekst.length < 200) {
     return res.status(400).json({ error: 'Te weinig leesbare tekst uit de krant gehaald.' });
@@ -81,6 +87,10 @@ export default async function handler(req, res) {
   };
 
   const catLijst = categorieen.map(c => `- ${c.id}: ${c.naam}`).join('\n');
+  const editieDatumLang = editieDatum
+    ? new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+        .format(new Date(editieDatum + 'T12:00:00'))
+    : null;
   const systemPrompt =
     'Je maakt een Triviant-achtige meerkeuzequiz (net als Trivial Pursuit) op basis van de aangeleverde ' +
     'kranttekst van NRC. Regels:\n' +
@@ -95,6 +105,14 @@ export default async function handler(req, res) {
     '- "bron" is de titel (of een korte omschrijving) van het artikel.\n' +
     '- Negeer advertenties, kolofon, tv-gids, weerbericht, puzzels en pure opmaak/ruis uit de tekst.\n' +
     '- Schrijf in het Nederlands.' +
+    (editieDatumLang
+      ? `\n- Deze editie is van ${editieDatumLang}. De krant gebruikt soms relatieve tijdsaanduidingen ` +
+        '("dinsdag", "gisteren", "afgelopen weekend", "komende week") die alleen kloppen gezien vanaf die ' +
+        'publicatiedatum. Vervang zulke aanduidingen in "vraag", "opties" én "uitleg" door een concrete datum ' +
+        'of periode (bijv. "op 3 oktober 2026" of "eind september 2026"), berekend vanaf de publicatiedatum. ' +
+        'Dit is nodig omdat de vraag later, los van deze editie, naast vragen uit andere edities in de ' +
+        'vragenbank terechtkomt — zonder absolute datum is dan niet meer te zien welk moment bedoeld wordt.'
+      : '') +
     (nietOpnieuw.length
       ? '\n- Er zijn al vragen gemaakt over deze editie (zie de lijst hieronder in het bericht). Maak geen ' +
         'vragen die hetzelfde feit of onderwerp herhalen — kies andere artikelen, feiten of invalshoeken.'
