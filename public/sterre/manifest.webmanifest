@@ -1,0 +1,18 @@
+{
+  "id": "/sterre/",
+  "name": "Sterre — oefenen voor groep 3",
+  "short_name": "Sterre",
+  "description": "Rekenen en lezen oefenen in groep 3: sommen, klokkijken, letters, zinnen en een kleurplaat.",
+  "lang": "nl",
+  "start_url": "/sterre/",
+  "scope": "/sterre/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1F3A93",
+  "theme_color": "#1F3A93",
+  "icons": [
+    { "src": "/sterre/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/sterre/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/sterre/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

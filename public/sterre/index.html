@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="manifest" href="/sterre/manifest.webmanifest">
+<meta name="theme-color" content="#1F3A93">
+<link rel="icon" href="/sterre/icon-192.png">
+<link rel="apple-touch-icon" href="/sterre/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sterre">
+<meta name="description" content="Oefenen met rekenen en lezen in groep 3.">
+<title>Sterre – oefenen voor groep 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBFCFF; --grid:#DCE7F6; --ink:#1F3A93; --text:#1B2340; --muted:#56628C;
+  --red:#E23B3B; --sun:#FFC93C; --sun-edge:#C9931A; --curtain:#C22A3E;
+  --green:#2E9E5B; --green-bg:#DDF3E5; --wrong-bg:#FBE3E3; --tile:#FFFFFF; --soft:#8FB3EA; --shadow:#1F3A93;
+  --radius:14px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#121A2F; --grid:#1D2946; --ink:#A9C1FF; --text:#EAF0FF; --muted:#A7B3D6;
+    --red:#FF5C5C; --sun:#FFD25E; --sun-edge:#B8861A; --curtain:#A52033;
+    --green:#4CC57F; --green-bg:#173A28; --wrong-bg:#40202A; --tile:#18223D; --soft:#4F6FB0; --shadow:#06091A;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121A2F; --grid:#1D2946; --ink:#A9C1FF; --text:#EAF0FF; --muted:#A7B3D6;
+  --red:#FF5C5C; --sun:#FFD25E; --sun-edge:#B8861A; --curtain:#A52033;
+  --green:#4CC57F; --green-bg:#173A28; --wrong-bg:#40202A; --tile:#18223D; --soft:#4F6FB0; --shadow:#06091A;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; min-height:100vh; color:var(--text); background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+  font-family:"Andika","Comic Neue","Trebuchet MS",system-ui,sans-serif;
+  font-size:1.125rem; line-height:1.45;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
+.wrap{max-width:760px;margin:0 auto;padding:16px 18px 40px}
+[hidden]{display:none!important}
+
+/* Stats */
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.chip{display:flex;align-items:center;gap:8px;background:var(--tile);border:2.5px solid var(--ink);
+  border-radius:999px;padding:5px 12px 5px 8px;font-weight:700;box-shadow:2px 2px 0 var(--shadow)}
+.chip svg{width:30px;height:30px;flex:none}
+.chip small{font-weight:400;color:var(--muted);font-size:.9rem}
+.chip.level{flex:1 1 200px}
+.lvl-badge{width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:1rem;flex:none}
+.xpbar{flex:1;height:12px;border-radius:99px;background:var(--grid);overflow:hidden;min-width:60px}
+.xpbar i{display:block;height:100%;background:var(--sun);border-radius:99px;transition:width .6s}
+.chip.streak.off{opacity:.6}
+
+/* Hero / podium */
+.hero{margin:10px 0 4px;border:3px solid var(--ink);border-radius:var(--radius);overflow:hidden;box-shadow:5px 5px 0 var(--shadow);background:var(--tile)}
+.stage{position:relative;display:block;width:100%}
+.hero-text{padding:12px 16px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h1{font-size:clamp(2.2rem,8vw,3.2rem);line-height:1;margin:0;color:var(--ink);letter-spacing:-.01em}
+.bubble{position:relative;background:var(--paper);border:2.5px solid var(--ink);border-radius:16px;padding:8px 14px;font-size:1.05rem;flex:1 1 220px}
+.lead{margin:0;color:var(--muted);font-size:1.05rem;flex-basis:100%}
+
+/* Mascot */
+.m-body{fill:var(--sun);stroke:var(--sun-edge);stroke-width:3;stroke-linejoin:round}
+.m-eye{fill:#1B2340}
+.m-mouth{fill:none;stroke:#1B2340;stroke-width:3.5;stroke-linecap:round}
+.m-cheek{fill:#FF9C9C;opacity:.75}
+.bounce{animation:bounce .6s ease}
+@keyframes bounce{30%{transform:translateY(-12px)}60%{transform:translateY(0)}80%{transform:translateY(-4px)}}
+.wobble{animation:wobble .5s ease}
+@keyframes wobble{25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+
+/* Tiles */
+.section-title{font-size:1.4rem;margin:26px 0 4px;color:var(--ink)}
+.section-sub{margin:0 0 12px;color:var(--muted);font-size:1rem}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+.tile{text-align:left;background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);
+  padding:14px;display:grid;gap:4px;box-shadow:4px 4px 0 var(--shadow);transition:transform .12s, box-shadow .12s}
+.tile:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--shadow)}
+.tile:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shadow)}
+.tile .icon{height:52px;display:flex;align-items:center;font-size:2rem;font-weight:700;color:var(--ink)}
+.tile .icon svg{height:48px;width:auto}
+.tile b{font-size:1.2rem}
+.tile .sub{color:var(--muted);font-size:.98rem}
+.stars{font-size:1.2rem;letter-spacing:2px;color:var(--sun);min-height:1.5em}
+.stars .off{color:var(--grid)}
+.collect{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+.collect .tile{grid-template-columns:auto 1fr;align-items:center;column-gap:12px}
+.collect .tile .big{font-size:2.4rem;grid-row:span 2}
+
+.settings{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.toggle{border:2.5px solid var(--ink);background:var(--tile);border-radius:999px;padding:8px 16px;display:inline-flex;align-items:center;gap:8px}
+.toggle[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;padding:8px;font-size:.95rem}
+.note{color:var(--muted);font-size:.95rem;margin-top:14px}
+.backup{margin-top:16px;background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);padding:14px;box-shadow:4px 4px 0 var(--shadow)}
+.backup h3{margin:0 0 6px;font-size:1.15rem;color:var(--ink)}
+.backup p{margin:0 0 10px;color:var(--muted);font-size:.95rem}
+.backup textarea,.backup input{width:100%;font-family:ui-monospace,Menlo,monospace;font-size:.85rem;padding:8px;border:2.5px solid var(--ink);
+  border-radius:10px;background:var(--paper);color:var(--text);margin-bottom:8px}
+.backup textarea{height:72px;resize:vertical}
+
+/* Game */
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.btn{border:3px solid var(--ink);background:var(--tile);border-radius:12px;padding:8px 14px;box-shadow:3px 3px 0 var(--shadow);font-weight:700}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.icon-only{padding:8px 12px;font-size:1.3rem;line-height:1}
+.bar h2{flex:1;margin:0;font-size:1.25rem;color:var(--ink)}
+.progress{display:flex;gap:6px;justify-content:center;margin:4px 0 18px;flex-wrap:wrap}
+.pdot{width:22px;height:22px;border-radius:50%;border:2.5px dashed var(--soft);transition:background .25s,border-color .25s,transform .25s}
+.pdot.first{background:var(--sun);border:2.5px solid var(--sun-edge);transform:scale(1.1)}
+.pdot.retry{background:var(--soft);border:2.5px solid var(--soft)}
+.pdot.now{border-style:solid;border-color:var(--ink)}
+
+.card{position:relative;background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);
+  padding:20px 18px 22px;box-shadow:5px 5px 0 var(--shadow);text-align:center}
+.combo{position:absolute;top:-16px;right:14px;background:var(--sun);color:#1B2340;border:2.5px solid var(--ink);
+  border-radius:999px;padding:2px 12px;font-weight:700;font-size:1rem;transform:scale(0);transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.combo.show{transform:scale(1)}
+.prompt{font-size:clamp(1.4rem,5vw,1.9rem);margin:0 0 10px;font-weight:700}
+.sum{font-size:clamp(3rem,13vw,5rem);font-weight:700;line-height:1.1;color:var(--ink);margin:6px 0 10px}
+.sum .q{color:var(--red)}
+.visual{display:flex;justify-content:center;margin:8px 0 14px;overflow-x:auto}
+.visual svg{max-width:100%;height:auto}
+.objects{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:300px;margin:0 auto 12px;font-size:2rem}
+.objects span{line-height:1.2}
+.bigword{font-size:clamp(2.6rem,11vw,4rem);font-weight:700;color:var(--ink);letter-spacing:.06em;margin:6px 0 10px}
+.bigword .miss{color:var(--red)}
+.pict{font-size:clamp(4rem,18vw,6rem);line-height:1.1;margin:4px 0 8px}
+.hak{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:8px 0 12px}
+.hak span{border:3px solid var(--ink);border-radius:12px;padding:6px 16px;font-size:2.2rem;font-weight:700;background:var(--paper)}
+.zin{font-size:clamp(1.5rem,6vw,2.1rem);font-weight:700;color:var(--ink);margin:10px 0}
+.hint-area{margin:4px 0 12px}
+.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:10px}
+.choice{border:3px solid var(--ink);background:var(--paper);border-radius:14px;
+  font-size:clamp(2rem,8vw,2.8rem);font-weight:700;padding:14px 8px;min-height:84px;box-shadow:4px 4px 0 var(--shadow);transition:background .15s}
+.choice.small{font-size:clamp(1.3rem,5vw,1.7rem)}
+.choice.pics{font-size:clamp(2.2rem,9vw,3rem)}
+.choice:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shadow)}
+.choice.goed{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.choice.fout{background:var(--wrong-bg);opacity:.55;animation:shake .35s}
+.choice.wijs{border-color:var(--green);animation:wijs 1s ease-in-out infinite}
+@keyframes wijs{50%{box-shadow:0 0 0 6px var(--sun),4px 4px 0 var(--shadow)}}
+.choice:disabled{cursor:default}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+.fb-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;min-height:56px;position:relative}
+.fb-row .mascot{width:52px;height:52px;flex:none}
+.feedback{font-weight:700;font-size:1.2rem;text-align:left}
+.feedback.ok{color:var(--green)} .feedback.no{color:var(--red)}
+.xp-pop{position:absolute;right:10%;top:0;font-weight:700;color:var(--sun-edge);font-size:1.4rem;animation:pop 1s ease forwards;pointer-events:none}
+@keyframes pop{0%{opacity:0;transform:translateY(10px) scale(.6)}20%{opacity:1;transform:translateY(0) scale(1.1)}100%{opacity:0;transform:translateY(-30px)}}
+.tip{margin:12px auto 0;max-width:520px;text-align:left;background:var(--paper);border:2.5px solid var(--sun-edge);
+  border-left-width:8px;border-radius:12px;padding:10px 14px;font-size:1.1rem;display:flex;gap:10px;align-items:flex-start}
+.tip .tip-ic{font-size:1.3rem}
+.tip .again{margin-left:auto;flex:none;padding:4px 10px;font-size:1rem}
+
+/* Splitshuis */
+.huis{display:inline-grid;width:min(260px,80%);margin:4px auto 10px}
+.dak{background:var(--red);color:#fff;font-size:3rem;font-weight:700;height:100px;
+  clip-path:polygon(50% 0,100% 100%,0 100%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px}
+.kamers{display:grid;grid-template-columns:1fr 1fr;border:3px solid var(--ink);border-top:0}
+.kamer{font-size:3rem;font-weight:700;padding:10px 0;color:var(--ink)}
+.kamer+.kamer{border-left:3px solid var(--ink)}
+.kamer.vraag{color:var(--red)}
+
+/* Result */
+.result{text-align:center}
+.result .mascot{width:110px;height:110px;margin:0 auto}
+.big-stars{font-size:3.2rem;letter-spacing:8px;margin:4px 0;color:var(--sun)}
+.big-stars .off{color:var(--grid)}
+.big-stars span.pop-in{display:inline-block;animation:starin .5s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes starin{from{transform:scale(0) rotate(-90deg)}to{transform:scale(1)}}
+.result h2{font-size:1.9rem;margin:4px 0;color:var(--ink)}
+.result p{font-size:1.15rem;margin:4px 0 14px}
+.rewards{display:grid;gap:10px;margin:14px auto 18px;max-width:420px;text-align:left}
+.reward{display:flex;align-items:center;gap:12px;background:var(--paper);border:2.5px solid var(--ink);border-radius:12px;padding:8px 12px}
+.reward .ic{font-size:1.7rem;width:38px;text-align:center}
+.reward b{display:block}
+.reward small{color:var(--muted)}
+.row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.sticker-pack{width:150px;height:170px;margin:6px auto 4px;perspective:600px;cursor:pointer;border:0;background:none;padding:0}
+.sp-inner{position:relative;width:100%;height:100%;transition:transform .7s;transform-style:preserve-3d}
+.sticker-pack.open .sp-inner{transform:rotateY(180deg)}
+.sp-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;border:3px solid var(--ink);display:grid;place-items:center;box-shadow:4px 4px 0 var(--shadow)}
+.sp-front{background:repeating-linear-gradient(45deg,var(--curtain) 0 14px,#E0556A 14px 28px);color:#fff;font-size:3.4rem;font-weight:700}
+.sp-back{background:var(--tile);transform:rotateY(180deg);font-size:5rem}
+.sp-label{color:var(--muted);font-size:1rem;margin:4px 0 10px}
+
+/* Album & badges */
+.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:12px}
+.slot{aspect-ratio:1;border-radius:14px;border:2.5px dashed var(--soft);display:grid;place-items:center;font-size:2.6rem;background:var(--tile)}
+.slot.have{border:3px solid var(--ink);box-shadow:3px 3px 0 var(--shadow)}
+.slot.empty{color:var(--soft);font-size:1.4rem;font-weight:700}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.badge{background:var(--tile);border:3px solid var(--ink);border-radius:14px;padding:12px;text-align:center;box-shadow:3px 3px 0 var(--shadow)}
+.badge .ic{font-size:2.5rem}
+.badge b{display:block;margin-top:4px}
+.badge small{color:var(--muted);font-size:.9rem;line-height:1.3;display:block}
+.badge.locked{border-style:dashed;box-shadow:none;opacity:.6}
+.badge.locked .ic{filter:grayscale(1);opacity:.4}
+.counter{color:var(--muted);margin:-6px 0 14px}
+
+/* Kleurplaat */
+.palette{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.swatch{width:62px;height:62px;border-radius:50%;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--shadow);
+  font-weight:700;font-size:1.3rem;color:#1B2340;display:grid;place-items:center}
+.swatch[aria-pressed="true"]{outline:5px solid var(--sun);outline-offset:3px}
+.kleurbox{background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);padding:10px;box-shadow:5px 5px 0 var(--shadow)}
+.kleurbox svg{width:100%;height:auto;display:block;touch-action:manipulation}
+.region{stroke:var(--ink);stroke-width:2.5;cursor:pointer;transition:fill .25s}
+.region.mis{animation:shake .35s}
+.rlabel{font-family:inherit;font-weight:700;font-size:15px;fill:#1B2340;pointer-events:none;text-anchor:middle}
+
+/* Toast & confetti */
+.toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top,0px));transform:translate(-50%,-150%);
+  background:var(--ink);color:var(--paper);padding:12px 20px;border-radius:14px;font-weight:700;font-size:1.15rem;
+  z-index:20;transition:transform .4s cubic-bezier(.3,1.4,.5,1);box-shadow:4px 4px 0 var(--sun)}
+.toast.show{transform:translate(-50%,0)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:15;width:100%;height:100%}
+
+.clock-face{fill:var(--tile);stroke:var(--ink);stroke-width:6}
+.clock-num{fill:var(--text);font-size:17px;font-weight:700;font-family:inherit}
+.tick{stroke:var(--muted);stroke-width:2}
+.hand-h{stroke:var(--ink);stroke-width:8;stroke-linecap:round}
+.hand-m{stroke:var(--red);stroke-width:5;stroke-linecap:round}
+.line-axis{stroke:var(--ink);stroke-width:3}
+.line-tick{stroke:var(--ink);stroke-width:2}
+.line-lab{fill:var(--text);font-size:15px;font-weight:700;font-family:inherit}
+.arrow{fill:var(--red)}
+.jump{fill:none;stroke:var(--sun-edge);stroke-width:3}
+.jump-b{fill:none;stroke:var(--red);stroke-width:3}
+.dot{fill:var(--ink)}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:420px){
+  .tiles{grid-template-columns:1fr 1fr;gap:12px}
+  .tile{padding:10px}
+  .collect{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="toast" id="toast" role="status"></div>
+<main class="wrap">
+
+<!-- HOME -->
+<section id="home">
+  <div class="stats" id="stats"></div>
+  <header class="hero">
+    <svg class="stage" id="stageSvg" viewBox="0 0 400 150" role="img" aria-label="Podium met spotlight"></svg>
+    <div class="hero-text">
+      <h1>Sterre</h1>
+      <div class="bubble" id="homeBubble">Hoi! Spot aan, we beginnen!</div>
+      <p class="lead">Oefenen met rekenen en lezen in groep 3.</p>
+    </div>
+  </header>
+  <div id="groups"></div>
+
+  <div class="collect">
+    <button class="tile" id="albumBtn"><span class="big">📒</span><b>Stickerboek</b><span class="sub" id="albumSub"></span></button>
+    <button class="tile" id="badgeBtn"><span class="big">🏅</span><b>Medailles</b><span class="sub" id="badgeSub"></span></button>
+  </div>
+
+  <div class="settings">
+    <button class="toggle" id="readToggle" aria-pressed="false">🔊 Vragen voorlezen</button>
+    <button class="toggle" id="soundToggle" aria-pressed="true">🎵 Geluidjes</button>
+    <button class="toggle" id="backupBtn">💾 Voortgang bewaren</button>
+    <button class="linkbtn" id="resetBtn">Voortgang wissen</button>
+  </div>
+  <p class="note">Elke oefening levert een sticker op. Dagdoel: 2 rondes per dag.</p>
+  <div class="backup" hidden id="backup">
+    <h3>Voortgang bewaren</h3>
+    <p>Bewaart de browser de voortgang niet? Kopieer dan deze code en bewaar hem, bijvoorbeeld in een notitie. Met "Herstel" zet je hem later terug.</p>
+    <textarea id="backupCode" readonly aria-label="Je bewaarcode"></textarea>
+    <div class="row" style="justify-content:flex-start">
+      <button class="btn" id="copyCode">Kopieer code</button>
+      <button class="btn" id="closeBackup">Sluiten</button>
+    </div>
+    <p style="margin:14px 0 6px">Een code terugzetten:</p>
+    <input id="restoreCode" placeholder="plak hier je code" aria-label="Code om te herstellen">
+    <button class="btn primary" id="restoreBtn">Herstel</button>
+  </div>
+</section>
+
+<!-- GAME -->
+<section id="game" hidden>
+  <div class="bar">
+    <button class="btn" id="stopBtn">← Stoppen</button>
+    <h2 id="gameTitle"></h2>
+    <button class="btn icon-only" id="speakBtn" aria-label="Lees de vraag voor">🔊</button>
+  </div>
+  <div class="progress" id="progress" aria-label="Voortgang"></div>
+  <div class="card">
+    <span class="combo" id="combo"></span>
+    <p class="prompt" id="prompt"></p>
+    <div id="visual"></div>
+    <div class="hint-area" id="hintArea"></div>
+    <div class="choices" id="choices"></div>
+    <div class="fb-row">
+      <div class="mascot" id="gameMascot"></div>
+      <div class="feedback" id="feedback" aria-live="polite">Kies het goede antwoord.</div>
+    </div>
+    <div class="tip" id="tip" hidden></div>
+  </div>
+</section>
+
+<!-- KLEURPLAAT -->
+<section id="kleur" hidden>
+  <div class="bar">
+    <button class="btn" id="kleurStop">← Stoppen</button>
+    <h2>Kleur het podium</h2>
+    <button class="toggle" id="vrijToggle" aria-pressed="false">Vrij kleuren</button>
+  </div>
+  <p id="kleurUitleg" style="margin:0 0 6px;color:var(--muted)">Reken de som uit, kies die kleur en tik op het vlak.</p>
+  <div class="palette" id="palette"></div>
+  <div class="kleurbox"><div id="kleurSvg"></div></div>
+  <div class="fb-row"><div class="mascot" id="kleurMascot"></div><div class="feedback" id="kleurFeedback">Kies een kleur om te beginnen.</div></div>
+</section>
+
+<!-- RESULT -->
+<section id="result" hidden>
+  <div class="card result">
+    <div class="mascot" id="resMascot"></div>
+    <div class="big-stars" id="resStars"></div>
+    <h2 id="resTitle"></h2>
+    <p id="resText"></p>
+    <button class="sticker-pack" id="pack" aria-label="Maak je nieuwe sticker open">
+      <div class="sp-inner"><div class="sp-face sp-front">?</div><div class="sp-face sp-back" id="packBack"></div></div>
+    </button>
+    <div class="sp-label" id="packLabel"></div>
+    <div class="rewards" id="rewards"></div>
+    <div class="row">
+      <button class="btn primary" id="againBtn">Nog een keer</button>
+      <button class="btn" id="homeBtn">Andere oefening</button>
+    </div>
+  </div>
+</section>
+
+<!-- ALBUM -->
+<section id="album" hidden>
+  <div class="bar"><button class="btn back">← Terug</button><h2>Stickerboek</h2></div>
+  <p class="counter" id="albumCount"></p>
+  <div class="album" id="albumGrid"></div>
+</section>
+
+<!-- BADGES -->
+<section id="badges" hidden>
+  <div class="bar"><button class="btn back">← Terug</button><h2>Medailles</h2></div>
+  <p class="counter" id="badgeCount"></p>
+  <div class="badges" id="badgeGrid"></div>
+</section>
+
+</main>
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const pick = arr => arr[rnd(0,arr.length-1)];
+const shuffle = arr => { for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; };
+const MIN = "\u2212";
+const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- storage ---------- */
+function load(k,f){ try{ const v=localStorage.getItem(k); return v===null?f:JSON.parse(v); }catch(e){ return f; } }
+function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+const FRESH = () => ({xp:0,streak:0,lastDay:null,day:null,dayCount:0,stickers:[],badges:[],rounds:0,correct:0,perfect:0,perfectBy:{},played:{},bestCombo:0,best:{}});
+let P = Object.assign(FRESH(), load("sterre-v1", null) || load("rekenrek-v2", {}) || {});
+function encodeP(){ try{ return btoa(encodeURIComponent(JSON.stringify(P))); }catch(e){ return ""; } }
+function decodeP(code){ try{ return JSON.parse(decodeURIComponent(atob(code.trim()))); }catch(e){ return null; } }
+function syncHash(){ try{ history.replaceState(null,"","#p="+encodeP()); }catch(e){} }
+const persist = () => { save("sterre-v1", P); syncHash(); };
+(function restoreFromHash(){
+  const m = location.hash.match(/^#p=(.+)$/);
+  if(!m) return;
+  const H = decodeP(m[1]);
+  if(H && typeof H.xp==="number" && H.xp >= (P.xp||0)) P = Object.assign(FRESH(), H);
+})();
+let autoRead = !!load("rekenrek-read", false);
+let soundOn = load("rekenrek-sound", true) !== false;
+
+const dayStr = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const today = () => dayStr(new Date());
+const yesterday = () => { const d=new Date(); d.setDate(d.getDate()-1); return dayStr(d); };
+const liveStreak = () => (P.lastDay===today()||P.lastDay===yesterday()) ? P.streak : 0;
+const todayCount = () => P.day===today() ? P.dayCount : 0;
+const DAILY_GOAL = 2;
+const need = L => 100 + 50*(L-1);
+function levelInfo(xp){ let L=1, rest=xp; while(rest>=need(L)){ rest-=need(L); L++; } return {L, rest, need:need(L)}; }
+
+/* ---------- speech ---------- */
+let nlVoice=null;
+function pickVoice(){ try{ const vs=speechSynthesis.getVoices(); nlVoice=vs.find(v=>/^nl(-|_)NL/i.test(v.lang))||vs.find(v=>/^nl/i.test(v.lang))||null; }catch(e){} }
+try{ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }catch(e){}
+function say(t,rate){ try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="nl-NL"; u.rate=rate||.9; if(nlVoice)u.voice=nlVoice; speechSynthesis.speak(u); }catch(e){} }
+const sayMath = t => say(String(t).replace(/\u2212/g," min ").replace(/\+/g," plus ").replace(/=/g," is "));
+
+/* ---------- sound ---------- */
+let actx=null;
+function audio(){ try{ if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==="suspended") actx.resume(); }catch(e){} return actx; }
+document.addEventListener("pointerdown", ()=>audio(), {once:false});
+function tone(f,start,dur,type,vol){
+  try{ const a=audio(); if(!a) return;
+    const t=a.currentTime+start, o=a.createOscillator(), g=a.createGain();
+    o.type=type||"sine"; o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol||.18,t+.02); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t+dur+.05);
+  }catch(e){}
+}
+const sfx = {
+  good(){ if(!soundOn) return; tone(660,0,.15,"triangle"); tone(990,.1,.25,"triangle"); },
+  combo(){ if(!soundOn) return; [660,830,990,1320].forEach((f,i)=>tone(f,i*.07,.18,"triangle",.14)); },
+  bad(){ if(!soundOn) return; tone(330,0,.14,"sine",.14); tone(247,.13,.28,"sine",.14); },
+  fanfare(){ if(!soundOn) return; [523,659,784,1047,784,1047].forEach((f,i)=>tone(f,i*.12,i===5?.5:.16,"triangle",.16)); },
+  pop(){ if(!soundOn) return; tone(880,0,.08,"square",.08); tone(1320,.06,.2,"triangle",.14); },
+  paint(){ if(!soundOn) return; tone(520+rnd(0,300),0,.12,"triangle",.12); }
+};
+
+/* ---------- mascot: Sterre de ster ---------- */
+function starPath(cx,cy,R,r){
+  let d="";
+  for(let i=0;i<10;i++){ const rad=(i%2?r:R), a=(i*36-90)*Math.PI/180;
+    d += (i?"L":"M")+(cx+rad*Math.cos(a)).toFixed(1)+" "+(cy+rad*Math.sin(a)).toFixed(1)+" "; }
+  return d+"Z";
+}
+function mascot(mood){
+  let eyes = `<circle class="m-eye" cx="41" cy="50" r="4.5"/><circle class="m-eye" cx="59" cy="50" r="4.5"/>`, mouth, extra="";
+  if(mood==="juich"){ eyes=`<path class="m-mouth" d="M36 50 q5 -6 10 0 M54 50 q5 -6 10 0"/>`; mouth=`<path d="M40 60 q10 14 20 0 z" fill="#1B2340"/>`; extra=`<path d="M14 26 l4 8 8 4 -8 4 -4 8 -4 -8 -8 -4 8 -4z" fill="var(--sun)"/>`; }
+  else if(mood==="denk"){ mouth=`<path class="m-mouth" d="M44 62 q6 -3 12 0"/>`; }
+  else { mouth=`<path class="m-mouth" d="M41 59 q9 9 18 0"/>`; }
+  return `<svg viewBox="0 0 100 100" role="img" aria-label="Sterre">${extra}
+    <path class="m-body" d="${starPath(50,52,46,20)}"/>
+    <circle class="m-cheek" cx="33" cy="60" r="4.5"/><circle class="m-cheek" cx="67" cy="60" r="4.5"/>
+    ${eyes}${mouth}</svg>`;
+}
+function setMascot(el,mood,anim){ el.innerHTML=mascot(mood); if(anim&&!reduceMotion) el.firstElementChild.classList.add(anim); }
+
+/* ---------- podium hero ---------- */
+function buildStage(){
+  $("stageSvg").innerHTML = `
+    <rect x="0" y="0" width="400" height="150" fill="var(--ink)"/>
+    <path d="M200 -10 L120 150 L280 150 Z" fill="var(--sun)" opacity="0.28"/>
+    <g transform="translate(168,52) scale(0.62)">${mascot("juich")}</g>
+    <rect x="0" y="126" width="400" height="24" fill="var(--curtain)" opacity=".55"/>
+    <path d="M0 0 h70 q-14 75 4 150 H0 Z" fill="var(--curtain)"/>
+    <path d="M400 0 h-70 q14 75 -4 150 H400 Z" fill="var(--curtain)"/>
+    <path d="M0 0 h400 v18 q-100 26 -200 4 Q100 4 0 22 Z" fill="var(--curtain)"/>`;
+}
+
+/* ---------- getallenlijn met sprongen ---------- */
+function lineSVG(a,b,back){
+  const X = i => 24+i*19.5;
+  let s = `<svg viewBox="0 0 440 130" width="440" role="img" aria-label="Getallenlijn met sprongen"><line class="line-axis" x1="14" y1="92" x2="428" y2="92"/>`;
+  for(let i=0;i<=20;i++){ const big=i%5===0;
+    s += `<line class="line-tick" x1="${X(i)}" y1="${big?82:86}" x2="${X(i)}" y2="${big?102:98}"/>`;
+    if(big) s += `<text class="line-lab" x="${X(i)}" y="122" text-anchor="middle">${i}</text>`; }
+  const n = Math.min(b,12);
+  for(let j=0;j<n;j++){
+    const from = back ? a-j : a+j, to = back ? from-1 : from+1;
+    const x1=X(from), x2=X(to), mid=(x1+x2)/2;
+    s += `<path class="${back?"jump-b":"jump"}" d="M${x1} 88 Q${mid} ${58} ${x2} 88"/>`;
+  }
+  s += `<circle class="dot" cx="${X(a)}" cy="92" r="5"/><circle class="dot" cx="${X(back?a-b:a+b)}" cy="92" r="5" fill="var(--red)"/>`;
+  return s+`</svg>`;
+}
+
+/* ---------- choices ---------- */
+function numChoices(ans,lo,hi){
+  const set=new Set([ans]);
+  for(const v of shuffle([ans-1,ans+1,ans-2,ans+2,ans+10,ans-10]).filter(v=>v>=lo&&v<=hi)){ if(set.size>=4) break; set.add(v); }
+  let g=0; while(set.size<4&&g++<100) set.add(rnd(lo,hi));
+  return shuffle([...set]).map(v=>({label:String(v), value:v}));
+}
+function fromList(ans, all, n){
+  const set=new Set([ans]);
+  for(const v of shuffle(all.slice())){ if(set.size>=(n||4)) break; set.add(v); }
+  return shuffle([...set]);
+}
+
+/* ================= REKENEN ================= */
+const ITEMS = ["🍎","⭐","🐝","🌼","🚗","🐟","🎈","🍓"];
+function genTellen(){
+  const n=rnd(3,20), it=pick(ITEMS);
+  const cells = Array.from({length:n},()=>`<span>${it}</span>`).join("");
+  return {key:"t"+n+it, prompt:"Hoeveel zie je?", speak:"Hoeveel zie je?",
+    visual:`<div class="objects">${cells}</div>`, answer:n, choices:numChoices(n,1,20),
+    explain:v=>`${v} is te ${v<n?"weinig":"veel"}. Tel per rijtje van 5: 5, 10, 15 … en tel dan de laatste er los bij.`,
+    solution: n>5 ? `${Math.floor(n/5)*5} en nog ${n%5} is ${n}.` : `Het zijn er ${n}.`};
+}
+function genSplits(){
+  const n=rnd(3,10), a=rnd(1,n-1), b=n-a, left=Math.random()<.5, known=left?a:b, ans=left?b:a;
+  return {key:`s${n}-${a}-${left}`, prompt:`Splits ${n}. Wat hoort in het lege vak?`, speak:`${n} is ${known} en hoeveel?`,
+    visual:`<div class="huis"><div class="dak">${n}</div><div class="kamers">${left?`<div class="kamer">${a}</div><div class="kamer vraag">?</div>`:`<div class="kamer vraag">?</div><div class="kamer">${b}</div>`}</div></div>`,
+    answer:ans, choices:numChoices(ans,0,n),
+    explain:v=>`${known} en ${v} is samen ${known+v}. Dat is ${known+v>n?"meer dan":"nog geen"} ${n}. Tel vanaf ${known} verder tot ${n}.`,
+    solution:`${known} en ${ans} is samen ${n}.`};
+}
+function genPlus(max){
+  let a,b;
+  if(max===10){ a=rnd(1,8); b=rnd(1,10-a); } else { const sum=rnd(11,20); a=rnd(Math.max(1,sum-10),Math.min(sum-1,15)); b=sum-a; }
+  const ans=a+b;
+  return {key:`p${a}+${b}`, prompt:"Hoeveel is het samen?", speak:`Hoeveel is ${a} plus ${b}?`,
+    visual:`<div class="sum">${a} + ${b} = <span class="q">?</span></div>`, hint:lineSVG(a,b,false),
+    answer:ans, choices:numChoices(ans,0,max),
+    explain:v=>{
+      if(v===a-b && b>0) return "Let op het teken: + betekent erbij. Het wordt dus meer.";
+      if(v<a) return `Het moet meer zijn dan ${a}, want er komt iets bij.`;
+      if(Math.abs(v-ans)===1) return `Bijna, je zit er 1 naast. Begin bij ${a} en spring er precies ${b} bij.`;
+      if(a<10&&ans>10) return `Tip: maak eerst de 10 vol. ${a} + ${10-a} = 10, en dan nog ${b-(10-a)} erbij.`;
+      return `Begin bij ${a} op de getallenlijn en spring ${b} vooruit.`;
+    },
+    solution:(a<10&&ans>10) ? `${a} + ${10-a} = 10, en 10 + ${b-(10-a)} = ${ans}. Dus ${a} + ${b} = ${ans}.` : `Vanaf ${a} spring je ${b} vooruit. Dus ${a} + ${b} = ${ans}.`};
+}
+function genMin(max){
+  let a,b;
+  if(max===10){ a=rnd(3,10); b=rnd(1,a-1); } else { a=rnd(11,20); b=rnd(1,Math.min(a-1,12)); }
+  const ans=a-b;
+  return {key:`m${a}-${b}`, prompt:"Hoeveel blijft er over?", speak:`Hoeveel is ${a} min ${b}?`,
+    visual:`<div class="sum">${a} ${MIN} ${b} = <span class="q">?</span></div>`, hint:lineSVG(a,b,true),
+    answer:ans, choices:numChoices(ans,0,max),
+    explain:v=>{
+      if(v===a+b) return `Let op het teken: ${MIN} betekent eraf. Het wordt dus minder.`;
+      if(v>a) return `Het moet minder zijn dan ${a}, want er gaat iets af.`;
+      if(Math.abs(v-ans)===1) return `Bijna, je zit er 1 naast. Spring precies ${b} terug vanaf ${a}.`;
+      if(a>10&&ans<10) return `Tip: spring eerst ${a-10} terug, dan sta je op 10. Spring daarna nog ${b-(a-10)} terug.`;
+      return `Begin bij ${a} op de getallenlijn en spring ${b} terug.`;
+    },
+    solution:(a>10&&ans<10) ? `${a} ${MIN} ${a-10} = 10, en 10 ${MIN} ${b-(a-10)} = ${ans}. Dus ${a} ${MIN} ${b} = ${ans}.` : `Vanaf ${a} spring je ${b} terug. Dus ${a} ${MIN} ${b} = ${ans}.`};
+}
+function genLijn(){
+  let n; do{ n=rnd(1,19); }while(n%5===0);
+  const X = i => 20+i*20;
+  let s=`<svg viewBox="0 0 440 110" width="440" role="img" aria-label="Getallenlijn van 0 tot 20 met een pijl"><line class="line-axis" x1="10" y1="70" x2="430" y2="70"/>`;
+  for(let i=0;i<=20;i++){ const big=i%5===0; s+=`<line class="line-tick" x1="${X(i)}" y1="${big?58:63}" x2="${X(i)}" y2="${big?82:77}"/>`; if(big) s+=`<text class="line-lab" x="${X(i)}" y="102" text-anchor="middle">${i}</text>`; }
+  s+=`<path class="arrow" d="M${X(n)} 55 l-9 -16 h6 v-22 h6 v22 h6 z"/></svg>`;
+  const L=Math.round(n/5)*5, d=Math.abs(n-L);
+  return {key:"l"+n, prompt:"Welk getal hoort bij de pijl?", speak:"Welk getal hoort bij de pijl?", visual:s, answer:n, choices:numChoices(n,1,19),
+    explain:v=>`${v} is te ${v<n?"klein":"groot"}. De pijl staat vlakbij ${L}. Tel de streepjes vanaf ${L}.`,
+    solution:`De pijl staat ${d} ${d===1?"streepje":"streepjes"} ${n>L?"na":"voor"} ${L}. Dat is ${n}.`};
+}
+const timeLabel = (h,half) => half ? `half ${h%12+1}` : `${h} uur`;
+function clockSVG(h,half){
+  const ha=(h%12)*30+(half?15:0), ma=half?180:0;
+  let s=`<svg viewBox="0 0 200 200" width="200" role="img" aria-label="Klok"><circle class="clock-face" cx="100" cy="100" r="92"/>`;
+  for(let i=0;i<12;i++){ const a=i*30*Math.PI/180; s+=`<line class="tick" x1="${100+80*Math.sin(a)}" y1="${100-80*Math.cos(a)}" x2="${100+86*Math.sin(a)}" y2="${100-86*Math.cos(a)}"/>`; }
+  for(let i=1;i<=12;i++){ const a=i*30*Math.PI/180; s+=`<text class="clock-num" x="${100+66*Math.sin(a)}" y="${100-66*Math.cos(a)+6}" text-anchor="middle">${i}</text>`; }
+  return s+`<line class="hand-h" x1="100" y1="100" x2="100" y2="54" transform="rotate(${ha} 100 100)"/><line class="hand-m" x1="100" y1="100" x2="100" y2="30" transform="rotate(${ma} 100 100)"/><circle cx="100" cy="100" r="6" fill="var(--ink)"/></svg>`;
+}
+function timeChoices(h,half){
+  const key=`${h}-${half}`, opts=new Map([[key,timeLabel(h,half)]]);
+  for(const [th,tf] of shuffle([[h,!half],[h%12+1,!half],[h%12+1,half],[(h+10)%12+1,half]])){ if(opts.size>=4) break; opts.set(`${th}-${tf}`,timeLabel(th,tf)); }
+  while(opts.size<4){ const th=rnd(1,12), tf=Math.random()<.5; opts.set(`${th}-${tf}`,timeLabel(th,tf)); }
+  return {key, choices:shuffle([...opts].map(([value,label])=>({value,label})))};
+}
+function genKlok(){
+  const h=rnd(1,12), half=Math.random()<.5, c=timeChoices(h,half);
+  return {key:"k"+c.key, prompt:"Hoe laat is het?", speak:"Hoe laat is het?", visual:clockSVG(h,half), answer:c.key, small:true, choices:c.choices,
+    explain:v=>{
+      const vhalf = v.split("-")[1]==="true";
+      if(half&&!vhalf) return "Kijk naar de grote wijzer. Die staat onderaan, op de 6. Dan is het half.";
+      if(!half&&vhalf) return "Kijk naar de grote wijzer. Die staat bovenaan, op de 12. Dan is het een heel uur.";
+      if(half) return `Bij half kijk je naar het getal waar de kleine wijzer naartoe gaat. Hij staat tussen de ${h} en de ${h%12+1}.`;
+      return "Kijk naar de kleine wijzer. Die wijst het uur aan.";
+    },
+    solution: half ? `De grote wijzer staat op de 6 en de kleine tussen de ${h} en de ${h%12+1}. Het is half ${h%12+1}.` : `De grote wijzer staat op de 12 en de kleine op de ${h}. Het is ${h} uur.`};
+}
+function genUur(){
+  const h=rnd(1,12), half=Math.random()<.5, later=Math.random()<.5;
+  const nh = later ? h%12+1 : (h+10)%12+1;
+  const c = timeChoices(nh,half);
+  const nu = timeLabel(h,half), straks = timeLabel(nh,half);
+  return {key:"u"+h+half+later, prompt:`Het is ${nu}. Hoe laat is het een uur ${later?"later":"eerder"}?`,
+    speak:`Het is ${nu}. Hoe laat is het een uur ${later?"later":"eerder"}?`,
+    visual:clockSVG(h,half), answer:c.key, small:true, choices:c.choices,
+    explain:v=>{
+      const [vh,vf]=v.split("-"), vhalf=vf==="true";
+      if(vhalf!==half) return `Een uur ${later?"later":"eerder"} blijft de grote wijzer op dezelfde plek staan. Het blijft dus ${half?"een half uur":"een heel uur"}.`;
+      if(v===`${h}-${half}`) return `Dat is de tijd van nu. Er moet ${later?"één uur bij":"één uur af"}.`;
+      return `Schuif de kleine wijzer ${later?"één getal vooruit":"één getal terug"}: van ${h} naar ${nh}.`;
+    },
+    solution:`De kleine wijzer schuift ${later?"vooruit":"terug"} van de ${h} naar de ${nh}. Een uur ${later?"later":"eerder"} is het ${straks}.`};
+}
+
+
+/* ---- winteroefeningen rekenen ---- */
+function genBuur(){
+  const n=rnd(1,19), na=Math.random()<.5, ans = na ? n+1 : n-1;
+  return {key:"bu"+n+na, prompt:`Welk getal komt ${na?"na":"voor"} de ${n}?`, speak:`Welk getal komt ${na?"na":"voor"} de ${n}?`,
+    visual:`<div class="sum">${na?`${n} , <span class="q">?</span>`:`<span class="q">?</span> , ${n}`}</div>`,
+    answer:ans, choices:numChoices(ans,0,20),
+    explain:v=>`Tel vanaf ${n} één ${na?"verder":"terug"}. ${v} is ${Math.abs(v-ans)} ernaast.`,
+    solution:`Na ${na?n:ans} komt ${na?ans:n}. Het antwoord is ${ans}.`};
+}
+function genVergelijk(){
+  let a=rnd(1,20), b=rnd(1,20); while(b===a) b=rnd(1,20);
+  const meer=Math.random()<.5, ans = meer ? Math.max(a,b) : Math.min(a,b);
+  return {key:`v${a}-${b}-${meer}`, prompt:`Welk getal is ${meer?"meer":"minder"}?`, speak:`Welk getal is ${meer?"meer":"minder"}: ${a} of ${b}?`,
+    visual:`<div class="sum">${a} &nbsp;of&nbsp; ${b}</div>`,
+    answer:ans, choices:shuffle([a,b]).map(v=>({label:String(v), value:v})),
+    explain:v=>`Denk aan de getallenlijn: hoe verder naar rechts, hoe meer. ${Math.max(a,b)} staat rechts van ${Math.min(a,b)}.`,
+    solution:`${Math.max(a,b)} is meer en ${Math.min(a,b)} is minder. Het antwoord is ${ans}.`};
+}
+function genSprong(){
+  const step=pick([2,2,5,10]), max = step===2?20:(step===5?50:100);
+  const len=4, startK = rnd(1, Math.max(1, max/step - len));
+  const reeks = Array.from({length:len},(_,i)=>(startK+i)*step);
+  const ans = (startK+len)*step;
+  const opts=new Set([ans, ans+step, ans-step, ans+1, ans-1]);
+  const choices = shuffle([...opts].filter(v=>v>0&&v<=max+step)).slice(0,4);
+  if(!choices.includes(ans)) choices[0]=ans;
+  return {key:"sp"+step+startK, prompt:`Tel verder met sprongen van ${step}.`, speak:`${reeks.join(", ")}. Welk getal komt er dan?`,
+    visual:`<div class="sum" style="font-size:clamp(2rem,9vw,3.2rem)">${reeks.join(" , ")} , <span class="q">?</span></div>`,
+    answer:ans, choices:shuffle(choices).map(v=>({label:String(v), value:v})),
+    explain:v=>`Elke keer komt er ${step} bij. Van ${reeks[len-1]} spring je naar ${ans}.`,
+    solution:`${reeks[len-1]} + ${step} = ${ans}.`};
+}
+function genOverTien(){
+  const a=rnd(6,9), b=rnd(11-a,9), eerst=10-a, rest=b-eerst;
+  return {key:`ot${a}+${b}`, prompt:"Maak eerst de tien vol. Welk getal hoort op het vraagteken?",
+    speak:`${a} plus ${b}. Eerst ${a} plus ${eerst} is 10, en dan nog hoeveel erbij?`,
+    visual:`<div class="sum" style="font-size:clamp(2rem,8vw,3rem)">${a} + ${b} = ${a} + ${eerst} + <span class="q">?</span></div>`,
+    answer:rest, choices:numChoices(rest,0,9),
+    explain:v=>`${a} + ${eerst} is 10. Van de ${b} heb je er al ${eerst} gebruikt. Hoeveel houd je er dan nog over?`,
+    solution:`${a} + ${eerst} = 10 en ${b} ${MIN} ${eerst} = ${rest}. Dus ${a} + ${b} = 10 + ${rest} = ${a+b}.`};
+}
+function genFamilie(){
+  const s=rnd(11,20), a=rnd(2,s-2), b=s-a, minsom=Math.random()<.5;
+  const vraag = minsom ? `${s} ${MIN} ${b}` : `${b} + ${a}`;
+  const ans = minsom ? a : s;
+  return {key:`f${a}-${b}-${minsom}`, prompt:"Je weet deze som al. Gebruik hem!", speak:`${a} plus ${b} is ${s}. Hoeveel is ${vraag}?`,
+    visual:`<div class="sum" style="font-size:clamp(1.8rem,7vw,2.6rem)">${a} + ${b} = ${s}<br>${vraag} = <span class="q">?</span></div>`,
+    answer:ans, choices:numChoices(ans,0,20),
+    explain:v=> minsom
+      ? `Er zijn ${b} bij gekomen, dus als je ze er weer afhaalt ben je terug bij ${a}.`
+      : `Je mag omdraaien: ${a} + ${b} is net zoveel als ${b} + ${a}.`,
+    solution: minsom ? `${s} ${MIN} ${b} = ${a}, want ${a} + ${b} = ${s}.` : `${b} + ${a} = ${s}, net als ${a} + ${b}.`};
+}
+const MUNT = {1:"#E4C06A",2:"#C9CBD3",5:"#9FC7E8",10:"#E7A86B"};
+function geldSVG(items){
+  let x=10, w=items.reduce((t,v)=>t+(v<=2?56:74),0)+20;
+  let s=`<svg viewBox="0 0 ${w} 70" width="${Math.min(w,420)}" role="img" aria-label="Geld">`;
+  items.forEach(v=>{
+    if(v<=2){ s+=`<circle cx="${x+24}" cy="35" r="23" fill="${MUNT[v]}" stroke="var(--ink)" stroke-width="2.5"/><text x="${x+24}" y="42" text-anchor="middle" class="rlabel">&euro;${v}</text>`; x+=56; }
+    else { s+=`<rect x="${x}" y="14" width="64" height="42" rx="6" fill="${MUNT[v]}" stroke="var(--ink)" stroke-width="2.5"/><text x="${x+32}" y="41" text-anchor="middle" class="rlabel">&euro;${v}</text>`; x+=74; }
+  });
+  return s+`</svg>`;
+}
+function genGeld(){
+  const munten=[], n=rnd(2,4);
+  let total=0, guard=0;
+  while(munten.length<n && guard++<40){
+    const v=pick([1,1,2,2,5,10]);
+    if(total+v<=20){ munten.push(v); total+=v; }
+  }
+  munten.sort((a,b)=>b-a);
+  let run=0; const stappen = munten.map(v=>(run+=v));
+  return {key:"g"+munten.join("-"), prompt:"Hoeveel geld is dit samen?", speak:"Hoeveel geld is dit samen?",
+    visual:geldSVG(munten), answer:total, choices:numChoices(total,1,20),
+    explain:v=>`Begin bij het grootste geldstuk en tel door: ${stappen.slice(0,2).map(t=>"\u20ac"+t).join(", ")} …`,
+    solution:`Doortellen geeft ${stappen.map(t=>"\u20ac"+t).join(", ")}. Samen \u20ac${total}.`};
+}
+
+/* ================= TAAL: Lijn 3, thema 2 ================= */
+/* letters thema 1: r d k n s i e aa | thema 2: b oo m ee t a ie */
+const WORDS = [
+  {w:"boom", p:"🌳", k:["b","oo","m"]},
+  {w:"boot", p:"⛵", k:["b","oo","t"]},
+  {w:"beer", p:"🐻", k:["b","ee","r"]},
+  {w:"mier", p:"🐜", k:["m","ie","r"]},
+  {w:"maan", p:"🌙", k:["m","aa","n"]},
+  {w:"kat",  p:"🐱", k:["k","a","t"]},
+  {w:"roos", p:"🌹", k:["r","oo","s"]},
+  {w:"noot", p:"🌰", k:["n","oo","t"]},
+  {w:"bed",  p:"🛏️", k:["b","e","d"]},
+  {w:"mes",  p:"🔪", k:["m","e","s"]},
+  {w:"raam", p:"🪟", k:["r","aa","m"]},
+  {w:"tas",  p:"👜", k:["t","a","s"]},
+  {w:"rat",  p:"🐀", k:["r","a","t"]},
+  {w:"kaas", p:"🧀", k:["k","aa","s"]},
+  {w:"been", p:"🦵", k:["b","ee","n"]}
+];
+const WORDS3 = [
+  {w:"boek", p:"\ud83d\udcd6", k:["b","oe","k"]},
+  {w:"poes", p:"\ud83d\udc08", k:["p","oe","s"]},
+  {w:"koek", p:"\ud83c\udf6a", k:["k","oe","k"]},
+  {w:"bal",  p:"\u26bd", k:["b","a","l"]},
+  {w:"pen",  p:"\ud83d\udd8a\ufe0f", k:["p","e","n"]},
+  {w:"hoed", p:"\ud83c\udfa9", k:["h","oe","d"]},
+  {w:"pop",  p:"\ud83e\udea9", k:["p","o","p"]},
+  {w:"bus",  p:"\ud83d\ude8c", k:["b","u","s"]},
+  {w:"kip",  p:"\ud83d\udc14", k:["k","i","p"]},
+  {w:"sok",  p:"\ud83e\udde6", k:["s","o","k"]},
+  {w:"lip",  p:"\ud83d\udc44", k:["l","i","p"]},
+  {w:"doos", p:"\ud83d\udce6", k:["d","oo","s"]},
+  {w:"peer", p:"\ud83c\udf50", k:["p","ee","r"]}
+];
+const WORDS4 = [
+  {w:"vis",  p:"\ud83d\udc1f", k:["v","i","s"]},
+  {w:"zon",  p:"\u2600\ufe0f", k:["z","o","n"]},
+  {w:"muis", p:"\ud83d\udc2d", k:["m","ui","s"]},
+  {w:"geit", p:"\ud83d\udc10", k:["g","ei","t"]},
+  {w:"vuur", p:"\ud83d\udd25", k:["v","uu","r"]},
+  {w:"zaag", p:"\ud83e\ude9a", k:["z","aa","g"]},
+  {w:"wiel", p:"\ud83d\udede", k:["w","ie","l"]},
+  {w:"duif", p:"\ud83d\udd4a\ufe0f", k:["d","ui","f"]},
+  {w:"neus", p:"\ud83d\udc43", k:["n","eu","s"]},
+  {w:"deur", p:"\ud83d\udeaa", k:["d","eu","r"]},
+  {w:"vaas", p:"\ud83c\udffa", k:["v","aa","s"]},
+  {w:"zeep", p:"\ud83e\uddfc", k:["z","ee","p"]}
+];
+const LEVELS = {
+  2:{titel:"Thema 2", letters:"b, oo, m, ee, t, a, ie", pool:()=>WORDS},
+  3:{titel:"Thema 3", letters:"l, u, o, p, oe, h, ei", pool:()=>WORDS.concat(WORDS3)},
+  4:{titel:"Winter (thema 4-6)", letters:"w, g, f, v, z, ij, ui, eu, uu", pool:()=>WORDS.concat(WORDS3, WORDS4)}
+};
+if(!P.taalLevel) P.taalLevel = 2;
+const poolWords = () => (LEVELS[P.taalLevel]||LEVELS[2]).pool();
+const BEGIN = ["b","m","k","r","n","t","d","s","p","l","h","v","z","w","g"];
+const KLANK = ["oo","aa","ee","ie","a","e","i","oe","o","u","ei","ui","eu","uu"];
+const speakLetter = l => ({oo:"oo",aa:"aa",ee:"ee",ie:"ie"}[l] || l);
+
+function genEersteLetter(){
+  const POOL=poolWords(), W=pick(POOL), ans=W.k[0];
+  return {key:"e"+W.w, prompt:"Met welke letter begint dit woord?", speak:`${W.w}. Met welke letter begint ${W.w}?`,
+    visual:`<div class="pict">${W.p}</div>`, answer:ans, small:true,
+    choices: fromList(ans, BEGIN).map(l=>({label:l, value:l})),
+    explain:v=>`Zeg het woord langzaam: ${W.w}. Je hoort aan het begin de ${speakLetter(ans)}, niet de ${speakLetter(v)}.`,
+    solution:`${W.w} begint met de ${speakLetter(ans)}.`};
+}
+function genHakPlak(){
+  const POOL=poolWords(), W=pick(POOL);
+  const others = shuffle(POOL.filter(x=>x.w!==W.w)).slice(0,3);
+  return {key:"h"+W.w, prompt:"Plak de letters aan elkaar. Welk woord is het?",
+    speak:`${W.k.map(speakLetter).join(", ")}. Welk woord is dat?`,
+    visual:`<div class="hak">${W.k.map(l=>`<span>${l}</span>`).join("")}</div>`,
+    answer:W.w, pics:true,
+    choices: shuffle([W,...others]).map(x=>({label:x.p, value:x.w})),
+    explain:v=>`Zeg de letters achter elkaar: ${W.k.join(" - ")}. Dan hoor je ${W.w}.`,
+    solution:`${W.k.join(" - ")} is ${W.w}.`};
+}
+function genWoordBijPlaat(){
+  const POOL=poolWords(), W=pick(POOL);
+  const pool = shuffle(POOL.filter(x=>x.w!==W.w && x.w[0]===W.w[0])).concat(shuffle(POOL.filter(x=>x.w!==W.w)));
+  const seen=new Set(), others=[];
+  for(const x of pool){ if(others.length>=3) break; if(seen.has(x.w)) continue; seen.add(x.w); others.push(x); }
+  return {key:"w"+W.w, prompt:"Welk woord hoort bij het plaatje?", speak:"Welk woord hoort bij het plaatje?",
+    visual:`<div class="pict">${W.p}</div>`, answer:W.w, small:true,
+    choices: shuffle([W,...others]).map(x=>({label:x.w, value:x.w})),
+    explain:v=>`Lees allebei de woorden goed: ${v} en ${W.w}. Kijk naar de middelste klank.`,
+    solution:`Dit is een ${W.w}: ${W.k.join(" - ")}.`};
+}
+function genKlankMist(){
+  const POOL=poolWords(), W=pick(POOL), ans=W.k[1];
+  const woord = `${W.k[0]}<span class="miss">__</span>${W.k[2]}`;
+  return {key:"km"+W.w, prompt:"Welke klank hoor je in het midden?", speak:`${W.w}. Welke klank hoor je in het midden van ${W.w}?`,
+    visual:`<div class="pict">${W.p}</div><div class="bigword">${woord}</div>`, answer:ans, small:true,
+    choices: fromList(ans, KLANK).map(l=>({label:l, value:l})),
+    explain:v=>`Rek het woord uit: ${W.k[0]}-${speakLetter(ans)}-${W.k[2]}. Je hoort in het midden de ${speakLetter(ans)}.`,
+    solution:`${W.w} schrijf je met ${speakLetter(ans)} in het midden: ${W.k.join(" - ")}.`};
+}
+
+function genBouw(){
+  const POOL=poolWords(), W=pick(POOL);
+  const extra = shuffle(KLANK.concat(BEGIN).filter(l=>!W.k.includes(l))).slice(0,2);
+  const tegels = shuffle(W.k.concat(extra));
+  return {key:"bw"+W.w, prompt:"Maak het woord met de letters.", speak:`${W.w}. Maak het woord ${W.w}.`,
+    visual:`<div class="pict">${W.p}</div>`, bouw:{woord:W.w, klanken:W.k, tegels},
+    explain:v=>`Zeg het woord langzaam: ${W.k.join(" - ")}. Welke klank hoor je eerst?`,
+    solution:`${W.w} schrijf je zo: ${W.k.join(" - ")}.`};
+}
+
+/* ================= KINDERBOEKENWEEK: Spot aan! ================= */
+const ZINNEN = [
+  {z:"de beer danst",         a:"🐻💃", f:["🐱💃","🐜💃"]},
+  {z:"de kat is in de boot",  a:"🐱⛵", f:["🐻⛵","🐱🌳"]},
+  {z:"de mier is een ster",   a:"🐜⭐", f:["🐻⭐","🐜🌹"]},
+  {z:"de beer eet kaas",      a:"🐻🧀", f:["🐀🧀","🐻🌰"]},
+  {z:"de rat is in bed",      a:"🐀🛏️", f:["🐱🛏️","🐀⛵"]},
+  {z:"de maan staat bij de boom", a:"🌙🌳", f:["⭐🌳","🌙🌹"]},
+  {z:"de kat en de roos",     a:"🐱🌹", f:["🐱🌰","🐜🌹"]},
+  {z:"de beer staat op de boot", a:"🐻⛵", f:["🐻🌳","🐜⛵"]}
+];
+const ZINNEN_WINTER = [
+  {z:"de poes eet koek",      a:"\ud83d\udc08\ud83c\udf6a", f:["\ud83d\udc3b\ud83c\udf6a","\ud83d\udc08\ud83c\udf50"]},
+  {z:"de kip is op de bal",   a:"\ud83d\udc14\u26bd", f:["\ud83d\udc14\ud83d\udce6","\ud83d\udc00\u26bd"]},
+  {z:"de rat is in de doos",  a:"\ud83d\udc00\ud83d\udce6", f:["\ud83d\udc31\ud83d\udce6","\ud83d\udc00\ud83c\udfa9"]},
+  {z:"de beer leest een boek",a:"\ud83d\udc3b\ud83d\udcd6", f:["\ud83d\udc31\ud83d\udcd6","\ud83d\udc3b\ud83c\udf6a"]},
+  {z:"de poes is in de bus",  a:"\ud83d\udc08\ud83d\ude8c", f:["\ud83d\udc14\ud83d\ude8c","\ud83d\udc08\ud83d\udce6"]},
+  {z:"de pop is op het bed",  a:"\ud83e\udea9\ud83d\udecf\ufe0f", f:["\ud83e\udea9\ud83d\udce6","\ud83d\udc3b\ud83d\udecf\ufe0f"]},
+  {z:"de kat heeft een hoed op", a:"\ud83d\udc31\ud83c\udfa9", f:["\ud83d\udc3b\ud83c\udfa9","\ud83d\udc31\ud83e\udde6"]},
+  {z:"de sok is in de tas",   a:"\ud83e\udde6\ud83d\udc5c", f:["\ud83e\udde6\ud83d\udce6","\ud83d\udd8a\ufe0f\ud83d\udc5c"]}
+];
+let zinQueue = [], winterQueue = [];
+function genZin(){
+  if(!winterQueue.length) winterQueue = shuffle(ZINNEN_WINTER.slice());
+  const Z = winterQueue.pop();
+  return {key:"wz"+Z.z, prompt:"Lees de zin. Welk plaatje hoort erbij?", speak:Z.z,
+    visual:`<div class="zin">\u201c${Z.z}\u201d</div>`, answer:Z.a, pics:true,
+    choices: shuffle([Z.a,...Z.f]).map(x=>({label:x, value:x})),
+    explain:v=>`Lees nog een keer, woord voor woord: ${Z.z}. Wijs elk woord aan met je vinger.`,
+    solution:`De zin zegt: ${Z.z}.`};
+}
+function genSpot(){
+  if(!zinQueue.length) zinQueue = shuffle(ZINNEN.slice());
+  const Z = zinQueue.pop();
+  return {key:"z"+Z.z, prompt:"Lees de zin. Welk plaatje hoort erbij?", speak:Z.z,
+    visual:`<div class="zin">“${Z.z}”</div>`, answer:Z.a, pics:true,
+    choices: shuffle([Z.a,...Z.f]).map(p=>({label:p, value:p})),
+    explain:v=>`Lees nog een keer, woord voor woord: ${Z.z}. Wijs elk woord aan met je vinger.`,
+    solution:`De zin zegt: ${Z.z}.`};
+}
+
+/* ================= KLEURPLAAT ================= */
+const COLORS = [
+  {n:1, naam:"rood",  hex:"#E0413F"},
+  {n:2, naam:"geel",  hex:"#FFC93C"},
+  {n:3, naam:"blauw", hex:"#3D6FD1"},
+  {n:4, naam:"bruin", hex:"#9A6134"},
+  {n:5, naam:"groen", hex:"#3FA86A"},
+  {n:6, naam:"roze",  hex:"#F08AB4"}
+];
+const REGIONS = [
+  {id:"lucht",  d:"M0 0 H400 V230 H0 Z", sum:"1+2", n:3, lx:140, ly:52},
+  {id:"bundel", d:"M200 10 L110 230 L290 230 Z", sum:"1+1", n:2, lx:200, ly:170},
+  {id:"ster",   d:"", star:[200,70,34,15], sum:"6"+MIN+"4", n:2, lx:200, ly:76},
+  {id:"vloer",  d:"M0 230 H400 V300 H0 Z", sum:"2+2", n:4, lx:200, ly:288},
+  {id:"gordL",  d:"M0 0 H90 Q76 150 86 300 H0 Z", sum:"3"+MIN+"2", n:1, lx:42, ly:150},
+  {id:"gordR",  d:"M400 0 H310 Q324 150 314 300 H400 Z", sum:"5"+MIN+"4", n:1, lx:358, ly:150},
+  {id:"jurk",   d:"M200 175 L170 250 H230 Z", sum:"1+4", n:5, lx:200, ly:232},
+  {id:"hoofd",  d:"M200 140 m-22 0 a22 22 0 1 0 44 0 a22 22 0 1 0 -44 0", sum:"3+3", n:6, lx:200, ly:146}
+];
+function kleurSVG(){
+  let s=`<svg viewBox="0 0 400 300" role="img" aria-label="Kleurplaat van een podium">`;
+  REGIONS.forEach(r=>{
+    const d = r.star ? starPath(r.star[0],r.star[1],r.star[2],r.star[3]) : r.d;
+    s += `<path class="region" id="reg-${r.id}" data-id="${r.id}" data-n="${r.n}" d="${d}" fill="var(--tile)" tabindex="0" role="button" aria-label="Vlak met som ${r.sum}"/>`;
+  });
+  REGIONS.forEach(r=>{ s += `<text class="rlabel" id="lab-${r.id}" x="${r.lx}" y="${r.ly}">${r.sum}</text>`; });
+  return s+`</svg>`;
+}
+
+/* ---------- activiteiten ---------- */
+const GROUPS = [
+  {title:"Rekenen", sub:"tellen, sommen, getallenlijn en de klok", acts:[
+    {id:"tellen", title:"Tellen", sub:"tot 20", icon:"🍎", gen:genTellen},
+    {id:"splitsen", title:"Splitsen", sub:"tot 10", icon:"🏠", gen:genSplits},
+    {id:"plus10", title:"Plussommen", sub:"tot 10", icon:"3+4", gen:()=>genPlus(10)},
+    {id:"min10", title:"Minsommen", sub:"tot 10", icon:`8${MIN}3`, gen:()=>genMin(10)},
+    {id:"plus20", title:"Plussommen", sub:"tot 20", icon:"9+6", gen:()=>genPlus(20)},
+    {id:"min20", title:"Minsommen", sub:"tot 20", icon:`15${MIN}7`, gen:()=>genMin(20)},
+    {id:"lijn", title:"Getallenlijn", sub:"tot 20", icon:"📏", gen:genLijn},
+    {id:"klok", title:"Klokkijken", sub:"hele en halve uren", icon:"🕒", gen:genKlok},
+    {id:"uur", title:"Een uur later", sub:"later en eerder", icon:"⏩", gen:genUur}
+  ]},
+  {title:"Meer uitdaging", sub:"voor de rest van de winter: buurgetallen, sprongen, over de tien, omkeersommen en geld", acts:[
+    {id:"buur", title:"Buurgetallen", sub:"ervoor en erna", icon:"↔️", gen:genBuur},
+    {id:"vergelijk", title:"Meer of minder", sub:"vergelijken tot 20", icon:"⚖️", gen:genVergelijk},
+    {id:"sprong", title:"Sprongen tellen", sub:"van 2, 5 en 10", icon:"🦘", gen:genSprong},
+    {id:"overtien", title:"Over de tien", sub:"eerst de 10 vol", icon:"🔟", gen:genOverTien},
+    {id:"familie", title:"Omkeersommen", sub:"somfamilies", icon:"🔁", gen:genFamilie},
+    {id:"geld", title:"Geld tellen", sub:"tot 20 euro", icon:"💶", gen:genGeld}
+  ]},
+  {id:"taal", title:"Taal", sub:"letters en woorden bij Lijn 3 — kies hieronder welke letters ze al kent", acts:[
+    {id:"letter1", title:"Eerste letter", sub:"welke hoor je?", icon:"🅱️", gen:genEersteLetter},
+    {id:"hakplak", title:"Hak en plak", sub:"b-oo-m", icon:"🧩", gen:genHakPlak},
+    {id:"woordplaat", title:"Woord zoeken", sub:"woord bij plaatje", icon:"🔤", gen:genWoordBijPlaat},
+    {id:"klankmist", title:"Welke klank?", sub:"middelste klank", icon:"🎯", gen:genKlankMist},
+    {id:"bouw", title:"Maak het woord", sub:"zelf spellen", icon:"✏️", gen:genBouw},
+    {id:"zinnen", title:"Zinnen lezen", sub:"zin bij plaatje", icon:"📚", gen:genZin}
+  ]},
+  {title:"Kinderboekenweek: Spot aan!", sub:"30 september tot en met 11 oktober — zinnen lezen op het podium", acts:[
+    {id:"spot", title:"Spot aan!", sub:"lees de zin", icon:"🎭", gen:genSpot, count:8}
+  ]},
+  {title:"Spelen", sub:"even iets anders", acts:[
+    {id:"kleur", title:"Kleurplaat", sub:"kleur op som", icon:"🎨", kind:"kleur"}
+  ]}
+];
+const ALL_ACTS = GROUPS.flatMap(g=>g.acts);
+const findAct = id => ALL_ACTS.find(a=>a.id===id);
+
+/* ---------- stickers & medailles ---------- */
+const STICKERS = ["🦊","🐼","🐸","🐙","🦄","🐢","🦁","🐧","🐨","🐝","🦋","🐳","🐰","🐯","🐞","🦒","🐬","🦔","🦜","🐘","🎭","🎪","🎤","🎬"];
+const BADGES = [
+  {id:"eerste", ic:"🎈", t:"Eerste ronde", d:"Maak je eerste ronde af.", ok:()=>P.rounds>=1},
+  {id:"foutloos", ic:"💯", t:"Foutloos", d:"Een ronde in één keer helemaal goed.", ok:()=>P.perfect>=1},
+  {id:"combo5", ic:"⚡", t:"Vijf op rij", d:"5 vragen achter elkaar goed.", ok:()=>P.bestCombo>=5},
+  {id:"goed50", ic:"🌟", t:"50 goed", d:"50 vragen goed beantwoord.", ok:()=>P.correct>=50},
+  {id:"goed200", ic:"🚀", t:"200 goed", d:"200 vragen goed beantwoord.", ok:()=>P.correct>=200},
+  {id:"dag3", ic:"📆", t:"3 dagen op rij", d:"Oefen 3 dagen achter elkaar.", ok:()=>P.streak>=3},
+  {id:"dag7", ic:"🏆", t:"Een hele week", d:"Oefen 7 dagen achter elkaar.", ok:()=>P.streak>=7},
+  {id:"ontdekker", ic:"🧭", t:"Ontdekker", d:"Probeer alle oefeningen een keer.", ok:()=>ALL_ACTS.every(a=>P.played[a.id])},
+  {id:"letterheld", ic:"🔤", t:"Letterheld", d:"Een taaloefening foutloos.", ok:()=>["letter1","hakplak","woordplaat","klankmist"].some(i=>P.perfectBy[i])},
+  {id:"spotaan", ic:"🎭", t:"Spot aan!", d:"Maak het leesspel van de Kinderboekenweek af.", ok:()=>P.played.spot},
+  {id:"klokkijker", ic:"⏰", t:"Klokkenkenner", d:"Klokkijken foutloos.", ok:()=>P.perfectBy.klok||P.perfectBy.uur},
+  {id:"kunstenaar", ic:"🎨", t:"Kunstenaar", d:"Maak de kleurplaat helemaal af.", ok:()=>P.played.kleur},
+  {id:"winterbaas", ic:"❄️", t:"Winterbaas", d:"Een oefening uit Meer uitdaging foutloos.", ok:()=>["buur","vergelijk","sprong","overtien","familie","geld"].some(i=>P.perfectBy[i])},
+  {id:"speller", ic:"✏️", t:"Speller", d:"Maak het woord foutloos.", ok:()=>P.perfectBy.bouw},
+  {id:"album12", ic:"📒", t:"Half vol", d:"Verzamel 12 stickers.", ok:()=>P.stickers.length>=12},
+  {id:"album24", ic:"👑", t:"Album vol!", d:"Verzamel alle 24 stickers.", ok:()=>P.stickers.length>=STICKERS.length}
+];
+
+/* ---------- home ---------- */
+function starHTML(n,anim){ let s=""; for(let i=0;i<3;i++) s += i<n ? `<span class="${anim?"pop-in":""}" style="animation-delay:${i*.25}s">★</span>` : `<span class="off">★</span>`; return s; }
+function goalRing(n){
+  const p=Math.min(1,n/DAILY_GOAL), c=2*Math.PI*11;
+  return `<svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="var(--grid)" stroke-width="5"/><circle cx="15" cy="15" r="11" fill="none" stroke="${p>=1?"var(--green)":"var(--sun)"}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${c*p} ${c}" transform="rotate(-90 15 15)"/></svg>`;
+}
+const streakIcon = `<svg viewBox="0 0 30 30"><path d="M15 3 l3.2 6.6 7.3 1 -5.3 5.1 1.3 7.2 -6.5 -3.4 -6.5 3.4 1.3 -7.2 -5.3 -5.1 7.3 -1z" fill="var(--sun)" stroke="var(--sun-edge)" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+
+function renderHome(){
+  const lv=levelInfo(P.xp), sk=liveStreak(), tc=todayCount();
+  $("stats").innerHTML = `
+    <div class="chip streak ${sk?"":"off"}">${streakIcon}<span>${sk}</span><small>${sk===1?"dag":"dagen"} op rij</small></div>
+    <div class="chip level"><span class="lvl-badge">${lv.L}</span><span class="xpbar"><i style="width:${Math.round(lv.rest/lv.need*100)}%"></i></span><small>${lv.rest}/${lv.need}</small></div>
+    <div class="chip">${goalRing(tc)}<small>${Math.min(tc,DAILY_GOAL)}/${DAILY_GOAL} vandaag</small></div>`;
+  $("groups").innerHTML = GROUPS.map(g=>`
+    <h2 class="section-title">${g.title}</h2><p class="section-sub">${g.sub}</p>
+    ${g.id==="taal" ? `<div class="settings" id="taalLevel" style="margin:0 0 12px">${Object.keys(LEVELS).map(k=>
+      `<button class="toggle" data-lv="${k}" aria-pressed="${String(+k===P.taalLevel)}">${LEVELS[k].titel}</button>`).join("")}
+      <span class="sub" style="color:var(--muted);flex-basis:100%;font-size:.95rem">Nieuwe letters: ${LEVELS[P.taalLevel].letters}</span></div>` : ""}
+    <div class="tiles">${g.acts.map(a=>`
+      <button class="tile" data-id="${a.id}">
+        <span class="icon">${a.icon}</span><b>${a.title}</b><span class="sub">${a.sub}</span>
+        <span class="stars">${starHTML(P.best[a.id]||0)}</span>
+      </button>`).join("")}</div>`).join("");
+  $("albumSub").textContent = `${P.stickers.length} van ${STICKERS.length}`;
+  $("badgeSub").textContent = `${P.badges.length} van ${BADGES.length}`;
+  let msg = "Hoi! Spot aan, we beginnen!";
+  if(tc>=DAILY_GOAL) msg = "Je dagdoel is gehaald! Wil je nog meer oefenen?";
+  else if(tc===1) msg = "Nog 1 ronde voor je dagdoel!";
+  else if(sk>=2) msg = `Al ${sk} dagen op rij. Goed bezig!`;
+  $("homeBubble").textContent = msg;
+}
+function renderAlbum(){
+  $("albumCount").textContent = `Je hebt ${P.stickers.length} van de ${STICKERS.length} stickers.`;
+  $("albumGrid").innerHTML = STICKERS.map((s,i)=> P.stickers.includes(i) ? `<div class="slot have">${s}</div>` : `<div class="slot empty">${i+1}</div>`).join("");
+}
+function renderBadges(){
+  $("badgeCount").textContent = `Je hebt ${P.badges.length} van de ${BADGES.length} medailles.`;
+  $("badgeGrid").innerHTML = BADGES.map(b=>`<div class="badge ${P.badges.includes(b.id)?"":"locked"}"><div class="ic">${b.ic}</div><b>${b.t}</b><small>${b.d}</small></div>`).join("");
+}
+function show(id){ ["home","game","result","album","badges","kleur"].forEach(s=>$(s).hidden = s!==id); window.scrollTo(0,0); }
+function goHome(){ try{speechSynthesis.cancel();}catch(e){} renderHome(); show("home"); }
+
+/* ---------- quiz ---------- */
+let st=null;
+const praise=["Goed zo!","Knap!","Super!","Helemaal goed!","Top!","Wauw!"];
+function start(id){
+  const act=findAct(id);
+  if(act.kind==="kleur") return startKleur();
+  st={act, total:act.count||10, i:0, score:0, results:[], q:null, wrong:false, wrongCount:0, locked:false, lastKey:null, combo:0, maxCombo:0, xp:0};
+  $("gameTitle").textContent = `${act.title} — ${act.sub}`;
+  show("game"); next();
+}
+function renderProgress(){
+  $("progress").innerHTML = Array.from({length:st.total},(_,i)=>{ const r=st.results[i]; return `<span class="pdot ${r||""} ${i===st.i&&!r?"now":""}"></span>`; }).join("");
+}
+function next(){
+  if(st.i>=st.total) return finish();
+  let q,g=0; do{ q=st.act.gen(); }while(q.key===st.lastKey&&g++<20);
+  Object.assign(st,{q, lastKey:q.key, wrong:false, wrongCount:0, locked:false});
+  $("prompt").textContent = q.prompt;
+  if(q.bouw){
+    st.built=[];
+    $("visual").innerHTML = `<div class="visual" style="display:block">${q.visual}<div class="bigword" id="bouwVak">${bouwVak()}</div></div>`;
+  } else {
+    $("visual").innerHTML = `<div class="visual" style="display:block">${q.visual}</div>`;
+  }
+  $("hintArea").innerHTML = q.hint ? `<button class="btn" id="hintBtn">Laat de getallenlijn zien</button>` : "";
+  if(q.hint) $("hintBtn").onclick = ()=>{ $("hintArea").innerHTML = `<div class="visual">${q.hint}</div>`; };
+  $("choices").innerHTML = q.bouw
+    ? q.bouw.tegels.map((l,i)=>`<button class="choice small" data-l="${l}" data-i="${i}">${l}</button>`).join("")
+    : q.choices.map((c,i)=>`<button class="choice ${q.small?"small":""} ${q.pics?"pics":""}" data-idx="${i}">${c.label}</button>`).join("");
+  $("feedback").textContent = "Kies het goede antwoord."; $("feedback").className="feedback";
+  $("tip").hidden = true; $("tip").innerHTML = "";
+  setMascot($("gameMascot"),"denk");
+  renderProgress();
+  if(autoRead) say(q.speak);
+}
+function xpPop(n){ const el=document.createElement("span"); el.className="xp-pop"; el.textContent=`+${n}`; document.querySelector("#game .fb-row").appendChild(el); setTimeout(()=>el.remove(),1000); }
+function bouwVak(){
+  const k=st.q.bouw.klanken;
+  return k.map((x,i)=> i<st.built.length ? st.built[i] : '<span class="miss">__</span>').join(" ");
+}
+function choose(btn){
+  if(st.locked||btn.disabled) return;
+  const c=st.q.choices[+btn.dataset.idx];
+  if(c.value===st.q.answer) markGoed(btn); else markFout(btn, c.value);
+}
+function bouwKlik(btn){
+  if(st.locked||btn.disabled) return;
+  const q=st.q, l=btn.dataset.l, exp=q.bouw.klanken[st.built.length];
+  if(l===exp){
+    st.built.push(l); btn.disabled=true; btn.classList.add("goed");
+    $("bouwVak").innerHTML = bouwVak(); sfx.pop();
+    if(st.built.length===q.bouw.klanken.length) markGoed(null);
+  } else markFout(btn, l);
+}
+function markGoed(btn){
+  st.locked=true;
+  if(btn) btn.classList.add("goed");
+  st.results[st.i] = st.wrong ? "retry" : "first";
+  let gain;
+  if(!st.wrong){ st.score++; st.combo++; gain=10; } else { st.combo=0; gain = st.wrongCount===1?5:2; }
+  st.maxCombo=Math.max(st.maxCombo,st.combo);
+  const comboEl=$("combo");
+  if(st.combo>=3){ comboEl.textContent=`⚡ ${st.combo} op rij!`; comboEl.classList.add("show"); } else comboEl.classList.remove("show");
+  if(st.combo>0&&st.combo%5===0){ gain+=10; sfx.combo(); } else sfx.good();
+  st.xp+=gain; xpPop(gain); $("tip").hidden=true;
+  const p = (st.combo>=5&&st.combo%5===0) ? `${st.combo} op rij! Bonus!` : pick(praise);
+  $("feedback").textContent=p; $("feedback").className="feedback ok";
+  setMascot($("gameMascot"), st.combo>=3?"juich":"blij","bounce");
+  if(autoRead) say(p);
+  st.i++; renderProgress();
+  setTimeout(next,1100);
+}
+function markFout(btn, waarde){
+  const q=st.q;
+  btn.classList.add("fout"); st.wrong=true; st.combo=0; st.wrongCount++;
+  if(!q.bouw) btn.disabled=true; else setTimeout(()=>btn.classList.remove("fout"),400);
+  $("combo").classList.remove("show");
+  if(q.hint && $("hintBtn")) $("hintArea").innerHTML = `<div class="visual">${q.hint}</div>`;
+  let head,text;
+  if(st.wrongCount>=2){
+    if(q.bouw){
+      const goedeTegel=[...$("choices").children].find(b=>!b.disabled && b.dataset.l===q.bouw.klanken[st.built.length]);
+      if(goedeTegel) goedeTegel.classList.add("wijs");
+    } else {
+      const right=[...$("choices").children].find(b=>q.choices[+b.dataset.idx].value===q.answer);
+      if(right) right.classList.add("wijs");
+    }
+    head="Kijk, zo zit het."; text=`${q.solution} Tik op het goede antwoord.`;
+  } else { head="Bijna! Lees de tip."; text = q.explain ? q.explain(waarde) : "Probeer het nog eens."; }
+  $("feedback").textContent=head; $("feedback").className="feedback no";
+  const tip=$("tip");
+  tip.innerHTML = `<span class="tip-ic">💡</span><span>${text}</span><button class="btn again" aria-label="Lees de tip voor">🔊</button>`;
+  tip.hidden=false; tip.querySelector(".again").onclick=()=>sayMath(text);
+  setMascot($("gameMascot"),"denk","wobble");
+  sfx.bad();
+  if(autoRead) sayMath(text);
+}
+
+/* ---------- kleurplaat ---------- */
+let kl=null;
+function startKleur(){
+  kl={chosen:null, done:[], mis:0, vrij:false};
+  $("palette").innerHTML = COLORS.map(c=>`<button class="swatch" data-n="${c.n}" aria-pressed="false" style="background:${c.hex}" aria-label="${c.naam}, kleur ${c.n}">${c.n}</button>`).join("");
+  $("kleurSvg").innerHTML = kleurSVG();
+  $("kleurFeedback").textContent = "Kies een kleur om te beginnen.";
+  $("vrijToggle").setAttribute("aria-pressed","false");
+  setMascot($("kleurMascot"),"blij");
+  show("kleur");
+}
+function kleurKlik(el){
+  const id=el.dataset.id, n=+el.dataset.n;
+  if(!kl.chosen){ $("kleurFeedback").textContent="Kies eerst een kleur."; return; }
+  if(kl.done.includes(id)) return;
+  if(kl.vrij || kl.chosen===n){
+    el.style.fill = COLORS.find(c=>c.n===kl.chosen).hex;
+    const lab=$("lab-"+id); if(lab) lab.style.display="none";
+    if(!kl.done.includes(id)) kl.done.push(id);
+    sfx.paint();
+    $("kleurFeedback").textContent = kl.done.length>=REGIONS.length ? "Klaar! Wat een mooie voorstelling." : "Mooi! Kies het volgende vlak.";
+    setMascot($("kleurMascot"),"blij","bounce");
+    if(kl.done.length>=REGIONS.length) setTimeout(finishKleur,700);
+  } else {
+    el.classList.add("mis"); setTimeout(()=>el.classList.remove("mis"),400);
+    kl.mis++; sfx.bad();
+    const r=REGIONS.find(x=>x.id===id);
+    $("kleurFeedback").textContent = `${r.sum} is niet ${kl.chosen}. Reken de som nog eens uit.`;
+    setMascot($("kleurMascot"),"denk","wobble");
+  }
+}
+function finishKleur(){
+  const stars = kl.mis<=1 ? 3 : kl.mis<=4 ? 2 : 1;
+  finishRound({id:"kleur", title:"Kleurplaat"}, stars, kl.mis===0, `Je hebt het podium helemaal ingekleurd, met ${kl.mis} keer de verkeerde kleur.`, 60+Math.max(0,30-kl.mis*5));
+}
+
+/* ---------- afronden ---------- */
+function finish(){
+  const s=st.score, total=st.total, stars = s===total?3 : s>=total*0.8?2 : s>=total*0.5?1 : 0;
+  finishRound(st.act, stars, s===total, `${s} van de ${total} vragen in één keer goed.`, st.xp, total);
+}
+function finishRound(act, stars, perfect, text, baseXp, answered){
+  const lvBefore=levelInfo(P.xp).L, rewards=[];
+  let xp=baseXp;
+  P.rounds++; P.correct += (answered||0); P.played[act.id]=true;
+  if(st) P.bestCombo=Math.max(P.bestCombo, st.maxCombo||0);
+  if(perfect){ P.perfect++; P.perfectBy[act.id]=true; xp+=50; rewards.push({ic:"💯",t:"Foutloos!",d:"+50 bonuspunten"}); }
+  if(stars>(P.best[act.id]||0)){ P.best[act.id]=stars; if(stars>0) rewards.push({ic:"⭐",t:"Nieuw record",d:`${stars} ${stars===1?"ster":"sterren"} bij ${act.title.toLowerCase()}`}); }
+  const t=today();
+  if(P.lastDay!==t){
+    P.streak = P.lastDay===yesterday() ? P.streak+1 : 1; P.lastDay=t;
+    rewards.push({ic:"📆",t:`${P.streak} ${P.streak===1?"dag":"dagen"} op rij`, d:P.streak===1?"Kom morgen terug voor dag 2.":"Je reeks wordt langer!"});
+  }
+  if(P.day!==t){ P.day=t; P.dayCount=0; }
+  P.dayCount++;
+  if(P.dayCount===DAILY_GOAL){ xp+=30; rewards.push({ic:"🎯",t:"Dagdoel gehaald!",d:"+30 bonuspunten"}); }
+  const missing = STICKERS.map((_,i)=>i).filter(i=>!P.stickers.includes(i));
+  let sticker=null;
+  if(missing.length){ sticker=pick(missing); P.stickers.push(sticker); } else xp+=20;
+  P.xp+=xp;
+  rewards.unshift({ic:"✨",t:`+${xp} punten`,d:`Samen al ${P.xp} punten`});
+  BADGES.filter(b=>!P.badges.includes(b.id)&&b.ok()).forEach(b=>{ P.badges.push(b.id); rewards.push({ic:b.ic,t:`Nieuwe medaille: ${b.t}`,d:b.d}); });
+  const lvAfter=levelInfo(P.xp).L;
+  if(lvAfter>lvBefore) rewards.push({ic:"🎉",t:`Level ${lvAfter}!`,d:"Je bent een level omhoog gegaan."});
+  persist();
+
+  setMascot($("resMascot"), stars>=2?"juich":"blij","bounce");
+  $("resStars").innerHTML = starHTML(stars,true);
+  $("resTitle").textContent = stars===3?"Alles in één keer goed!" : stars===2?"Knap gedaan!" : stars===1?"Goed geoefend!" : "Blijven oefenen!";
+  $("resText").textContent = text;
+  $("rewards").innerHTML = rewards.map(r=>`<div class="reward"><span class="ic">${r.ic}</span><span><b>${r.t}</b><small>${r.d}</small></span></div>`).join("");
+  const pk=$("pack"); pk.classList.remove("open");
+  if(sticker!==null){
+    pk.hidden=false; $("packBack").textContent=STICKERS[sticker];
+    $("packLabel").textContent="Tik om je nieuwe sticker open te maken!";
+    pk.onclick=()=>{ if(pk.classList.contains("open")) return; pk.classList.add("open"); sfx.pop(); confetti(60); $("packLabel").textContent=`Nieuwe sticker in je stickerboek! (${P.stickers.length}/${STICKERS.length})`; };
+  } else { pk.hidden=true; $("packLabel").textContent="Je stickerboek is vol! Je kreeg 20 extra punten."; }
+  lastAct = act.id;
+  show("result"); sfx.fanfare();
+  if(stars>=2) confetti(stars===3?160:90);
+  if(lvAfter>lvBefore) setTimeout(()=>toast(`🎉 Level ${lvAfter}!`),700);
+  if(autoRead) say(`${$("resTitle").textContent} ${text}`);
+}
+let lastAct=null;
+
+/* ---------- toast & confetti ---------- */
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2400); }
+function confetti(n){
+  if(reduceMotion) return;
+  const cv=$("confetti"), ctx=cv.getContext("2d"), dpr=window.devicePixelRatio||1;
+  cv.width=innerWidth*dpr; cv.height=innerHeight*dpr; ctx.scale(dpr,dpr);
+  const cs=getComputedStyle(document.documentElement);
+  const cols=[cs.getPropertyValue("--curtain"),cs.getPropertyValue("--sun"),cs.getPropertyValue("--soft"),cs.getPropertyValue("--green"),"#ffffff"];
+  const parts=Array.from({length:n},()=>({x:innerWidth/2+(Math.random()-.5)*120,y:innerHeight*.35,vx:(Math.random()-.5)*12,vy:-Math.random()*12-4,r:4+Math.random()*5,c:pick(cols),round:Math.random()<.5,a:Math.random()*6}));
+  let f=0;
+  (function tick(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    parts.forEach(p=>{ p.vy+=.35; p.vx*=.99; p.x+=p.vx; p.y+=p.vy; p.a+=.2; ctx.fillStyle=p.c;
+      if(p.round){ ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); } else { ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r); ctx.restore(); } });
+    if(++f<150) requestAnimationFrame(tick); else ctx.clearRect(0,0,innerWidth,innerHeight);
+  })();
+}
+
+/* ---------- events ---------- */
+$("groups").addEventListener("click", e=>{
+  const lv=e.target.closest("[data-lv]");
+  if(lv){ P.taalLevel=+lv.dataset.lv; persist(); renderHome(); return; }
+  const t=e.target.closest(".tile"); if(t) start(t.dataset.id);
+});
+$("choices").addEventListener("click", e=>{ const b=e.target.closest(".choice"); if(!b) return; if(st&&st.q&&st.q.bouw) bouwKlik(b); else choose(b); });
+document.addEventListener("keydown", e=>{ if($("game").hidden) return; const n=parseInt(e.key,10); if(n>=1&&n<=4){ const b=$("choices").children[n-1]; if(b && !(st&&st.q&&st.q.bouw)) choose(b); } });
+$("speakBtn").onclick = ()=>{ if(st&&st.q) say(st.q.speak); };
+$("stopBtn").onclick = goHome;
+$("kleurStop").onclick = goHome;
+$("againBtn").onclick = ()=>{ if(lastAct) start(lastAct); };
+$("homeBtn").onclick = goHome;
+$("albumBtn").onclick = ()=>{ renderAlbum(); show("album"); };
+$("badgeBtn").onclick = ()=>{ renderBadges(); show("badges"); };
+document.querySelectorAll(".back").forEach(b=>b.onclick=goHome);
+$("palette").addEventListener("click", e=>{
+  const s=e.target.closest(".swatch"); if(!s) return;
+  kl.chosen=+s.dataset.n;
+  [...$("palette").children].forEach(b=>b.setAttribute("aria-pressed", String(b===s)));
+  const c=COLORS.find(x=>x.n===kl.chosen);
+  $("kleurFeedback").textContent = kl.vrij ? `Kleur ${c.naam} gekozen. Tik op een vlak.` : `Kleur ${c.naam} = ${kl.chosen}. Zoek een som met antwoord ${kl.chosen}.`;
+});
+$("kleurSvg").addEventListener("click", e=>{ const r=e.target.closest(".region"); if(r) kleurKlik(r); });
+$("kleurSvg").addEventListener("keydown", e=>{ if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("region")){ e.preventDefault(); kleurKlik(e.target); } });
+$("vrijToggle").onclick = ()=>{ kl.vrij=!kl.vrij; $("vrijToggle").setAttribute("aria-pressed",String(kl.vrij));
+  $("kleurUitleg").textContent = kl.vrij ? "Vrij kleuren: kies een kleur en tik op een vlak." : "Reken de som uit, kies die kleur en tik op het vlak."; };
+
+const rt=$("readToggle"), so=$("soundToggle");
+const syncToggles=()=>{ rt.setAttribute("aria-pressed",String(autoRead)); so.setAttribute("aria-pressed",String(soundOn)); };
+rt.onclick=()=>{ autoRead=!autoRead; save("rekenrek-read",autoRead); syncToggles(); if(autoRead) say("Ik lees de vragen voor."); };
+so.onclick=()=>{ soundOn=!soundOn; save("rekenrek-sound",soundOn); syncToggles(); if(soundOn) sfx.good(); };
+$("backupBtn").onclick = ()=>{ const b=$("backup"); b.hidden=!b.hidden; if(!b.hidden){ $("backupCode").value=encodeP(); b.scrollIntoView({block:"nearest"}); } };
+$("closeBackup").onclick = ()=>{ $("backup").hidden=true; };
+$("copyCode").onclick = async ()=>{
+  const ta=$("backupCode"); ta.select();
+  try{ await navigator.clipboard.writeText(ta.value); toast("Code gekopieerd"); }
+  catch(e){ try{ document.execCommand("copy"); toast("Code gekopieerd"); }catch(e2){ toast("Selecteer en kopieer de code"); } }
+};
+$("restoreBtn").onclick = ()=>{
+  const v=$("restoreCode").value.trim(); if(!v) return;
+  const H=decodeP(v);
+  if(!H || typeof H.xp!=="number"){ toast("Die code klopt niet"); return; }
+  P=Object.assign(FRESH(),H); persist(); renderHome(); $("backup").hidden=true; $("restoreCode").value="";
+  toast("Voortgang hersteld");
+};
+let resetArmed=false;
+$("resetBtn").onclick=()=>{
+  const b=$("resetBtn");
+  if(!resetArmed){ resetArmed=true; b.textContent="Zeker weten? Tik nog een keer"; setTimeout(()=>{resetArmed=false; b.textContent="Voortgang wissen";},4000); return; }
+  P=FRESH(); persist(); resetArmed=false; b.textContent="Voortgang wissen"; renderHome(); toast("Voortgang gewist");
+};
+
+buildStage(); renderHome(); syncToggles(); syncHash();
+})();
+</script>
+
+<script>
+if("serviceWorker" in navigator){ window.addEventListener("load", ()=>{ navigator.serviceWorker.register("/sterre/sw.js").catch(()=>{}); }); }
+</script>
+</body>
+</html>
