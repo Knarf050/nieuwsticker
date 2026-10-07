@@ -12,11 +12,51 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Triviant">
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/triviant/triviant-data.js"></script>
+  <!-- React/Babel/Tailwind staan lokaal (public/triviant/vendor/) i.p.v. op een externe CDN: een
+       onverwachte major-versiesprong van @babel/standalone op een onversied CDN-adres liet de
+       pagina voorheen voorgoed wit blijven (niets kon ooit gaan renderen), zonder enige
+       foutmelding. Pin dus altijd een expliciete, geteste versie i.p.v. "latest" via een CDN. -->
+  <script>
+    // Laadbewaker: gedefinieerd vóór de scripts hieronder, zodat hun onerror 'm altijd kan
+    // aanroepen — ook al bestaat <body>/#root op dat moment nog niet (een <script src>-fout in
+    // <head> gebeurt terwijl de parser nog middenin <head> zit). We onthouden de fout dan en
+    // tonen 'm alsnog zodra DOMContentLoaded de rest van de pagina heeft opgebouwd.
+    window.__triviantGemount = false;
+    window.__triviantFoutBestand = null;
+    window.__triviantLaadfout = function (bestand) {
+      if (window.__triviantGemount || window.__triviantFoutBestand) return;
+      window.__triviantFoutBestand = bestand;
+      if (document.body) __triviantToonFout(bestand);
+    };
+    function __triviantToonFout(bestand) {
+      if (window.__triviantGemount) return;
+      window.__triviantGemount = true; // voorkom dat de timeout hierna nog een 2e keer ingrijpt
+      const root = document.getElementById('root');
+      if (!root) return;
+      root.innerHTML =
+        '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+        'min-height:100vh;padding:24px;text-align:center;font-family:system-ui,-apple-system,sans-serif;">' +
+        '<div style="font-size:40px;margin-bottom:12px;">⚠️</div>' +
+        '<div style="font-weight:800;margin-bottom:8px;">Triviant kon niet laden</div>' +
+        '<div style="color:#6b7280;font-size:14px;margin-bottom:20px;max-width:320px;">' +
+        'Een onderdeel (' + bestand + ') kwam niet binnen. Waarschijnlijk een korte hapering ' +
+        'in je verbinding — probeer het opnieuw.</div>' +
+        '<button onclick="location.reload()" style="background:#111827;color:#fff;font-weight:800;' +
+        'padding:12px 24px;border-radius:16px;border:none;font-size:14px;">Opnieuw proberen</button>' +
+        '</div>';
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.__triviantFoutBestand) __triviantToonFout(window.__triviantFoutBestand);
+    });
+    setTimeout(function () {
+      if (!window.__triviantGemount) window.__triviantLaadfout('de app (timeout)');
+    }, 12000);
+  </script>
+  <script src="/triviant/vendor/react.production.min.js" onerror="window.__triviantLaadfout('react.production.min.js')"></script>
+  <script src="/triviant/vendor/react-dom.production.min.js" onerror="window.__triviantLaadfout('react-dom.production.min.js')"></script>
+  <script src="/triviant/vendor/babel.min.js" onerror="window.__triviantLaadfout('babel.min.js')"></script>
+  <script src="/triviant/vendor/tailwind.js" onerror="window.__triviantLaadfout('tailwind.js')"></script>
+  <script src="/triviant/triviant-data.js" onerror="window.__triviantLaadfout('triviant-data.js')"></script>
   <style>
     body { font-family: 'Nunito', system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
     .pop { animation: pop .3s ease; }
@@ -35,7 +75,11 @@
   </style>
 </head>
 <body class="bg-[#f7f7f7]">
-  <div id="root"></div>
+  <div id="root">
+    <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,-apple-system,sans-serif;color:#9ca3af;font-size:14px;">
+      Laden…
+    </div>
+  </div>
 
   <button id="installBtn" style="display:none"
     class="fixed bottom-24 left-5 z-40 bg-white text-[#111827] font-extrabold text-sm px-4 py-3 rounded-2xl shadow-lg border-2 border-[#111827]">
@@ -387,6 +431,7 @@
       const toastTimer = useRef(null);
       const prevNiveau = useRef(null);
 
+      useEffect(() => { window.__triviantGemount = true; }, []);
       useEffect(() => { bewaarState(state); }, [state]);
 
       function melding(tekst) {
