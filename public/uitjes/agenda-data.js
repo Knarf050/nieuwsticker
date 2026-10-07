@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Dinsdag 6 oktober 2026',
-  updatedAt: '06-10-2026, 07:15',
+  dateLabel: 'Woensdag 7 oktober 2026',
+  updatedAt: '07-10-2026, 07:16',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,9 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '6–7 okt (start vandaag)', title: 'ONE Conference', loc: 'Den Haag', tag: 'Cultuur', highlight: true },
-        { time: '09:00–18:00', title: 'Blue Week', loc: 'Elsewhere The Hague', tag: 'Cultuur' },
-        { time: '20:15–21:30', title: '"AI&IK ERAN&CO"', loc: 'Theater aan het Spui', tag: 'Theater' },
+        { time: '20:00–21:00', title: '"Qaqnas"', loc: 'Theater aan het Spui — all-vrouwelijke Kurdische opera', tag: 'Theater', highlight: true },
+        { time: '19:30–21:25', title: '"Het Debuut 2026"', loc: 'Zaal 3', tag: 'Theater' },
       ],
     },
     {
@@ -24,8 +23,9 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '20:00–22:00', title: '"How to Be a Dissident" — Gal Beckerman', loc: 'Arminius', tag: 'Cultuur', highlight: true },
-        { time: '10:00–12:00', title: 'Forgotten Crafts: Cyanotype printing', loc: 'Dokhuis Rotterdam', tag: 'Workshop' },
+        { time: '10:00–15:00', title: 'Kinderboekenweek: "Spot Aan!" & "LetterPret!"', loc: 'Centrale Bibliotheek — gratis', tag: 'Familie', highlight: true },
+        { time: 'vanaf 18:00 (start vandaag)', title: 'Architectuur Filmfestival Rotterdam', loc: 'Diverse locaties', tag: 'Film' },
+        { time: 'vanaf 10:00 (start vandaag)', title: 'Dutch Sustainable Fashion Week Rotterdam', loc: 'Diverse locaties', tag: 'Cultuur' },
       ],
     },
     {
@@ -33,8 +33,8 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Royal Delft Museum', loc: 'Delft — Delfts Blauw en streetart', tag: 'Expo', highlight: true },
-        { time: 'doorlopend', title: 'Rijksmuseum van Oudheden', loc: 'Leiden — mummies en farao\'s', tag: 'Expo' },
+        { time: 'herfstvakantie', title: 'Nationaal Videogame Museum', loc: 'Zoetermeer — 200+ speelautomaten en homecomputers', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Stadswandeling met Goudse Gidsen Gilde', loc: 'Gouda', tag: 'Actief' },
       ],
     },
   ],
