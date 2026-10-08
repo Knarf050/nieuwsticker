@@ -1,9 +1,11 @@
 /* Triviant service worker (gehost onder /triviant/) — installeerbaar + offline.
    Verhoog CACHE bij elke wijziging om een verse versie uit te rollen. */
-const CACHE = 'triviant-v2';
+const CACHE = 'triviant-v3';
 const SHELL = [
   '/triviant/', '/triviant/index.html', '/triviant/triviant-data.js', '/triviant/manifest.webmanifest',
-  '/triviant/icon-192.png', '/triviant/icon-512.png', '/triviant/icon-maskable-512.png', '/triviant/apple-touch-icon.png'
+  '/triviant/icon-192.png', '/triviant/icon-512.png', '/triviant/icon-maskable-512.png', '/triviant/apple-touch-icon.png',
+  '/triviant/vendor/react.production.min.js', '/triviant/vendor/react-dom.production.min.js',
+  '/triviant/vendor/babel.min.js', '/triviant/vendor/tailwind.js'
 ];
 
 self.addEventListener('install', (e) => {
