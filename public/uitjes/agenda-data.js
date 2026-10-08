@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 7 oktober 2026',
-  updatedAt: '07-10-2026, 07:16',
+  dateLabel: 'Donderdag 8 oktober 2026',
+  updatedAt: '08-10-2026, 07:11',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '20:00–21:00', title: '"Qaqnas"', loc: 'Theater aan het Spui — all-vrouwelijke Kurdische opera', tag: 'Theater', highlight: true },
-        { time: '19:30–21:25', title: '"Het Debuut 2026"', loc: 'Zaal 3', tag: 'Theater' },
+        { time: '10:00–17:00', title: '"Mix & Match: Beauty from the World of Islam"', loc: 'Kunstmuseum Den Haag — nieuwe expositie, t/m 25 okt', tag: 'Expositie', highlight: true },
+        { time: '21:30', title: 'Gratis Salsa Night', loc: 'Grote Markt', tag: 'Dans' },
       ],
     },
     {
@@ -23,9 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '10:00–15:00', title: 'Kinderboekenweek: "Spot Aan!" & "LetterPret!"', loc: 'Centrale Bibliotheek — gratis', tag: 'Familie', highlight: true },
-        { time: 'vanaf 18:00 (start vandaag)', title: 'Architectuur Filmfestival Rotterdam', loc: 'Diverse locaties', tag: 'Film' },
-        { time: 'vanaf 10:00 (start vandaag)', title: 'Dutch Sustainable Fashion Week Rotterdam', loc: 'Diverse locaties', tag: 'Cultuur' },
+        { time: '20:30', title: 'Rotown Nights: Night Swimming + Part Garden', loc: 'Rotown, Nieuwe Binnenweg 19', tag: 'Muziek', highlight: true },
+        { time: '10:00', title: 'Safety & Health @ Work-beurs', loc: 'Ahoy, Hal 2 & 4', tag: 'Beurs' },
       ],
     },
     {
@@ -33,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'herfstvakantie', title: 'Nationaal Videogame Museum', loc: 'Zoetermeer — 200+ speelautomaten en homecomputers', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Stadswandeling met Goudse Gidsen Gilde', loc: 'Gouda', tag: 'Actief' },
+        { time: '10:00–17:00', title: 'Expositie "Urban Blue"', loc: 'Royal Delft Museum, Delft — t/m 1 nov', tag: 'Expositie', highlight: true },
+        { time: 'doorlopend', title: '"Monsters en mythische wezens"', loc: 'Museum Volkenkunde, Leiden — t/m 1 nov', tag: 'Familie' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'Tripadvisor — activiteiten Zuid-Holland', url: 'https://www.tripadvisor.com/Attractions-g188622-Activities-South_Holland_Province.html' },
+    { label: 'Muziekladder Rotterdam', url: 'https://muziekladder.nl/en/muziek/8-Rotterdam/agenda-4.html' },
+    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/herfstvakantie' },
   ],
 };
