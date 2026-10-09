@@ -252,6 +252,15 @@ h1{font-size:clamp(2.2rem,8vw,3.2rem);line-height:1;margin:0;color:var(--ink);le
 .stats-table th{color:var(--muted);font-weight:400;font-size:.9rem}
 .stats-table td.num{text-align:right;font-weight:700;white-space:nowrap}
 
+.savestate{color:var(--muted);font-size:.9rem;margin:10px 0 0}
+.savestate.fout{color:var(--red);font-weight:700}
+.iostip{margin:16px 0 0;background:var(--tile);border:3px solid var(--sun-edge);border-radius:var(--radius);
+  padding:12px 14px;box-shadow:4px 4px 0 var(--shadow);display:flex;gap:12px;align-items:flex-start}
+.iostip .ic{font-size:1.6rem}
+.iostip b{display:block;margin-bottom:2px}
+.iostip p{margin:0;color:var(--muted);font-size:.95rem}
+.iostip button{margin-top:8px}
+
 /* Toast & confetti */
 .toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top,0px));transform:translate(-50%,-150%);
   background:var(--ink);color:var(--paper);padding:12px 20px;border-radius:14px;font-weight:700;font-size:1.15rem;
@@ -311,9 +320,18 @@ h1{font-size:clamp(2.2rem,8vw,3.2rem);line-height:1;margin:0;color:var(--ink);le
     <button class="linkbtn" id="resetBtn">Voortgang wissen</button>
   </div>
   <p class="note">Elke oefening levert een sticker op. Dagdoel: 2 rondes per dag.</p>
+  <p class="savestate" id="saveState">Opgeslagen ✓</p>
+  <div class="iostip" id="iosTip" hidden>
+    <span class="ic">📲</span>
+    <div>
+      <b>Zet Sterre op het beginscherm</b>
+      <p>In een gewoon browsertabblad kan de iPhone de sterren en stickers weggooien. Tik op het deelteken onderin en kies "Zet op beginscherm". Dan blijft alles staan en start Sterre als een echte app.</p>
+      <button class="btn" id="iosTipDicht">Begrepen</button>
+    </div>
+  </div>
   <div class="backup" hidden id="backup">
     <h3>Voortgang bewaren</h3>
-    <p>Bewaart de browser de voortgang niet? Kopieer dan deze code en bewaar hem, bijvoorbeeld in een notitie. Met "Herstel" zet je hem later terug.</p>
+    <p>De voortgang wordt vanzelf opgeslagen. Wil je hem ook naar een ander apparaat meenemen, of voor de zekerheid bewaren? Kopieer dan deze code en plak hem daar bij "Herstel".</p>
     <textarea id="backupCode" readonly aria-label="Je bewaarcode"></textarea>
     <div class="row" style="justify-content:flex-start">
       <button class="btn" id="copyCode">Kopieer code</button>
@@ -430,21 +448,129 @@ const shuffle = arr => { for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math
 const MIN = "\u2212";
 const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* ---------- storage ---------- */
+/* ---------- opslag ----------
+   Drie plekken tegelijk, want iOS wist browseropslag van gewone tabbladen:
+   1. localStorage        — snel, maar kan door de browser gewist worden
+   2. een server-cookie   — gezet door /api/sterre, overleeft het wissen wel
+   3. de link (#p=...)    — als je de pagina bewaart of deelt
+   Bij het opstarten wint de versie met de meeste punten. */
 function load(k,f){ try{ const v=localStorage.getItem(k); return v===null?f:JSON.parse(v); }catch(e){ return f; } }
 function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
 const FRESH = () => ({xp:0,streak:0,lastDay:null,day:null,dayCount:0,stickers:[],badges:[],rounds:0,correct:0,perfect:0,perfectBy:{},played:{},bestCombo:0,best:{},maxDiff:1,recordBy:{},statsBy:{},regenHigh:0,dailyCount:0,dailyDone:null,taalLevel:2});
 let P = Object.assign(FRESH(), load("sterre-v1", null) || load("rekenrek-v2", {}) || {});
-function encodeP(){ try{ return btoa(encodeURIComponent(JSON.stringify(P))); }catch(e){ return ""; } }
-function decodeP(code){ try{ return JSON.parse(decodeURIComponent(atob(code.trim()))); }catch(e){ return null; } }
-function syncHash(){ try{ history.replaceState(null,"","#p="+encodeP()); }catch(e){} }
-const persist = () => { save("sterre-v1", P); syncHash(); };
+
+/* Compacte code: vaste volgorde, zodat alles in één cookie past. Alleen
+   achteraan uitbreiden, anders kloppen bestaande codes niet meer. */
+const ACT_IDS = ["daily","plus20","min20","overtien","familie","lijn","mix20","dubbel","drie","ontbreekt",
+  "honderd","keer","verhaal","patroon","wissel","sprong","mixlastig","klok","uur","kwartier","duur","mixklok",
+  "woordplaat","klankmist","bouw","zinnen","samen","rijm","meervoud","mixtaal","spot","regen","kleur"];
+const BADGE_IDS = ["eerste","foutloos","combo5","combo10","goed50","goed200","dag3","dag7","ontdekker","niveau3",
+  "snel","letterheld","speller","dichter","spotaan","klokkijker","keerbaas","honderdclub","kunstenaar",
+  "sterrenvanger","dagheld","album18","album36"];
+const DAG0 = Date.UTC(2026,0,1);
+const dagNr = d => d ? Math.round((Date.parse(d+"T00:00:00Z")-DAG0)/86400000)+1 : 0;
+const nrDag = n => n ? new Date(DAG0+(n-1)*86400000).toISOString().slice(0,10) : null;
+const bitsUitLijst = (lijst,n) => Array.from({length:n},(_,i)=>lijst.includes(i)?"1":"0").join("");
+const bitsUitIds = (lijst,ids) => ids.map(i=>lijst.includes(i)?"1":"0").join("");
+const bitsUitKeys = (obj,ids) => ids.map(i=>obj&&obj[i]?"1":"0").join("");
+
+function inpakken(bron, metStats){
+  const p = bron;
+  return [1, p.xp|0, p.streak|0, dagNr(p.lastDay), dagNr(p.day), p.dayCount|0,
+    bitsUitLijst(p.stickers||[], 48),
+    bitsUitIds(p.badges||[], BADGE_IDS),
+    p.rounds|0, p.correct|0, p.perfect|0, p.bestCombo|0, p.maxDiff||1,
+    p.regenHigh|0, p.dailyCount|0, dagNr(p.dailyDone), p.taalLevel||2,
+    ACT_IDS.map(i=>(p.best||{})[i]||0).join(""),
+    bitsUitKeys(p.played, ACT_IDS),
+    bitsUitKeys(p.perfectBy, ACT_IDS),
+    ACT_IDS.map(i=>(p.recordBy||{})[i]||0),
+    metStats ? ACT_IDS.map(i=>{ const s=(p.statsBy||{})[i]; return s?[s.rondes|0,s.goed|0,s.totaal|0,dagNr(s.last)]:0; }) : 0
+  ];
+}
+function uitpakken(a){
+  if(!Array.isArray(a) || a[0]!==1) return null;
+  const p = FRESH();
+  p.xp=a[1]|0; p.streak=a[2]|0; p.lastDay=nrDag(a[3]); p.day=nrDag(a[4]); p.dayCount=a[5]|0;
+  p.stickers = String(a[6]||"").split("").reduce((r,c,i)=>(c==="1"&&r.push(i),r),[]);
+  p.badges = BADGE_IDS.filter((_,i)=>String(a[7]||"")[i]==="1");
+  p.rounds=a[8]|0; p.correct=a[9]|0; p.perfect=a[10]|0; p.bestCombo=a[11]|0; p.maxDiff=a[12]||1;
+  p.regenHigh=a[13]|0; p.dailyCount=a[14]|0; p.dailyDone=nrDag(a[15]); p.taalLevel=a[16]||2;
+  const best=String(a[17]||""); ACT_IDS.forEach((id,i)=>{ const v=+best[i]; if(v) p.best[id]=v; });
+  ACT_IDS.forEach((id,i)=>{ if(String(a[18]||"")[i]==="1") p.played[id]=true; });
+  ACT_IDS.forEach((id,i)=>{ if(String(a[19]||"")[i]==="1") p.perfectBy[id]=true; });
+  (a[20]||[]).forEach((v,i)=>{ if(v && ACT_IDS[i]) p.recordBy[ACT_IDS[i]]=v; });
+  if(Array.isArray(a[21])) a[21].forEach((s,i)=>{ if(Array.isArray(s) && ACT_IDS[i])
+    p.statsBy[ACT_IDS[i]]={rondes:s[0],goed:s[1],totaal:s[2],last:nrDag(s[3])}; });
+  return p;
+}
+const b64 = t => { try{ return btoa(unescape(encodeURIComponent(t))).replace(/\+/g,"-").replace(/\//g,"_"); }catch(e){ return ""; } };
+const unb64 = c => { try{ return decodeURIComponent(escape(atob(String(c).trim().replace(/-/g,"+").replace(/_/g,"/")))); }catch(e){ return ""; } };
+
+function encodeP(bron, metStats){
+  try{ return b64(JSON.stringify(inpakken(bron||P, metStats!==false))); }catch(e){ return ""; }
+}
+function decodeP(code){
+  const t = unb64(code); if(!t) return null;
+  try{
+    const g = JSON.parse(t);
+    if(Array.isArray(g)) return uitpakken(g);
+    if(g && typeof g.xp==="number") return Object.assign(FRESH(), g); // oude codes blijven werken
+  }catch(e){}
+  return null;
+}
+const rijker = (a,b) => !b ? a : !a ? b : ((b.xp|0) > (a.xp|0) || ((b.xp|0)===(a.xp|0) && (b.rounds|0) > (a.rounds|0))) ? b : a;
+function syncHash(){ try{ history.replaceState(null,"","#p="+encodeP(P,false)); }catch(e){} }
+
+/* De cookie-opslag op de server. Mislukt dit (geen internet), dan blijft
+   localStorage gewoon werken en proberen we het bij de volgende ronde weer. */
+let bewaarTimer=null, laatstBewaard="";
+function toonBewaard(tekst, fout){
+  const el=document.getElementById("saveState"); if(!el) return;
+  el.textContent=tekst; el.className = "savestate" + (fout?" fout":"");
+}
+async function naarServer(){
+  let code = encodeP(P, true);
+  if(code.length > 3800) code = encodeP(P, false); // zonder de statistieken past het altijd
+  if(!code || code===laatstBewaard) return;
+  try{
+    const r = await fetch("/api/sterre", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({data:code}), credentials:"same-origin"});
+    if(!r.ok) throw new Error(r.status);
+    laatstBewaard = code;
+    toonBewaard("Opgeslagen ✓");
+  }catch(e){ toonBewaard("Nog niet opgeslagen — kom even online", true); }
+}
+const persist = () => {
+  save("sterre-v1", P); syncHash();
+  clearTimeout(bewaarTimer); bewaarTimer=setTimeout(naarServer, 400);
+};
+async function vanServer(){
+  try{
+    const r = await fetch("/api/sterre", {credentials:"same-origin"});
+    if(!r.ok) return null;
+    const j = await r.json();
+    return j && j.data ? decodeP(j.data) : null;
+  }catch(e){ return null; }
+}
 (function restoreFromHash(){
   const m = location.hash.match(/^#p=(.+)$/);
   if(!m) return;
   const H = decodeP(m[1]);
-  if(H && typeof H.xp==="number" && H.xp >= (P.xp||0)) P = Object.assign(FRESH(), H);
+  if(H) P = rijker(P, H);
 })();
+/* Vraag de browser om de opslag te bewaren en haal de servercopie op. */
+(async function startOpslag(){
+  try{ if(navigator.storage && navigator.storage.persist) await navigator.storage.persist(); }catch(e){}
+  const S = await vanServer();
+  if(S){
+    const beste = rijker(P, S);
+    if(beste !== P){ P = beste; save("sterre-v1", P); if(typeof renderHome==="function") renderHome(); }
+    laatstBewaard = encodeP(P, true);
+  }
+  naarServer();
+})();
+
 let autoRead = !!load("rekenrek-read", false);
 let soundOn = load("rekenrek-sound", true) !== false;
 
@@ -1698,7 +1824,7 @@ const rt=$("readToggle"), so=$("soundToggle");
 const syncToggles=()=>{ rt.setAttribute("aria-pressed",String(autoRead)); so.setAttribute("aria-pressed",String(soundOn)); };
 rt.onclick=()=>{ autoRead=!autoRead; save("rekenrek-read",autoRead); syncToggles(); if(autoRead) say("Ik lees de vragen voor."); };
 so.onclick=()=>{ soundOn=!soundOn; save("rekenrek-sound",soundOn); syncToggles(); if(soundOn) sfx.good(); };
-$("backupBtn").onclick = ()=>{ const b=$("backup"); b.hidden=!b.hidden; if(!b.hidden){ $("backupCode").value=encodeP(); b.scrollIntoView({block:"nearest"}); } };
+$("backupBtn").onclick = ()=>{ const b=$("backup"); b.hidden=!b.hidden; if(!b.hidden){ $("backupCode").value=encodeP(P,true); b.scrollIntoView({block:"nearest"}); } };
 $("closeBackup").onclick = ()=>{ $("backup").hidden=true; };
 $("copyCode").onclick = async ()=>{
   const ta=$("backupCode"); ta.select();
@@ -1709,15 +1835,26 @@ $("restoreBtn").onclick = ()=>{
   const v=$("restoreCode").value.trim(); if(!v) return;
   const H=decodeP(v);
   if(!H || typeof H.xp!=="number"){ toast("Die code klopt niet"); return; }
-  P=Object.assign(FRESH(),H); persist(); renderHome(); $("backup").hidden=true; $("restoreCode").value="";
+  P=H; persist(); renderHome(); $("backup").hidden=true; $("restoreCode").value="";
   toast("Voortgang hersteld");
 };
 let resetArmed=false;
 $("resetBtn").onclick=()=>{
   const b=$("resetBtn");
   if(!resetArmed){ resetArmed=true; b.textContent="Zeker weten? Tik nog een keer"; setTimeout(()=>{resetArmed=false; b.textContent="Voortgang wissen";},4000); return; }
-  P=FRESH(); persist(); resetArmed=false; b.textContent="Voortgang wissen"; renderHome(); toast("Voortgang gewist");
+  P=FRESH(); laatstBewaard="";
+  try{ fetch("/api/sterre",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:""}),credentials:"same-origin"}); }catch(e){}
+  persist(); resetArmed=false; b.textContent="Voortgang wissen"; renderHome(); toast("Voortgang gewist");
 };
+
+(function iosTip(){
+  const iOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+              (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  const alsApp = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  if(!iOS || alsApp || load("sterre-tip-weg", false)) return;
+  $("iosTip").hidden = false;
+  $("iosTipDicht").onclick = ()=>{ $("iosTip").hidden = true; save("sterre-tip-weg", true); };
+})();
 
 buildStage(); renderHome(); syncToggles(); syncHash();
 })();
