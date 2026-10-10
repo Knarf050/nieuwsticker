@@ -32,21 +32,23 @@ button.speelt{background:var(--green-bg);border-color:var(--green);color:var(--g
 <body>
 <div class="wrap">
   <h1>Welke stem vind je het prettigst?</h1>
-  <p class="lead">Vier varianten van dezelfde stem. Luister en laat weten welke letter je kiest, dan bouw ik die in de app.</p>
+  <p class="lead">Drie nieuwe, hogere varianten bovenaan. Luister en laat weten welke letter het wordt, dan bouw ik die in de hele app in.</p>
   <div id="lijst"></div>
   <div class="slot">
-    <b>Geen van alle?</b> Zeg dat ook gerust. Dan is Ellen in Safari het enige echte alternatief,
-    of we houden het bij de stem die er nu in zit.
+    <b>Nog hoger nodig?</b> Zeg het gerust. Boven de 240 Hz gaat de stem wel steeds meer
+    kraken, want hij is uit een mannenstem gemaakt. Dan kijken we naar iets anders.
   </div>
 </div>
 <script>
 (function(){
 "use strict";
 const VARIANTEN = [
-  {id:"a-man",   naam:"A — zoals nu",        bij:"de stem die nu in de app zit"},
-  {id:"b-licht", naam:"B — iets lichter",    bij:"een stukje hoger, nog vrij neutraal"},
-  {id:"c-vrouw", naam:"C — vrouwenstem",     bij:"duidelijk een vrouwenstem"},
-  {id:"d-hoog",  naam:"D — hoger nog",       bij:"het hoogst, richting een jonge stem"}
+  {id:"d-hoog",   naam:"D — zoals je al hoorde", bij:"ter vergelijking, 201 Hz"},
+  {id:"e-hoger",  naam:"E — hoger",              bij:"219 Hz"},
+  {id:"f-meisje", naam:"F — nog hoger",          bij:"226 Hz, richting een jonge vrouw"},
+  {id:"g-hoogst", naam:"G — hoogst",             bij:"240 Hz, het hoogst dat netjes blijft"},
+  {id:"c-vrouw",  naam:"C — de vorige ronde",    bij:"207 Hz"},
+  {id:"a-man",    naam:"A — zoals nu in de app", bij:"137 Hz"}
 ];
 const ZINNEN = [
   {id:"som", knop:"Een som"},
