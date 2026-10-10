@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Vrijdag 9 oktober 2026',
-  updatedAt: '09-10-2026, 07:12',
+  dateLabel: 'Zaterdag 10 oktober 2026',
+  updatedAt: '10-10-2026, 07:10',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vanaf 11:00 (9–11 okt)', title: 'Home Made Thai Market', loc: 'Lange Voorhout', tag: 'Markt', highlight: true },
-        { time: '19:30', title: 'PAUW + Greentea Peng', loc: 'PAARD', tag: 'Muziek' },
+        { time: '19:00–00:00', title: 'Museumnacht Den Haag', loc: 'Lange Voorhout en Haagse musea', tag: 'Cultuur', highlight: true },
+        { time: '11:00–18:00', title: 'Home Made Market', loc: 'Lange Voorhout', tag: 'Markt' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'doorlopend (t/m 11 okt)', title: 'Afrovibes Festival', loc: 'Diverse locaties', tag: 'Cultuur', highlight: true },
-        { time: '22:00', title: 'Gabber Resistance', loc: 'Maassilo', tag: 'Muziek' },
+        { time: '18:00', title: 'Oktoberfest Rotterdam', loc: 'Van Nelle Fabriek', tag: 'Festival', highlight: true },
+        { time: '21:15', title: 'Nobu', loc: 'Rotown', tag: 'Muziek' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend (t/m 18 okt)', title: 'Leiden International Film Festival', loc: 'Leiden', tag: 'Film', highlight: true },
-        { time: 'rondleidingen (t/m 31 okt)', title: 'Bunkercomplex Rijksdorp', loc: 'Wassenaar', tag: 'Historie' },
+        { time: '12:00–20:30 (10–11 okt)', title: 'Fantasy Fest — Twisted Trick or Treat', loc: 'Rijswijk', tag: 'Familie', highlight: true },
+        { time: '09:00–12:00', title: 'Oogst- en Streekmarkt', loc: 'Schoonhoven', tag: 'Markt' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'dagjeweg.nl — Rotterdam', url: 'https://www.dagjeweg.nl/kalender/rotterdam/9-oktober-2026' },
+    { label: 'Rotown — agenda', url: 'https://www.rotown.nl/' },
     { label: 'uitzinnig.nl — evenementen Zuid-Holland', url: 'https://www.uitzinnig.nl/evenement/12/zuid-holland.aspx?arcp=1&m=10' },
   ],
 };
