@@ -486,7 +486,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
 <script>
 (function(){
 "use strict";
-const VERSIE = "2026-10-10g";
+const VERSIE = "2026-10-10h";
 const $ = id => document.getElementById(id);
 const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
 const pick = arr => arr[rnd(0,arr.length-1)];
@@ -746,6 +746,7 @@ async function zegMetStem(t, achteraan){
    of stille zin blijft op WebKit in de wachtrij hangen en legt alles stil. */
 let nlVoice=null, spraakOk=null, spraakFout=null;
 let stemNaam = load("sterre-stemnaam", null);     // naam van de gekozen toestelstem
+let stemZelf = load("sterre-stemzelf", false);    // heeft iemand die zelf gekozen?
 /* Welke stemmen heeft dit toestel voor Nederlands? */
 function nlStemmen(){
   try{
@@ -765,13 +766,37 @@ function pickVoice(){
   const nl = nlStemmen();
   if(!nl.length){ nlVoice = null; return; }
   // Eerst Nederlands uit Nederland, en daarbinnen het liefst een vrouwenstem.
-  nlVoice = (stemNaam && nl.find(v=>v.name===stemNaam))
+  // Een naam uit de instellingen telt alleen als iemand hem zelf koos.
+  nlVoice = (stemZelf && stemNaam && nl.find(v=>v.name===stemNaam))
          || nl.find(v=>isNL(v) && VROUW.test(v.name))
          || nl.find(isNL)
          || nl.find(v=>VROUW.test(v.name))
          || nl[0];
 }
-try{ pickVoice(); speechSynthesis.addEventListener("voiceschanged", ()=>{ pickVoice(); try{ vulStemLijst(); }catch(e){} }); }catch(e){}
+const stemHandtekening = () => nlStemmen().map(v=>v.name+"|"+v.lang).join(",");
+/* Haalt iemand een nieuwe stem op in de instellingen van het toestel, dan
+   beoordelen we opnieuw of voorlezen via het toestel kan. Anders blijft een
+   eerdere "doet niets" voor altijd hangen. */
+function controleerStemmen(){
+  const nu = stemHandtekening();
+  if(!nu) return;                                  // lijst nog niet geladen
+  const vorig = load("sterre-stemlijst", "");
+  if(nu === vorig) return;
+  save("sterre-stemlijst", nu);
+  pickVoice();
+  if(!vorig){ try{ vulStemLijst(); }catch(e){} return; }   // eerste keer: niets melden
+  toestelWerkt = null; save("sterre-toestelwerkt", null);
+  if(stemNaam && !nlStemmen().some(v=>v.name===stemNaam)){ stemNaam = null; save("sterre-stemnaam", null); }
+  if(!stemZelf){ stemNaam = null; save("sterre-stemnaam", null); }
+  if(stemKeuze === "app" && !stemZelf){ stemKeuze = "auto"; save("sterre-stem","auto"); }
+  pickVoice();
+  try{ vulStemLijst(); }catch(e){}
+  if(nlVoice && stemKeuze !== "app") toast("Nieuwe stem gevonden: " + nlVoice.name);
+}
+try{
+  pickVoice();
+  speechSynthesis.addEventListener("voiceschanged", ()=>{ pickVoice(); controleerStemmen(); });
+}catch(e){}
 function maakZin(t, rate){
   if(!nlVoice) pickVoice();
   const u = new SpeechSynthesisUtterance(String(t));
@@ -794,11 +819,11 @@ const opIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
 /* Eerder zette de app op een iPhone zelf de eigen stem aan, omdat de
    toestelstem niets deed. Nu kiezen we eerst een vrouwenstem en proberen we
    het opnieuw. Wie zelf een stem koos, houdt die keuze. */
-if(!load("sterre-stemkans", false)){
-  save("sterre-stemkans", true);
-  if(load("sterre-stem", null) === "app" && !load("sterre-stemnaam", null)){
-    save("sterre-stem", "auto"); save("sterre-stemklacht", false);
-  }
+if(!load("sterre-stemkans2", false)){
+  save("sterre-stemkans2", true);
+  save("sterre-toestelwerkt", null);
+  save("sterre-stemlijst", "");
+  if(!load("sterre-stemzelf", false)){ save("sterre-stem", "auto"); save("sterre-stemnaam", null); }
 }
 let stemKeuze = load("sterre-stem", "auto");   // auto, toestel of app
 /* Onthouden of de stem van het toestel überhaupt iets doet. Zolang dat
@@ -2267,7 +2292,7 @@ function vulStemLijst(){
   // Sommige toestellen tonen dezelfde stem twee keer; één keer is genoeg.
   const gezien = new Set();
   nl = nl.filter(v=>{ const sl=v.name+"|"+v.lang; if(gezien.has(sl)) return false; gezien.add(sl); return true; });
-  const huidig = stemKeuze==="app" ? "app" : (stemNaam || (nlVoice && nlVoice.name) || "app");
+  const huidig = stemKeuze==="app" ? "app" : ((nlVoice && nlVoice.name) || "app");
   kies.innerHTML =
     `<option value="app">uit de app</option>` +
     nl.map(v=>{
@@ -2289,6 +2314,7 @@ function vulStemLijst(){
 $("stemKies").onchange = ()=>{
   ontgrendel();
   const waarde = $("stemKies").value;
+  stemZelf = true; save("sterre-stemzelf", true);
   if(waarde === "app"){
     stemKeuze = "app"; stemNaam = null;
     save("sterre-stem","app"); save("sterre-stemnaam", null);
@@ -2402,6 +2428,7 @@ $("resetBtn").onclick=()=>{
 
 $("versie").textContent = VERSIE;
 if(stemKeuze !== "toestel") haalStemIndex();
+[0, 400, 1500].forEach(ms=>setTimeout(()=>{ try{ controleerStemmen(); }catch(e){} }, ms));
 buildStage(); zetThema(); renderHome(); syncToggles(); syncHash();
 })();
 </script>
