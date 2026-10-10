@@ -79,6 +79,9 @@ button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sun);outli
 /* Snelknoppen voor geluid */
 .snel{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
 .snel .toggle{padding:6px 12px;font-size:.95rem;border-width:2px}
+.stemkies{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.stemkies select{font:inherit;font-size:.95rem;font-weight:700;border:0;background:none;color:inherit;
+  max-width:11rem;padding:2px 0}
 
 /* Hero / podium */
 .hero{margin:0 0 12px;border:3px solid var(--ink);border-radius:var(--radius);overflow:hidden;box-shadow:4px 4px 0 var(--shadow);background:var(--tile);display:flex;align-items:stretch}
@@ -346,7 +349,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
     <button class="toggle" id="readToggle" aria-pressed="false">🔊 Voorlezen: <b id="readState">uit</b></button>
     <button class="toggle" id="soundToggle" aria-pressed="true">🎵 Geluidjes: <b id="soundState">aan</b></button>
     <button class="toggle" id="testBtn">▶️ Test geluid</button>
-    <button class="toggle" id="stemBtn">🗣️ Stem: <b id="stemState">van het toestel</b></button>
+    <label class="toggle stemkies">🗣️ Stem <select id="stemKies" aria-label="Kies een stem"></select></label>
     <button class="toggle" id="themaBtn">🌙 Donker</button>
   </div>
   <p class="geluidstatus" id="geluidStatus" hidden></p>
@@ -481,7 +484,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
 <script>
 (function(){
 "use strict";
-const VERSIE = "2026-10-10e";
+const VERSIE = "2026-10-10f";
 const $ = id => document.getElementById(id);
 const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
 const pick = arr => arr[rnd(0,arr.length-1)];
@@ -706,34 +709,63 @@ async function speelStuk(start, duur){
     tmr = setTimeout(stop, duur*1000+1200);     // noodrem als 'playing' uitblijft
   });
 }
-async function zegMetStem(t){
-  const beurt = ++stemBeurt;
-  if(!stemIndex) await haalStemIndex();
-  if(!stemIndex) return false;
-  if(!maakStemAudio()) return false;
-  const stukken = knipZin(t).map(w=>stemIndex[w]).filter(Boolean);
-  if(!stukken.length) return false;
-  for(const [start,duur] of stukken){
-    if(beurt !== stemBeurt) return true;        // er is alweer iets nieuws gezegd
-    await speelStuk(start, duur);
-    await new Promise(r=>setTimeout(r, 30));
-  }
+/* Zinnen netjes achter elkaar. Zonder wachtrij kapte een volgende zin de
+   vorige af, en dan hoorde je het complimentje niet. */
+let stemWachtrij = [], stemLoopt = false;
+function stopStem(){
+  stemBeurt++; stemWachtrij.length = 0;
+  try{ if(stemAudio) stemAudio.pause(); }catch(e){}
+}
+async function zegMetStem(t, achteraan){
+  if(!achteraan) stopStem();
+  stemWachtrij.push(t);
+  if(stemLoopt) return true;            // de lopende lus pakt het vanzelf op
+  stemLoopt = true;
+  try{
+    if(!stemIndex) await haalStemIndex();
+    if(!stemIndex || !maakStemAudio()){ stemWachtrij.length = 0; return false; }
+    while(stemWachtrij.length){
+      const mijn = stemBeurt;
+      const stukken = knipZin(stemWachtrij.shift()).map(w=>stemIndex[w]).filter(Boolean);
+      for(const [begin, duur] of stukken){
+        if(mijn !== stemBeurt) break;     // er is alweer iets nieuws gezegd
+        await speelStuk(begin, duur);
+        await new Promise(r=>setTimeout(r, 30));
+      }
+      if(mijn === stemBeurt && stemWachtrij.length) await new Promise(r=>setTimeout(r, 140));
+    }
+  } finally { stemLoopt = false; }
   return true;
 }
-function stopStem(){ stemBeurt++; try{ if(stemAudio) stemAudio.pause(); }catch(e){} }
 
 /* ---------- spraak ----------
    Dit werkte al in Chrome op de iPhone: cancel() en dan meteen speak().
    Niet "verbeteren" zonder het op een iPhone te proberen; een uitgestelde
    of stille zin blijft op WebKit in de wachtrij hangen en legt alles stil. */
 let nlVoice=null, spraakOk=null, spraakVangnet=null, spraakFout=null;
-function pickVoice(){
+let stemNaam = load("sterre-stemnaam", null);     // naam van de gekozen toestelstem
+/* Welke stemmen heeft dit toestel voor Nederlands? */
+function nlStemmen(){
   try{
-    const vs=speechSynthesis.getVoices();
-    nlVoice = vs.find(v=>/^nl(-|_)NL/i.test(v.lang)) || vs.find(v=>/^nl/i.test(v.lang)) || null;
-  }catch(e){}
+    const vs = speechSynthesis.getVoices() || [];
+    const nl = vs.filter(v=>/^nl/i.test(v.lang));
+    nl.sort((a,b)=>{                               // Nederlands voor Vlaams, daarna op naam
+      const an=/^nl-?NL/i.test(a.lang)?0:1, bn=/^nl-?NL/i.test(b.lang)?0:1;
+      return an-bn || a.name.localeCompare(b.name);
+    });
+    return nl;
+  }catch(e){ return []; }
 }
-try{ pickVoice(); speechSynthesis.addEventListener("voiceschanged", pickVoice); }catch(e){}
+// Namen van vrouwelijke Nederlandse stemmen op iOS en Android.
+const VROUW = /ellen|claire|lotte|saskia|femke|lisa|sanne|fenna|google nederlands/i;
+function pickVoice(){
+  const nl = nlStemmen();
+  if(!nl.length){ nlVoice = null; return; }
+  nlVoice = (stemNaam && nl.find(v=>v.name===stemNaam))
+         || nl.find(v=>VROUW.test(v.name))         // standaard een vrouwenstem
+         || nl[0];
+}
+try{ pickVoice(); speechSynthesis.addEventListener("voiceschanged", ()=>{ pickVoice(); try{ vulStemLijst(); }catch(e){} }); }catch(e){}
 function maakZin(t, rate){
   if(!nlVoice) pickVoice();
   const u = new SpeechSynthesisUtterance(String(t));
@@ -746,24 +778,38 @@ function maakZin(t, rate){
     spraakFout = (e && e.error) || "onbekend";
     spraakOk = false;
     if(spraakFout === "interrupted" || spraakFout === "canceled") return;   // door onszelf gestopt
-    // De browser zegt zelf dat het niet lukt: meteen op onze eigen stem over.
+    // De browser zegt zelf dat het niet lukt. Bij "kies maar" gaan we over op
+    // onze eigen stem; heeft iemand zelf een stem gekozen, dan houden we die
+    // keuze en laten we deze ene zin wel door de app voorlezen.
     if(stemKeuze === "auto"){
       stemKeuze = "app"; save("sterre-stem","app");
-      try{ syncToggles(); }catch(e2){}
-      toast("Eigen stem aangezet");
+      try{ vulStemLijst(); }catch(e2){}
+      toast("Stem uit de app aangezet");
+    } else if(stemKeuze === "toestel" && !load("sterre-stemklacht", false)){
+      save("sterre-stemklacht", true);
+      toast("Deze stem doet niets in deze browser");
     }
-    if(stemKeuze === "app") zegMetStem(u.text);
+    zegMetStem(u.text);
   };
   return u;
 }
 const opIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
               (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-let stemKeuze = load("sterre-stem", opIOS ? "app" : "auto");   // auto, toestel of app
+/* Eerder zette de app op een iPhone zelf de eigen stem aan, omdat de
+   toestelstem niets deed. Nu kiezen we eerst een vrouwenstem en proberen we
+   het opnieuw. Wie zelf een stem koos, houdt die keuze. */
+if(!load("sterre-stemkans", false)){
+  save("sterre-stemkans", true);
+  if(load("sterre-stem", null) === "app" && !load("sterre-stemnaam", null)){
+    save("sterre-stem", "auto"); save("sterre-stemklacht", false);
+  }
+}
+let stemKeuze = load("sterre-stem", "auto");   // auto, toestel of app
 function say(t, rate, achteraan){
   if(!t) return;
-  if(stemKeuze === "app"){ if(!achteraan) stopStem(); zegMetStem(t); return; }
+  if(stemKeuze === "app"){ zegMetStem(t, achteraan); return; }
   const sp = window.speechSynthesis;
-  if(!sp){ stemKeuze="app"; save("sterre-stem","app"); zegMetStem(t); return; }
+  if(!sp){ stemKeuze="app"; save("sterre-stem","app"); zegMetStem(t, achteraan); return; }
   if(!achteraan) stopStem();
   try{
     if(!achteraan) sp.cancel();
@@ -1834,9 +1880,10 @@ function next(){
   setMascot($("gameMascot"),"denk");
   renderMeta();
   renderProgress();
-  // Al voorgelezen tijdens de vorige aanraking? Dan niet nog een keer.
-  if(autoRead && !st.alVoorgelezen) say(q.speak);
-  st.alVoorgelezen = false;
+  // Al voorgelezen tijdens de vorige aanraking? Dan niet nog een keer. Is er
+  // intussen van stem gewisseld, dan is die poging verloren en lezen we alsnog.
+  if(autoRead && st.voorgelezenMet !== stemKeuze) say(q.speak);
+  st.voorgelezenMet = null;
 }
 function xpPop(n){ const el=document.createElement("span"); el.className="xp-pop"; el.textContent=`+${n}`; document.querySelector("#game .fb-row").appendChild(el); setTimeout(()=>el.remove(),1000); }
 function bouwVak(){
@@ -1891,10 +1938,10 @@ function markGoed(btn){
   st.i++;
   // iOS leest alleen voor als het uit een aanraking komt. We zitten nu in de
   // tik van het kind, dus zetten we de volgende vraag meteen in de wachtrij.
-  st.alVoorgelezen = false;
+  st.voorgelezenMet = null;
   if(st.i < st.total){
     st.volgende = maakVraag();
-    if(autoRead){ say(st.volgende.speak, null, true); st.alVoorgelezen = true; }
+    if(autoRead){ say(st.volgende.speak, null, true); st.voorgelezenMet = stemKeuze; }
   }
   renderProgress();
   setTimeout(next,1100);
@@ -2210,15 +2257,32 @@ const rt=$("readToggle"), so=$("soundToggle");
 const syncToggles=()=>{
   rt.setAttribute("aria-pressed",String(autoRead)); $("readState").textContent = autoRead?"aan":"uit";
   so.setAttribute("aria-pressed",String(soundOn)); $("soundState").textContent = soundOn?"aan":"uit";
-  $("stemState").textContent = stemKeuze==="app" ? "uit de app" : "van het toestel";
-  $("stemBtn").setAttribute("aria-pressed", String(stemKeuze==="app"));
+  vulStemLijst();
 };
-$("stemBtn").onclick = ()=>{
+function vulStemLijst(){
+  const kies = $("stemKies"); if(!kies) return;
+  const nl = nlStemmen();
+  const huidig = stemKeuze==="app" ? "app" : (stemNaam || (nlVoice && nlVoice.name) || "app");
+  kies.innerHTML =
+    `<option value="app">uit de app</option>` +
+    nl.map(v=>`<option value="${v.name.replace(/"/g,"&quot;")}">${v.name}${/^nl-?BE/i.test(v.lang)?" (Vlaams)":""}</option>`).join("") +
+    (nl.length ? "" : `<option value="toestel" disabled>geen stem op dit toestel</option>`);
+  kies.value = [...kies.options].some(o=>o.value===huidig) ? huidig : "app";
+}
+$("stemKies").onchange = ()=>{
   ontgrendel();
-  stemKeuze = stemKeuze==="app" ? "toestel" : "app";
-  save("sterre-stem", stemKeuze); syncToggles();
-  if(stemKeuze==="app") haalStemIndex();
-  say(st && st.q ? st.q.speak : "Zo klink ik.");
+  const waarde = $("stemKies").value;
+  if(waarde === "app"){
+    stemKeuze = "app"; stemNaam = null;
+    save("sterre-stem","app"); save("sterre-stemnaam", null);
+    haalStemIndex();
+  } else {
+    stemKeuze = "toestel"; stemNaam = waarde;
+    save("sterre-stem","toestel"); save("sterre-stemnaam", waarde);
+    save("sterre-stemklacht", false);
+    pickVoice();
+  }
+  say(st && st.q ? st.q.speak : "Hallo, zo klink ik. Zullen we gaan rekenen?");
 };
 rt.onclick=()=>{
   ontgrendel(); autoRead=!autoRead; save("rekenrek-read",autoRead); syncToggles();
@@ -2274,6 +2338,7 @@ $("testBtn").onclick = ()=>{
     const iOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
     const alsApp = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
     const eigenStem = stemKeuze==="app";
+    void eigenStem;
     if(geluid && (stemGestart || eigenStem))
       geluidMelding(`Deuntje en stem werken${eigenStem?" (de stem uit de app)":""}. Hoor je toch niets? Draai het volume omhoog met de knopjes aan de zijkant, terwijl deze pagina open staat.`, "goed");
     else if(geluid)
