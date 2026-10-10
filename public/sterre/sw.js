@@ -1,9 +1,11 @@
 /* Sterre service worker (gehost onder /sterre/) — installeerbaar + offline.
    Verhoog CACHE bij elke wijziging om een verse versie uit te rollen. */
-const CACHE = 'sterre-v7';
+const CACHE = 'sterre-v8';
 const SHELL = [
   '/sterre/', '/sterre/index.html', '/sterre/manifest.webmanifest',
-  '/sterre/icon-192.png', '/sterre/icon-512.png', '/sterre/icon-maskable-512.png', '/sterre/apple-touch-icon.png'
+  '/sterre/icon-192.png', '/sterre/icon-512.png', '/sterre/icon-maskable-512.png', '/sterre/apple-touch-icon.png',
+  '/sterre/geluid/goed.wav', '/sterre/geluid/combo.wav', '/sterre/geluid/fout.wav',
+  '/sterre/geluid/fanfare.wav', '/sterre/geluid/pop.wav', '/sterre/geluid/verf.wav'
 ];
 
 self.addEventListener('install', (e) => {

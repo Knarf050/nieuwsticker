@@ -664,20 +664,60 @@ function say(t, rate){
 const sayMath = t => say(String(t).replace(/−/g," min ").replace(/\+/g," plus ").replace(/=/g," is "));
 
 /* ---------- geluid ----------
-   Op een iPhone of iPad gaat webgeluid standaard via het belkanaal en is het
-   dus stil als de zijschakelaar op stil staat. Met audioSession zetten we het
-   op het mediakanaal, net als een filmpje. */
-let actx=null, ontgrendeld=false;
+   Twee wegen, want op een iPhone is webgeluid lastig:
+   1. Echte geluidsbestandjes via <audio>. Die gaan over het mediakanaal,
+      dus ze klinken ook als de zijschakelaar op stil staat.
+   2. Zelf opgewekte tonen als terugval, voor als stap 1 niet lukt.
+   Safari kent naast "suspended" ook de toestand "interrupted"; daar moet je
+   net zo goed uit hervatten, anders blijft alles stil. */
+let actx=null, ontgrendeld=false, tagsKlaar=false, laatsteWeg="";
+const BESTANDEN = {good:"goed", combo:"combo", bad:"fout", fanfare:"fanfare", pop:"pop", paint:"verf"};
+const spelers = {};
+function maakSpelers(){
+  if(Object.keys(spelers).length) return;
+  try{
+    for(const k in BESTANDEN){
+      const a = new Audio(`geluid/${BESTANDEN[k]}.wav`);
+      a.preload="auto"; a.playsInline=true; a.setAttribute("playsinline","");
+      spelers[k]=a;
+    }
+  }catch(e){}
+}
+function speelBestand(k){
+  const a=spelers[k]; if(!a) return false;
+  try{
+    a.pause(); a.currentTime=0;
+    const p=a.play();
+    if(p && p.then){ p.then(()=>{ laatsteWeg="bestand"; }).catch(()=>{}); }
+    else laatsteWeg="bestand";
+    return true;
+  }catch(e){ return false; }
+}
 function audio(){
   try{
     if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)();
-    if(actx.state==="suspended") actx.resume();
+    if(actx.state!=="running" && actx.resume) actx.resume();   // ook uit "interrupted"
   }catch(e){ return null; }
   return actx;
 }
 function ontgrendel(){
-  if(ontgrendeld) return;
-  try{ if(navigator.audioSession) navigator.audioSession.type="playback"; }catch(e){}
+  try{ if(navigator.audioSession && navigator.audioSession.type!=="playback") navigator.audioSession.type="playback"; }catch(e){}
+  maakSpelers();
+  if(!tagsKlaar){
+    // De bestandjes één keer stil aanzetten; daarna mogen ze zonder aanraking spelen.
+    let gelukt=0;
+    for(const k in spelers){
+      const a=spelers[k];
+      try{
+        a.muted=true;
+        const p=a.play();
+        const klaar=()=>{ try{ a.pause(); a.currentTime=0; a.muted=false; }catch(e){} };
+        if(p && p.then) p.then(()=>{ gelukt++; klaar(); }).catch(()=>{ a.muted=false; });
+        else { gelukt++; klaar(); }
+      }catch(e){ try{ a.muted=false; }catch(e2){} }
+    }
+    tagsKlaar = true;
+  }
   const a=audio();
   if(a){
     try{ const b=a.createBuffer(1,1,22050), s=a.createBufferSource(); s.buffer=b; s.connect(a.destination); s.start(0); }catch(e){}
@@ -686,6 +726,8 @@ function ontgrendel(){
 }
 ["pointerdown","touchend","click","keydown"].forEach(ev=>
   document.addEventListener(ev, ontgrendel, {capture:true, passive:true}));
+// Safari onderbreekt de audio bij een telefoontje of het wisselen van app.
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) audio(); });
 
 function tone(f,start,dur,type,vol){
   try{ const a=audio(); if(!a) return;
@@ -693,16 +735,25 @@ function tone(f,start,dur,type,vol){
     o.type=type||"sine"; o.frequency.value=f;
     g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol||.18,t+.02); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
     o.connect(g).connect(a.destination); o.start(t); o.stop(t+dur+.05);
+    laatsteWeg = laatsteWeg || "toon";
   }catch(e){}
+}
+const TONEN = {
+  good(){ tone(660,0,.15,"triangle"); tone(990,.1,.25,"triangle"); },
+  combo(){ [660,830,990,1320].forEach((f,i)=>tone(f,i*.07,.18,"triangle",.14)); },
+  bad(){ tone(330,0,.14,"sine",.14); tone(247,.13,.28,"sine",.14); },
+  fanfare(){ [523,659,784,1047,784,1047].forEach((f,i)=>tone(f,i*.12,i===5?.5:.16,"triangle",.16)); },
+  pop(){ tone(880,0,.08,"square",.08); tone(1320,.06,.2,"triangle",.14); },
+  paint(){ tone(520+rnd(0,300),0,.12,"triangle",.12); }
+};
+function speel(k){
+  if(!soundOn) return;
+  if(!speelBestand(k) && TONEN[k]) TONEN[k]();
 }
 function tril(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
 const sfx = {
-  good(){ if(!soundOn) return; tone(660,0,.15,"triangle"); tone(990,.1,.25,"triangle"); },
-  combo(){ if(!soundOn) return; [660,830,990,1320].forEach((f,i)=>tone(f,i*.07,.18,"triangle",.14)); },
-  bad(){ if(!soundOn) return; tone(330,0,.14,"sine",.14); tone(247,.13,.28,"sine",.14); },
-  fanfare(){ if(!soundOn) return; [523,659,784,1047,784,1047].forEach((f,i)=>tone(f,i*.12,i===5?.5:.16,"triangle",.16)); },
-  pop(){ if(!soundOn) return; tone(880,0,.08,"square",.08); tone(1320,.06,.2,"triangle",.14); },
-  paint(){ if(!soundOn) return; tone(520+rnd(0,300),0,.12,"triangle",.12); }
+  good(){ speel("good"); }, combo(){ speel("combo"); }, bad(){ speel("bad"); },
+  fanfare(){ speel("fanfare"); }, pop(){ speel("pop"); }, paint(){ speel("paint"); }
 };
 
 /* ---------- mascot: Sterre de ster ---------- */
@@ -2044,7 +2095,7 @@ $("testBtn").onclick = ()=>{
   knop.textContent = "🔈 Speelt…";
   geluidMelding("Luister: eerst een deuntje, daarna een zinnetje.");
   ontgrendel();
-  spraakOk = null;
+  spraakOk = null; laatsteWeg = "";
   let stemGestart = false;
   const aan = soundOn;
   soundOn = true; sfx.fanfare(); soundOn = aan;
@@ -2058,18 +2109,20 @@ $("testBtn").onclick = ()=>{
     clearInterval(peilen);
     knop.textContent = label;
     testBezig = false;
-    const toon = !!(actx && actx.state==="running");
-    if(toon && stemGestart)
-      geluidMelding("Deuntje en stem zijn allebei gestart. Hoor je toch niets? Zet de zijschakelaar van stil af en draai het volume omhoog.", "goed");
-    else if(toon){
-      const iOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
-      const alsApp = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+    const speler = spelers.fanfare;
+    const bestandLiep = laatsteWeg==="bestand" || !!(speler && speler.currentTime > 0);
+    const toonLiep = !!(actx && actx.state==="running");
+    const geluid = bestandLiep || toonLiep;
+    const iOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+    const alsApp = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+    if(geluid && stemGestart)
+      geluidMelding("Deuntje en stem zijn allebei gestart. Hoor je toch niets? Draai het volume omhoog met de knopjes aan de zijkant, terwijl deze pagina open staat.", "goed");
+    else if(geluid)
       geluidMelding(iOS && !alsApp
         ? "Het deuntje werkt, maar de stem start niet. Zet Sterre op je beginscherm of open hem in Safari; dan doet het voorlezen het meestal wel."
         : "Het deuntje werkt, maar de stem start niet. Kijk of er een Nederlandse stem op het toestel staat, bij Instellingen, Toegankelijkheid, Gesproken materiaal.", "fout");
-    }
     else
-      geluidMelding("Er kwam nog geen geluid op gang. Tik nog een keer op de knop; de eerste tik maakt het geluid alleen wakker.", "fout");
+      geluidMelding("Het geluid start niet. Controleer of deze pagina geluid mag maken: in Chrome via het slotje naast het webadres, bij Site-instellingen.", "fout");
   }, 2200);
 };
 let thema = load("sterre-thema", null);  // null = volg het toestel
