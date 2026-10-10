@@ -347,7 +347,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
     </div>
   </header>
   <div class="snel">
-    <button class="toggle" id="readToggle" aria-pressed="false">🔊 Voorlezen: <b id="readState">uit</b></button>
+    <button class="toggle" id="readToggle" aria-pressed="true">🔊 Voorlezen: <b id="readState">aan</b></button>
     <button class="toggle" id="soundToggle" aria-pressed="true">🎵 Geluidjes: <b id="soundState">aan</b></button>
     <button class="toggle" id="testBtn">▶️ Test geluid</button>
     <label class="toggle stemkies">🗣️ Stem <select id="stemKies" aria-label="Kies een stem"></select></label>
@@ -486,7 +486,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
 <script>
 (function(){
 "use strict";
-const VERSIE = "2026-10-10k";
+const VERSIE = "2026-10-10m";
 const $ = id => document.getElementById(id);
 const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
 const pick = arr => arr[rnd(0,arr.length-1)];
@@ -617,7 +617,7 @@ async function vanServer(){
   naarServer();
 })();
 
-let autoRead = !!load("rekenrek-read", false);
+let autoRead = !!load("rekenrek-read", true);
 let soundOn = load("rekenrek-sound", true) !== false;
 
 const dayStr = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
@@ -788,7 +788,6 @@ function controleerStemmen(){
   toestelWerkt = null; save("sterre-toestelwerkt", null);
   if(stemNaam && !nlStemmen().some(v=>v.name===stemNaam)){ stemNaam = null; save("sterre-stemnaam", null); }
   if(!stemZelf){ stemNaam = null; save("sterre-stemnaam", null); }
-  if(stemKeuze === "app" && !stemZelf){ stemKeuze = "auto"; save("sterre-stem","auto"); }
   pickVoice();
   try{ vulStemLijst(); }catch(e){}
   if(nlVoice && stemKeuze !== "app") toast("Nieuwe stem gevonden: " + nlVoice.name);
@@ -816,16 +815,16 @@ function maakZin(t, rate){
 }
 const opIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
               (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-/* Eerder zette de app op een iPhone zelf de eigen stem aan, omdat de
-   toestelstem niets deed. Nu kiezen we eerst een vrouwenstem en proberen we
-   het opnieuw. Wie zelf een stem koos, houdt die keuze. */
-if(!load("sterre-stemkans2", false)){
-  save("sterre-stemkans2", true);
+/* De app heeft nu zelf een Nederlandse vrouwenstem aan boord. Die is overal
+   gelijk en start direct, dus die is vanaf hier de standaard. De stem van het
+   toestel blijft een keuze in het menu; wie die zelf koos, houdt hem. */
+if(!load("sterre-stemkans3", false)){
+  save("sterre-stemkans3", true);
   save("sterre-toestelwerkt", null);
   save("sterre-stemlijst", "");
-  if(!load("sterre-stemzelf", false)){ save("sterre-stem", "auto"); save("sterre-stemnaam", null); }
+  if(!load("sterre-stemzelf", false)){ save("sterre-stem", "app"); save("sterre-stemnaam", null); }
 }
-let stemKeuze = load("sterre-stem", "auto");   // auto, toestel of app
+let stemKeuze = load("sterre-stem", "app");   // app, auto of toestel
 /* Onthouden of de stem van het toestel überhaupt iets doet. Zolang dat
    onbekend is, proberen we hem alleen voor een losse zin, nooit voor een zin
    die al in de wachtrij staat: zo'n poging kunnen we namelijk niet redden. */
@@ -905,6 +904,9 @@ function audio(){
 function ontgrendel(){
   try{ if(navigator.audioSession && navigator.audioSession.type!=="playback") navigator.audioSession.type="playback"; }catch(e){}
   maakSpelers();
+  // De eigen stem is één groot bestand; bij de eerste aanraking al ophalen,
+  // dan hoeft de eerste zin er niet op te wachten.
+  if(stemKeuze !== "toestel"){ haalStemIndex(); maakStemAudio(); }
   if(!tagsKlaar){
     // De bestandjes één keer stil aanzetten; daarna mogen ze zonder aanraking spelen.
     let gelukt=0;
@@ -2294,27 +2296,23 @@ function vulStemLijst(){
   nl = nl.filter(v=>{ const sl=v.name+"|"+v.lang; if(gezien.has(sl)) return false; gezien.add(sl); return true; });
   const huidig = stemKeuze==="app" ? "app" : ((nlVoice && nlVoice.name) || "app");
   kies.innerHTML =
-    `<option value="app">uit de app</option>` +
+    `<option value="app">Sterre (aanbevolen)</option>` +
     nl.map(v=>{
       const land = /^nl-?BE/i.test(v.lang) ? "Vlaams" : "Nederlands";
       return `<option value="${v.name.replace(/"/g,"&quot;")}">${v.name} (${land})</option>`;
-    }).join("") +
-    (nl.length ? "" : `<option value="toestel" disabled>geen stem op dit toestel</option>`);
+    }).join("");
   kies.value = [...kies.options].some(o=>o.value===huidig) ? huidig : "app";
   const hint = $("stemHint"); if(!hint) return;
   const opIOSnu = /iP(hone|ad|od)/.test(navigator.userAgent) ||
                   (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   let tekst = "";
-  if(!nl.length){
-    tekst = "Dit toestel geeft deze app geen stemmen door" +
-      (opIOSnu ? ". Dat gebeurt in een app op het beginscherm; in Safari lukt het meestal wel." : ".") +
-      " Zolang dat zo is leest de app zelf voor.";
+  if(kies.value === "app"){
+    tekst = "Sterre leest voor met haar eigen stem. Die werkt altijd, ook zonder internet.";
   } else {
-    if(kies.value === "app") tekst = "De stem uit de app werkt altijd, ook zonder internet.";
-    else if(/^nl-?BE/i.test((nlVoice&&nlVoice.lang)||"")) tekst = "Dit is een Vlaamse stem.";
+    if(/^nl-?BE/i.test((nlVoice&&nlVoice.lang)||"")) tekst = "Dit is een Vlaamse stem.";
     if(opIOSnu && nl.length <= 3)
       tekst += (tekst ? " " : "") + "Meer Nederlandse stemmen haal je op bij Instellingen, Toegankelijkheid, Gesproken materiaal, Stemmen.";
-    tekst += ` (${nl.length} ${nl.length===1?"stem":"stemmen"} gevonden)`;
+    tekst += (tekst ? " " : "") + "Kies weer Sterre als deze stem stil blijft.";
   }
   hint.textContent = tekst; hint.hidden = !tekst;
 }
