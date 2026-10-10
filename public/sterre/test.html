@@ -34,6 +34,8 @@ textarea{width:100%;height:150px;font-family:ui-monospace,Menlo,monospace;font-s
   <h1>Geluidstest voor Sterre</h1>
   <p class="lead">Tik op de knop en wacht tot alles klaar is. Je hoort een paar geluidjes. Stuur daarna de uitslag door.</p>
   <button class="pri" id="start">▶︎ Start de test</button>
+  <button id="stemtest" hidden>🗣️ Test de stem van het toestel</button>
+  <button id="appstem" hidden>🔊 Laat de app-stem horen</button>
   <button id="kopieer" hidden>Kopieer de uitslag</button>
   <div id="uitslag"></div>
   <textarea id="tekst" hidden readonly></textarea>
@@ -78,30 +80,15 @@ async function test(){
     meld("Opslagmappen", namen.join(", ") || "geen");
   }
 
-  // 3. De stem van het toestel
+  // 3. Welke stemmen staan erop
   const sp = window.speechSynthesis;
-  if(!sp){ meld("Stem van het toestel", "niet aanwezig in deze browser", "nee"); }
+  if(!sp) meld("Stem van het toestel", "niet aanwezig in deze browser", "nee");
   else {
     let stemmen = sp.getVoices();
     if(!stemmen.length){ await wacht(600); stemmen = sp.getVoices(); }
     const nl = stemmen.filter(v=>/^nl/i.test(v.lang));
     meld("Stemmen op het toestel", `${stemmen.length} totaal, ${nl.length} Nederlands` +
       (nl.length ? ` (${nl.map(v=>v.name).slice(0,3).join(", ")})` : ""), stemmen.length ? "ok" : "nee");
-    const uitkomst = await new Promise(klaar=>{
-      let af=false; const af1=(w)=>{ if(!af){ af=true; klaar(w); } };
-      try{
-        sp.cancel();
-        const u = new SpeechSynthesisUtterance("Hallo, ik ben Sterre.");
-        u.lang = "nl-NL"; if(nl[0]) { try{ u.voice = nl[0]; }catch(e){} }
-        u.onstart = ()=>af1("begon te praten");
-        u.onend   = ()=>af1("klaar, maar begin nooit gemeld");
-        u.onerror = e=>af1("fout: " + ((e && e.error) || "onbekend"));
-        sp.resume(); sp.speak(u);
-        setTimeout(()=>af1(`niets gebeurd (speaking=${sp.speaking}, pending=${sp.pending})`), 3500);
-      }catch(e){ af1("uitzondering: " + e.message); }
-    });
-    meld("Voorlezen geprobeerd", uitkomst, /begon/.test(uitkomst) ? "ok" : "nee");
-    try{ sp.cancel(); }catch(e){}
   }
 
   // 4. Een geluidje als bestand
@@ -170,15 +157,60 @@ async function test(){
 
   const k = document.createElement("div");
   k.className = "klaar";
-  k.textContent = "Klaar. Tik op “Kopieer de uitslag” en plak hem in het gesprek.";
+  k.textContent = "Klaar. Tik nu nog op de twee stemknoppen hierboven, en kopieer daarna de uitslag.";
   $("uitslag").appendChild(k);
   $("tekst").value = regels.join("\n");
   $("kopieer").hidden = false;
+  $("stemtest").hidden = false;
+  $("appstem").hidden = false;
   $("start").disabled = false;
   $("start").textContent = "↻ Nog een keer";
 }
 
 $("start").onclick = ()=>{ test().catch(e=>meld("Test liep vast", e.message, "nee")); };
+
+// Voorlezen moet van iOS binnen een aanraking starten. Daarom een eigen
+// knop: zo valt de proef precies in de tik en krijgen we geen vals signaal.
+$("stemtest").onclick = ()=>{
+  const sp = window.speechSynthesis;
+  if(!sp){ meld("Voorlezen in de tik", "deze browser heeft geen stem", "nee"); return; }
+  $("stemtest").disabled = true;
+  let af = false;
+  const klaar = (w, goed)=>{ if(af) return; af = true;
+    meld("Voorlezen in de tik", w, goed ? "ok" : "nee");
+    $("stemtest").disabled = false; $("tekst").value = regels.join("\n"); };
+  try{
+    sp.cancel();
+    const nl = sp.getVoices().filter(v=>/^nl/i.test(v.lang));
+    const u = new SpeechSynthesisUtterance("Hallo, ik ben Sterre.");
+    u.lang = "nl-NL"; if(nl[0]){ try{ u.voice = nl[0]; }catch(e){} }
+    u.onstart = ()=>klaar("begon te praten, je hoorde het dus", true);
+    u.onend   = ()=>klaar("klaar gemeld, maar het begin nooit", false);
+    u.onerror = e=>klaar("fout: " + ((e && e.error) || "onbekend"), false);
+    sp.resume(); sp.speak(u);
+    setTimeout(()=>klaar(`niets gebeurd (speaking=${sp.speaking}, pending=${sp.pending})`, false), 3000);
+  }catch(e){ klaar("uitzondering: " + e.message, false); }
+};
+
+$("appstem").onclick = async ()=>{
+  $("appstem").disabled = true;
+  try{
+    const index = await (await fetch("stem/stem.json")).json();
+    const a = new Audio("stem/stem.mp3");
+    a.playsInline = true; a.setAttribute("playsinline","");
+    await new Promise(r=>{ a.addEventListener("loadedmetadata", r, {once:true}); setTimeout(r, 8000); });
+    for(const w of ["hoeveel","is","8","plus","5"]){
+      const f = index[w]; if(!f) continue;
+      a.currentTime = f[0];
+      await new Promise(r=>{ a.addEventListener("seeked", r, {once:true}); setTimeout(r, 800); });
+      await a.play().catch(()=>{});
+      await new Promise(r=>setTimeout(r, f[1]*1000 + 60));
+      a.pause();
+    }
+    meld("App-stem beluisterd", 'je hoorde "hoeveel is 8 plus 5"', "ok");
+  }catch(e){ meld("App-stem beluisterd", "mislukt: " + e.message, "nee"); }
+  $("appstem").disabled = false; $("tekst").value = regels.join("\n");
+};
 $("kopieer").onclick = async ()=>{
   const t = $("tekst");
   t.hidden = false; t.select();

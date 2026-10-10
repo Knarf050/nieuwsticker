@@ -481,7 +481,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
 <script>
 (function(){
 "use strict";
-const VERSIE = "2026-10-10c";
+const VERSIE = "2026-10-10d";
 const $ = id => document.getElementById(id);
 const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
 const pick = arr => arr[rnd(0,arr.length-1)];
@@ -728,7 +728,9 @@ function maakZin(t, rate){
   };
   return u;
 }
-let stemKeuze = load("sterre-stem", "auto");   // auto, toestel of app
+const opIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+              (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+let stemKeuze = load("sterre-stem", opIOS ? "app" : "auto");   // auto, toestel of app
 function say(t, rate, achteraan){
   if(!t) return;
   if(stemKeuze === "app"){ if(!achteraan) stopStem(); zegMetStem(t); return; }
@@ -756,7 +758,7 @@ function say(t, rate, achteraan){
         if(begonnen || spraakOk===true || sp.speaking || sp.pending) return;
         if(stemKeuze==="auto"){ stemKeuze="app"; save("sterre-stem","app"); syncToggles(); toast("Eigen stem aangezet"); }
         zegMetStem(t);
-      }, 420);
+      }, 200);
     }, 260);
   }catch(e){}
 }
@@ -2289,12 +2291,25 @@ $("resetBtn").onclick=()=>{
 })();
 
 $("versie").textContent = VERSIE;
+if(stemKeuze !== "toestel") haalStemIndex();
 buildStage(); zetThema(); renderHome(); syncToggles(); syncHash();
 })();
 </script>
 
 <script>
-if("serviceWorker" in navigator){ window.addEventListener("load", ()=>{ navigator.serviceWorker.register("/sterre/sw.js").catch(()=>{}); }); }
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("/sterre/sw.js").catch(()=>{});
+  });
+}
+// Oude opslagmappen van eerdere versies weghalen; die bleven soms hangen.
+if(window.caches){
+  caches.keys().then(namen=>{
+    const nieuwste = namen.filter(n=>/^sterre-v(\d+)$/.test(n))
+      .sort((a,b)=>(+b.match(/\d+/)[0]) - (+a.match(/\d+/)[0]))[0];
+    namen.forEach(n=>{ if(n.startsWith("sterre-") && n !== nieuwste) caches.delete(n); });
+  }).catch(()=>{});
+}
 </script>
 </body>
 </html>
