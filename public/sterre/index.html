@@ -272,6 +272,10 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
 .stats-table td.num{text-align:right;font-weight:700;white-space:nowrap}
 
 .savestate{color:var(--muted);font-size:.9rem;margin:10px 0 0}
+.geluidstatus{margin:-6px 0 14px;padding:10px 14px;border-radius:12px;font-size:1rem;
+  border:2.5px solid var(--soft);background:var(--tile);color:var(--text)}
+.geluidstatus.goed{border-color:var(--green);background:var(--green-bg);color:var(--green);font-weight:700}
+.geluidstatus.fout{border-color:var(--red);background:var(--wrong-bg)}
 .savestate.fout{color:var(--red);font-weight:700}
 .iostip{margin:16px 0 0;background:var(--tile);border:3px solid var(--sun-edge);border-radius:var(--radius);
   padding:12px 14px;box-shadow:4px 4px 0 var(--shadow);display:flex;gap:12px;align-items:flex-start}
@@ -344,6 +348,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
     <button class="toggle" id="testBtn">▶️ Test geluid</button>
     <button class="toggle" id="themaBtn">🌙 Donker</button>
   </div>
+  <p class="geluidstatus" id="geluidStatus" hidden></p>
   <div id="groups"></div>
 
   <div class="settings">
@@ -2025,22 +2030,47 @@ $("restoreBtn").onclick = ()=>{
   P=H; persist(); renderHome(); $("backup").hidden=true; $("restoreCode").value="";
   toast("Voortgang hersteld");
 };
+function geluidMelding(tekst, soort){
+  const el=$("geluidStatus");
+  el.textContent = tekst;
+  el.className = "geluidstatus" + (soort ? " "+soort : "");
+  el.hidden = false;
+}
+let testBezig=false;
 $("testBtn").onclick = ()=>{
+  if(testBezig) return;
+  testBezig = true;
+  const knop=$("testBtn"), label=knop.textContent;
+  knop.textContent = "🔈 Speelt…";
+  geluidMelding("Luister: eerst een deuntje, daarna een zinnetje.");
   ontgrendel();
   spraakOk = null;
+  let stemGestart = false;
   const aan = soundOn;
   soundOn = true; sfx.fanfare(); soundOn = aan;
+  tril(40);
   say("Hoor je mij? Dan werkt het voorlezen ook.");
-  setTimeout(()=>{
+  const peilen = setInterval(()=>{
     const sp = window.speechSynthesis;
-    const gingStem = spraakOk===true || (sp && (sp.speaking || sp.pending));
-    const gingToon = actx && actx.state==="running";
-    let tekst, fout=false;
-    if(gingToon && gingStem) tekst = "Geluid en stem gestart. Hoor je niets? Zet de zijschakelaar van stil af en draai het volume omhoog.";
-    else if(gingToon && !gingStem){ tekst = "De geluidjes werken, maar de stem start niet. Probeer Sterre in Safari of vanaf het beginscherm."; fout=true; }
-    else { tekst = "Er kwam nog geen geluid op gang. Tik nog een keer op de knop."; fout=true; }
-    toonBewaard(tekst, fout);
-  }, 1400);
+    if(spraakOk===true || (sp && (sp.speaking || sp.pending))) stemGestart = true;
+  }, 120);
+  setTimeout(()=>{
+    clearInterval(peilen);
+    knop.textContent = label;
+    testBezig = false;
+    const toon = !!(actx && actx.state==="running");
+    if(toon && stemGestart)
+      geluidMelding("Deuntje en stem zijn allebei gestart. Hoor je toch niets? Zet de zijschakelaar van stil af en draai het volume omhoog.", "goed");
+    else if(toon){
+      const iOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+      const alsApp = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+      geluidMelding(iOS && !alsApp
+        ? "Het deuntje werkt, maar de stem start niet. Zet Sterre op je beginscherm of open hem in Safari; dan doet het voorlezen het meestal wel."
+        : "Het deuntje werkt, maar de stem start niet. Kijk of er een Nederlandse stem op het toestel staat, bij Instellingen, Toegankelijkheid, Gesproken materiaal.", "fout");
+    }
+    else
+      geluidMelding("Er kwam nog geen geluid op gang. Tik nog een keer op de knop; de eerste tik maakt het geluid alleen wakker.", "fout");
+  }, 2200);
 };
 let thema = load("sterre-thema", null);  // null = volg het toestel
 function zetThema(){
