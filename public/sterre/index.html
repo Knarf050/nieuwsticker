@@ -617,9 +617,10 @@ const need = L => 100 + 50*(L-1);
 function levelInfo(xp){ let L=1, rest=xp; while(rest>=need(L)){ rest-=need(L); L++; } return {L, rest, need:need(L)}; }
 
 /* ---------- spraak ----------
-   iOS is kieskeurig: de eerste keer moet binnen een aanraking gebeuren, en
-   cancel() direct gevolgd door speak() laat de stem helemaal zwijgen. */
-let nlVoice=null, spraakKan=null;
+   Dit werkte al in Chrome op de iPhone: cancel() en dan meteen speak().
+   Niet "verbeteren" zonder het op een iPhone te proberen; een uitgestelde
+   of stille zin blijft op WebKit in de wachtrij hangen en legt alles stil. */
+let nlVoice=null, spraakOk=null, spraakVangnet=null;
 function pickVoice(){
   try{
     const vs=speechSynthesis.getVoices();
@@ -627,23 +628,32 @@ function pickVoice(){
   }catch(e){}
 }
 try{ pickVoice(); speechSynthesis.addEventListener("voiceschanged", pickVoice); }catch(e){}
+function maakZin(t, rate){
+  if(!nlVoice) pickVoice();
+  const u = new SpeechSynthesisUtterance(String(t));
+  u.lang="nl-NL"; u.rate=rate||.9;
+  if(nlVoice) u.voice=nlVoice;
+  u.onstart = ()=>{ spraakOk=true; };
+  return u;
+}
 function say(t, rate){
   if(!t) return;
-  const sp = window.speechSynthesis; if(!sp){ spraakKan=false; return; }
-  const spreken = ()=>{
-    try{
-      if(!nlVoice) pickVoice();
-      const u=new SpeechSynthesisUtterance(String(t));
-      u.lang="nl-NL"; u.rate=rate||.9;
-      if(nlVoice) u.voice=nlVoice;
-      u.onstart = ()=>{ spraakKan=true; };
-      sp.resume();
-      sp.speak(u);
-    }catch(e){ spraakKan=false; }
-  };
+  const sp = window.speechSynthesis; if(!sp) return;
   try{
-    if(sp.speaking || sp.pending){ sp.cancel(); setTimeout(spreken, 150); }
-    else spreken();
+    sp.cancel();
+    let begonnen = false;
+    const u = maakZin(t, rate);
+    u.onstart = ()=>{ begonnen = true; spraakOk = true; };
+    sp.speak(u);
+    // Vangnet: alleen opnieuw proberen als hij echt niet op gang kwam.
+    // Korte zinnen zijn soms al klaar voordat we kijken, dus eerst even peilen.
+    clearTimeout(spraakVangnet);
+    const peil = setTimeout(()=>{ if(sp.speaking || sp.pending) begonnen = true; }, 110);
+    spraakVangnet = setTimeout(()=>{
+      clearTimeout(peil);
+      if(begonnen || sp.speaking || sp.pending) return;
+      try{ sp.resume(); sp.speak(maakZin(t, rate)); }catch(e){}
+    }, 260);
   }catch(e){}
 }
 const sayMath = t => say(String(t).replace(/−/g," min ").replace(/\+/g," plus ").replace(/=/g," is "));
@@ -668,11 +678,6 @@ function ontgrendel(){
     try{ const b=a.createBuffer(1,1,22050), s=a.createBufferSource(); s.buffer=b; s.connect(a.destination); s.start(0); }catch(e){}
     if(a.state==="running") ontgrendeld=true;
   }
-  // De stem alvast wakker maken; dit moet binnen een aanraking gebeuren.
-  try{
-    const sp=window.speechSynthesis;
-    if(sp && !sp.speaking){ const u=new SpeechSynthesisUtterance(" "); u.volume=0; u.lang="nl-NL"; sp.speak(u); }
-  }catch(e){}
 }
 ["pointerdown","touchend","click","keydown"].forEach(ev=>
   document.addEventListener(ev, ontgrendel, {capture:true, passive:true}));
@@ -1640,7 +1645,7 @@ function next(){
   setMascot($("gameMascot"),"denk");
   renderMeta();
   renderProgress();
-  if(autoRead){ say(q.speak); controleerSpraak(); }
+  if(autoRead) say(q.speak);
 }
 function xpPop(n){ const el=document.createElement("span"); el.className="xp-pop"; el.textContent=`+${n}`; document.querySelector("#game .fb-row").appendChild(el); setTimeout(()=>el.remove(),1000); }
 function bouwVak(){
@@ -1719,7 +1724,7 @@ function markFout(btn, waarde){
   tip.hidden=false; tip.querySelector(".again").onclick=()=>sayMath(text);
   setMascot($("gameMascot"),"denk","wobble");
   sfx.bad(); tril(60);
-  if(autoRead){ sayMath(text); controleerSpraak(); }
+  if(autoRead) sayMath(text);
 }
 
 /* ---------- kleurplaat ---------- */
@@ -1978,17 +1983,7 @@ $("groups").addEventListener("click", e=>{
 });
 $("choices").addEventListener("click", e=>{ const b=e.target.closest(".choice"); if(!b) return; if(st&&st.q&&st.q.bouw) bouwKlik(b); else choose(b); });
 document.addEventListener("keydown", e=>{ if($("game").hidden) return; const n=parseInt(e.key,10); if(n>=1&&n<=4){ const b=$("choices").children[n-1]; if(b && !(st&&st.q&&st.q.bouw)) choose(b); } });
-$("speakBtn").onclick = ()=>{ if(st&&st.q){ ontgrendel(); say(st.q.speak); controleerSpraak(); } };
-function controleerSpraak(){
-  if(spraakKan!==null || load("sterre-spraak-gemeld", false)) return;
-  setTimeout(()=>{
-    if(spraakKan===true || load("sterre-spraak-gemeld", false)) return;
-    save("sterre-spraak-gemeld", true);
-    toast("Voorlezen lukt niet in deze browser");
-    const t=$("tip");
-    if(t){ t.innerHTML = `<span class="tip-ic">🔇</span><span>Voorlezen werkt niet in Chrome op de iPhone. Open Sterre in Safari, of zet hem op je beginscherm; dan werkt de stem wel.</span>`; t.hidden=false; }
-  }, 1800);
-}
+$("speakBtn").onclick = ()=>{ if(st&&st.q){ ontgrendel(); say(st.q.speak); } };
 $("stopBtn").onclick = goHome;
 $("kleurStop").onclick = goHome;
 $("againBtn").onclick = ()=>{ if(lastAct) start(lastAct); };
@@ -2032,15 +2027,20 @@ $("restoreBtn").onclick = ()=>{
 };
 $("testBtn").onclick = ()=>{
   ontgrendel();
+  spraakOk = null;
   const aan = soundOn;
   soundOn = true; sfx.fanfare(); soundOn = aan;
-  say("Hoor je mij? Dan werkt het geluid.");
+  say("Hoor je mij? Dan werkt het voorlezen ook.");
   setTimeout(()=>{
-    const stil = !actx || actx.state!=="running";
-    toonBewaard(stil
-      ? "Geen geluid? Tik nog een keer, of kijk of het toestel op stil staat."
-      : "Hoor je niets? Zet de zijschakelaar van stil af en draai het volume omhoog.", stil);
-  }, 1200);
+    const sp = window.speechSynthesis;
+    const gingStem = spraakOk===true || (sp && (sp.speaking || sp.pending));
+    const gingToon = actx && actx.state==="running";
+    let tekst, fout=false;
+    if(gingToon && gingStem) tekst = "Geluid en stem gestart. Hoor je niets? Zet de zijschakelaar van stil af en draai het volume omhoog.";
+    else if(gingToon && !gingStem){ tekst = "De geluidjes werken, maar de stem start niet. Probeer Sterre in Safari of vanaf het beginscherm."; fout=true; }
+    else { tekst = "Er kwam nog geen geluid op gang. Tik nog een keer op de knop."; fout=true; }
+    toonBewaard(tekst, fout);
+  }, 1400);
 };
 let thema = load("sterre-thema", null);  // null = volg het toestel
 function zetThema(){
