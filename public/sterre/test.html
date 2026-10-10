@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sterre — geluidstest</title>
+<style>
+:root{--paper:#FBFCFF;--ink:#1F3A93;--text:#1B2340;--muted:#56628C;--tile:#fff;
+  --green:#2E9E5B;--green-bg:#DDF3E5;--red:#E23B3B;--red-bg:#FBE3E3;--grid:#DCE7F6;--sun:#FFC93C}
+@media (prefers-color-scheme:dark){:root{--paper:#121A2F;--ink:#A9C1FF;--text:#EAF0FF;--muted:#A7B3D6;
+  --tile:#18223D;--green:#4CC57F;--green-bg:#173A28;--red:#FF5C5C;--red-bg:#40202A;--grid:#1D2946}}
+*{box-sizing:border-box}
+body{margin:0;padding:16px;font-family:system-ui,-apple-system,sans-serif;background:var(--paper);color:var(--text);line-height:1.45}
+.wrap{max-width:640px;margin:0 auto}
+h1{font-size:1.5rem;color:var(--ink);margin:0 0 4px}
+p.lead{margin:0 0 16px;color:var(--muted)}
+button{font:inherit;font-weight:700;border:3px solid var(--ink);background:var(--tile);color:var(--text);
+  border-radius:12px;padding:12px 16px;margin:0 8px 8px 0;cursor:pointer}
+button.pri{background:var(--ink);color:var(--paper)}
+#uitslag{margin-top:14px}
+.rij{background:var(--tile);border:2px solid var(--grid);border-left-width:7px;border-radius:10px;
+  padding:9px 12px;margin-bottom:7px;font-size:.98rem;word-break:break-word}
+.rij.ok{border-left-color:var(--green);background:var(--green-bg)}
+.rij.nee{border-left-color:var(--red);background:var(--red-bg)}
+.rij.info{border-left-color:var(--muted)}
+.rij b{display:block}
+textarea{width:100%;height:150px;font-family:ui-monospace,Menlo,monospace;font-size:.8rem;
+  border:2px solid var(--ink);border-radius:10px;padding:8px;background:var(--paper);color:var(--text)}
+.klaar{background:var(--sun);color:#1B2340;border-radius:10px;padding:10px 12px;font-weight:700;margin:12px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Geluidstest voor Sterre</h1>
+  <p class="lead">Tik op de knop en wacht tot alles klaar is. Je hoort een paar geluidjes. Stuur daarna de uitslag door.</p>
+  <button class="pri" id="start">▶︎ Start de test</button>
+  <button id="kopieer" hidden>Kopieer de uitslag</button>
+  <div id="uitslag"></div>
+  <textarea id="tekst" hidden readonly></textarea>
+</div>
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const regels = [];
+function meld(naam, waarde, soort){
+  regels.push(`${naam}: ${waarde}`);
+  const d = document.createElement("div");
+  d.className = "rij " + (soort || "info");
+  d.innerHTML = `<b>${naam}</b>${waarde}`;
+  $("uitslag").appendChild(d);
+  window.scrollTo(0, document.body.scrollHeight);
+}
+const wacht = ms => new Promise(r=>setTimeout(r, ms));
+
+async function test(){
+  $("start").disabled = true;
+  $("uitslag").innerHTML = "";
+  regels.length = 0;
+
+  // 1. Welke app en welke browser
+  meld("Adres", location.href);
+  meld("Browser", navigator.userAgent);
+  const alsApp = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  meld("Vanaf beginscherm", alsApp ? "ja" : "nee, in een browsertabblad", alsApp ? "ok" : "info");
+
+  // 2. Draait er een oude versie?
+  try{
+    const r = await fetch("index.html?v=" + Date.now(), {cache:"no-store"});
+    const t = await r.text();
+    const m = t.match(/VERSIE\s*=\s*"([^"]+)"/);
+    meld("Versie op de server", m ? m[1] : "onbekend");
+  }catch(e){ meld("Versie op de server", "niet op te halen: " + e.message, "nee"); }
+  if("serviceWorker" in navigator){
+    const regs = await navigator.serviceWorker.getRegistrations();
+    meld("Offline-hulpje", regs.length ? `${regs.length} actief` : "geen");
+    const namen = (window.caches ? await caches.keys() : []);
+    meld("Opslagmappen", namen.join(", ") || "geen");
+  }
+
+  // 3. De stem van het toestel
+  const sp = window.speechSynthesis;
+  if(!sp){ meld("Stem van het toestel", "niet aanwezig in deze browser", "nee"); }
+  else {
+    let stemmen = sp.getVoices();
+    if(!stemmen.length){ await wacht(600); stemmen = sp.getVoices(); }
+    const nl = stemmen.filter(v=>/^nl/i.test(v.lang));
+    meld("Stemmen op het toestel", `${stemmen.length} totaal, ${nl.length} Nederlands` +
+      (nl.length ? ` (${nl.map(v=>v.name).slice(0,3).join(", ")})` : ""), stemmen.length ? "ok" : "nee");
+    const uitkomst = await new Promise(klaar=>{
+      let af=false; const af1=(w)=>{ if(!af){ af=true; klaar(w); } };
+      try{
+        sp.cancel();
+        const u = new SpeechSynthesisUtterance("Hallo, ik ben Sterre.");
+        u.lang = "nl-NL"; if(nl[0]) { try{ u.voice = nl[0]; }catch(e){} }
+        u.onstart = ()=>af1("begon te praten");
+        u.onend   = ()=>af1("klaar, maar begin nooit gemeld");
+        u.onerror = e=>af1("fout: " + ((e && e.error) || "onbekend"));
+        sp.resume(); sp.speak(u);
+        setTimeout(()=>af1(`niets gebeurd (speaking=${sp.speaking}, pending=${sp.pending})`), 3500);
+      }catch(e){ af1("uitzondering: " + e.message); }
+    });
+    meld("Voorlezen geprobeerd", uitkomst, /begon/.test(uitkomst) ? "ok" : "nee");
+    try{ sp.cancel(); }catch(e){}
+  }
+
+  // 4. Een geluidje als bestand
+  async function speelBestand(naam, bron, van, duur){
+    const a = new Audio(bron);
+    a.playsInline = true; a.setAttribute("playsinline",""); a.preload = "auto";
+    const geladen = await new Promise(res=>{
+      a.addEventListener("loadedmetadata", ()=>res("gelukt"));
+      a.addEventListener("error", ()=>res("laden mislukt" + (a.error ? " (code " + a.error.code + ")" : "")));
+      setTimeout(()=>res("laden duurde te lang"), 8000);
+    });
+    if(geladen !== "gelukt"){ meld(naam, geladen, "nee"); return; }
+    let extra = `duur ${a.duration.toFixed(1)}s`;
+    if(van != null){
+      a.currentTime = van;
+      await new Promise(res=>{ a.addEventListener("seeked", res, {once:true}); setTimeout(res, 2500); });
+      const raak = Math.abs(a.currentTime - van) < 0.4;
+      extra += ` · zoeken naar ${van}s kwam uit op ${a.currentTime.toFixed(2)}s (${raak ? "goed" : "MISLUKT"})`;
+      if(!raak){ meld(naam, extra, "nee"); return; }
+    }
+    const gespeeld = await new Promise(res=>{
+      let begon = false;
+      a.addEventListener("playing", ()=>{ begon = true; }, {once:true});
+      const p = a.play();
+      if(p && p.catch) p.catch(e=>res("afspelen geweigerd: " + e.name));
+      setTimeout(()=>{ const t = a.currentTime; a.pause();
+        res(begon || t > (van||0) + 0.05 ? `speelde tot ${t.toFixed(2)}s` : "er kwam geen geluid"); },
+        duur ? duur*1000 + 500 : 1200);
+    });
+    meld(naam, extra + " · " + gespeeld, /speelde/.test(gespeeld) ? "ok" : "nee");
+  }
+  await speelBestand("Geluidje (fanfare.wav)", "geluid/fanfare.wav", null, 1.2);
+
+  // 5. De stem die in de app zit
+  let index = null;
+  try{
+    const r = await fetch("stem/stem.json", {cache:"no-store"});
+    index = await r.json();
+    meld("Woordenlijst van de app-stem", Object.keys(index).length + " fragmenten", "ok");
+  }catch(e){ meld("Woordenlijst van de app-stem", "niet op te halen: " + e.message, "nee"); }
+  if(index && index["poes"]){
+    const [van, duur] = index["poes"];
+    await speelBestand('App-stem, het woord "poes"', "stem/stem.mp3", van, duur);
+  }
+
+  // 6. Zelf opgewekte toon
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) meld("Zelf opgewekte toon", "deze browser kan het niet", "nee");
+    else{
+      const c = new AC();
+      if(c.state !== "running" && c.resume) await c.resume();
+      const o = c.createOscillator(), g = c.createGain();
+      o.frequency.value = 880; g.gain.value = 0.12;
+      o.connect(g).connect(c.destination); o.start(); setTimeout(()=>o.stop(), 350);
+      await wacht(500);
+      meld("Zelf opgewekte toon", "toestand: " + c.state, c.state === "running" ? "ok" : "nee");
+    }
+  }catch(e){ meld("Zelf opgewekte toon", "fout: " + e.message, "nee"); }
+
+  // 7. Wat staat er in Sterre ingesteld?
+  const lees = k => { try{ return localStorage.getItem(k); }catch(e){ return "niet te lezen"; } };
+  meld("Instelling voorlezen", lees("rekenrek-read") === "true" ? "aan" : "uit");
+  meld("Instelling geluidjes", lees("rekenrek-sound") === "false" ? "uit" : "aan");
+  meld("Instelling stem", (lees("sterre-stem") || "auto").replace(/"/g,""));
+
+  const k = document.createElement("div");
+  k.className = "klaar";
+  k.textContent = "Klaar. Tik op “Kopieer de uitslag” en plak hem in het gesprek.";
+  $("uitslag").appendChild(k);
+  $("tekst").value = regels.join("\n");
+  $("kopieer").hidden = false;
+  $("start").disabled = false;
+  $("start").textContent = "↻ Nog een keer";
+}
+
+$("start").onclick = ()=>{ test().catch(e=>meld("Test liep vast", e.message, "nee")); };
+$("kopieer").onclick = async ()=>{
+  const t = $("tekst");
+  t.hidden = false; t.select();
+  try{ await navigator.clipboard.writeText(t.value); $("kopieer").textContent = "Gekopieerd ✓"; }
+  catch(e){ try{ document.execCommand("copy"); $("kopieer").textContent = "Gekopieerd ✓"; }
+            catch(e2){ $("kopieer").textContent = "Selecteer de tekst hieronder"; } }
+};
+})();
+</script>
+</body>
+</html>
