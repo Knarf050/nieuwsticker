@@ -346,6 +346,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
     <button class="toggle" id="readToggle" aria-pressed="false">🔊 Voorlezen: <b id="readState">uit</b></button>
     <button class="toggle" id="soundToggle" aria-pressed="true">🎵 Geluidjes: <b id="soundState">aan</b></button>
     <button class="toggle" id="testBtn">▶️ Test geluid</button>
+    <button class="toggle" id="stemBtn">🗣️ Stem: <b id="stemState">van het toestel</b></button>
     <button class="toggle" id="themaBtn">🌙 Donker</button>
   </div>
   <p class="geluidstatus" id="geluidStatus" hidden></p>
@@ -621,11 +622,81 @@ const DAILY_GOAL = 2;
 const need = L => 100 + 50*(L-1);
 function levelInfo(xp){ let L=1, rest=xp; while(rest>=need(L)){ rest-=need(L); L++; } return {L, rest, need:need(L)}; }
 
+/* ---------- meegeleverde stem ----------
+   Niet elke browser op de iPhone kan voorlezen. Daarom zit er een eigen stem
+   in de app: één mp3 met alle woorden en getallen, met een index erbij.
+   Een zin wordt woord voor woord afgespeeld. Dat klinkt wat houterig, maar
+   het werkt overal, ook zonder internet. */
+let stemIndex=null, stemAudio=null, stemBeurt=0, stemLaden=null;
+const stemKlaar = () => !!(stemIndex && stemAudio);
+function haalStemIndex(){
+  if(stemLaden) return stemLaden;
+  stemLaden = fetch("stem/stem.json").then(r=>r.json()).then(j=>{ stemIndex=j; return j; }).catch(()=>null);
+  return stemLaden;
+}
+function maakStemAudio(){
+  if(stemAudio) return stemAudio;
+  try{
+    stemAudio = new Audio("stem/stem.mp3");
+    stemAudio.preload="auto"; stemAudio.playsInline=true; stemAudio.setAttribute("playsinline","");
+  }catch(e){ stemAudio=null; }
+  return stemAudio;
+}
+function knipZin(t){
+  return String(t)
+    .replace(/−/g," min ").replace(/\+/g," plus ").replace(/×/g," keer ")
+    .replace(/=/g," is ").replace(/:/g," gedeeld door ").replace(/€/g," euro ")
+    .toLowerCase().match(/[0-9]+|[a-zà-ÿ]+/g) || [];
+}
+function wachtTot(a, gebeurtenis, test, max){
+  return new Promise(res=>{
+    if(test()) return res(true);
+    let af=false;
+    const op=()=>{ if(af) return; af=true; a.removeEventListener(gebeurtenis, op); clearTimeout(t); res(test()); };
+    const t=setTimeout(op, max);
+    a.addEventListener(gebeurtenis, op);
+  });
+}
+/* Eerst echt naar de goede plek springen, dan pas spelen. Zonder dat
+   begint een mp3 gewoon bij het begin en hoor je het verkeerde woord. */
+async function speelStuk(start, duur){
+  const a=stemAudio; if(!a) return;
+  await wachtTot(a, "loadedmetadata", ()=>a.readyState>=1, 4000);
+  if(Math.abs(a.currentTime-start) > 0.03){
+    try{ a.currentTime = start; }catch(e){}
+    await wachtTot(a, "seeked", ()=>Math.abs(a.currentTime-start)<=0.05, 600);
+  }
+  await new Promise(klaar=>{
+    let af=false, tmr=null;
+    const stop=()=>{ if(af) return; af=true; clearTimeout(tmr); a.removeEventListener("playing",opGang); try{ a.pause(); }catch(e){} klaar(); };
+    const opGang=()=>{ clearTimeout(tmr); tmr=setTimeout(stop, duur*1000+50); };
+    a.addEventListener("playing", opGang);
+    const p = a.play();
+    if(p && p.catch) p.catch(()=>stop());
+    tmr = setTimeout(stop, duur*1000+1200);     // noodrem als 'playing' uitblijft
+  });
+}
+async function zegMetStem(t){
+  const beurt = ++stemBeurt;
+  if(!stemIndex) await haalStemIndex();
+  if(!stemIndex) return false;
+  if(!maakStemAudio()) return false;
+  const stukken = knipZin(t).map(w=>stemIndex[w]).filter(Boolean);
+  if(!stukken.length) return false;
+  for(const [start,duur] of stukken){
+    if(beurt !== stemBeurt) return true;        // er is alweer iets nieuws gezegd
+    await speelStuk(start, duur);
+    await new Promise(r=>setTimeout(r, 45));
+  }
+  return true;
+}
+function stopStem(){ stemBeurt++; try{ if(stemAudio) stemAudio.pause(); }catch(e){} }
+
 /* ---------- spraak ----------
    Dit werkte al in Chrome op de iPhone: cancel() en dan meteen speak().
    Niet "verbeteren" zonder het op een iPhone te proberen; een uitgestelde
    of stille zin blijft op WebKit in de wachtrij hangen en legt alles stil. */
-let nlVoice=null, spraakOk=null, spraakVangnet=null;
+let nlVoice=null, spraakOk=null, spraakVangnet=null, spraakFout=null;
 function pickVoice(){
   try{
     const vs=speechSynthesis.getVoices();
@@ -641,11 +712,16 @@ function maakZin(t, rate){
   // standaardstem dan helemaal geen geluid.
   if(nlVoice){ try{ u.voice=nlVoice; }catch(e){ nlVoice=null; } }
   u.onstart = ()=>{ spraakOk=true; };
+  u.onerror = e=>{ spraakFout = (e && e.error) || "onbekend"; spraakOk=false; };
   return u;
 }
+let stemKeuze = load("sterre-stem", "auto");   // auto, toestel of app
 function say(t, rate, achteraan){
   if(!t) return;
-  const sp = window.speechSynthesis; if(!sp) return;
+  if(stemKeuze === "app"){ if(!achteraan) stopStem(); zegMetStem(t); return; }
+  const sp = window.speechSynthesis;
+  if(!sp){ stemKeuze="app"; save("sterre-stem","app"); zegMetStem(t); return; }
+  if(!achteraan) stopStem();
   try{
     if(!achteraan) sp.cancel();
     let begonnen = false;
@@ -661,6 +737,13 @@ function say(t, rate, achteraan){
       clearTimeout(peil);
       if(begonnen || sp.speaking || sp.pending) return;
       try{ sp.resume(); sp.speak(maakZin(t, rate)); }catch(e){}
+      // Nog steeds niets? Dan kan deze browser het niet en nemen we onze
+      // eigen stem, vanaf nu voorgoed.
+      setTimeout(()=>{
+        if(begonnen || spraakOk===true || sp.speaking || sp.pending) return;
+        if(stemKeuze==="auto"){ stemKeuze="app"; save("sterre-stem","app"); syncToggles(); toast("Eigen stem aangezet"); }
+        zegMetStem(t);
+      }, 420);
     }, 260);
   }catch(e){}
 }
@@ -1643,7 +1726,7 @@ function renderStats(){
     }).join("");
 }
 function show(id){ ["home","game","result","album","badges","kleur","regen","overzicht"].forEach(s=>$(s).hidden = s!==id); if(id!=="regen") stopRegen(); window.scrollTo(0,0); }
-function goHome(){ try{speechSynthesis.cancel();}catch(e){} kleurBezig=false; st=null; renderHome(); show("home"); }
+function goHome(){ try{speechSynthesis.cancel();}catch(e){} stopStem(); kleurBezig=false; st=null; renderHome(); show("home"); }
 
 /* ---------- quiz ---------- */
 let st=null;
@@ -2084,6 +2167,15 @@ const rt=$("readToggle"), so=$("soundToggle");
 const syncToggles=()=>{
   rt.setAttribute("aria-pressed",String(autoRead)); $("readState").textContent = autoRead?"aan":"uit";
   so.setAttribute("aria-pressed",String(soundOn)); $("soundState").textContent = soundOn?"aan":"uit";
+  $("stemState").textContent = stemKeuze==="app" ? "uit de app" : "van het toestel";
+  $("stemBtn").setAttribute("aria-pressed", String(stemKeuze==="app"));
+};
+$("stemBtn").onclick = ()=>{
+  ontgrendel();
+  stemKeuze = stemKeuze==="app" ? "toestel" : "app";
+  save("sterre-stem", stemKeuze); syncToggles();
+  if(stemKeuze==="app") haalStemIndex();
+  say(st && st.q ? st.q.speak : "Zo klink ik.");
 };
 rt.onclick=()=>{
   ontgrendel(); autoRead=!autoRead; save("rekenrek-read",autoRead); syncToggles();
@@ -2118,7 +2210,7 @@ $("testBtn").onclick = ()=>{
   knop.textContent = "🔈 Speelt…";
   geluidMelding("Luister: eerst een deuntje, daarna een zinnetje.");
   ontgrendel();
-  spraakOk = null; laatsteWeg = "";
+  spraakOk = null; spraakFout = null; laatsteWeg = "";
   let stemGestart = false;
   const aan = soundOn;
   soundOn = true; sfx.fanfare(); soundOn = aan;
@@ -2138,12 +2230,13 @@ $("testBtn").onclick = ()=>{
     const geluid = bestandLiep || toonLiep;
     const iOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
     const alsApp = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
-    if(geluid && stemGestart)
-      geluidMelding("Deuntje en stem zijn allebei gestart. Hoor je toch niets? Draai het volume omhoog met de knopjes aan de zijkant, terwijl deze pagina open staat.", "goed");
+    const eigenStem = stemKeuze==="app";
+    if(geluid && (stemGestart || eigenStem))
+      geluidMelding(`Deuntje en stem werken${eigenStem?" (de stem uit de app)":""}. Hoor je toch niets? Draai het volume omhoog met de knopjes aan de zijkant, terwijl deze pagina open staat.`, "goed");
     else if(geluid)
-      geluidMelding(iOS && !alsApp
-        ? "Het deuntje werkt, maar de stem start niet. Zet Sterre op je beginscherm of open hem in Safari; dan doet het voorlezen het meestal wel."
-        : "Het deuntje werkt, maar de stem start niet. Kijk of er een Nederlandse stem op het toestel staat, bij Instellingen, Toegankelijkheid, Gesproken materiaal.", "fout");
+      geluidMelding("Het deuntje werkt, maar de stem van het toestel start niet" +
+        (spraakFout ? ` (melding: ${spraakFout})` : "") +
+        ". Tik op \u201cStem\u201d om de stem uit de app te gebruiken; die werkt in elke browser.", "fout");
     else
       geluidMelding("Het geluid start niet. Controleer of deze pagina geluid mag maken: in Chrome via het slotje naast het webadres, bij Site-instellingen.", "fout");
   }, 2200);
