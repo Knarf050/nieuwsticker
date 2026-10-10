@@ -68,17 +68,17 @@ button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sun);outli
 /* Bovenbalk: stickerboek, medailles, overzicht */
 .topnav{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:2px 0 10px}
 .navtile{
-  background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);padding:8px 6px;
-  box-shadow:3px 3px 0 var(--shadow);display:grid;justify-items:center;gap:1px;line-height:1.15;
+  background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);padding:6px 4px;
+  box-shadow:3px 3px 0 var(--shadow);display:grid;justify-items:center;gap:0;line-height:1.1;
   transition:transform .12s, box-shadow .12s}
 .navtile:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
-.navtile .ic{font-size:1.5rem}
-.navtile b{font-size:.95rem}
-.navtile small{color:var(--muted);font-size:.8rem}
+.navtile .ic{font-size:1.25rem}
+.navtile b{font-size:.9rem}
+.navtile small{color:var(--muted);font-size:.75rem}
 
 /* Snelknoppen voor geluid */
-.snel{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
-.snel .toggle{padding:6px 12px;font-size:.95rem;border-width:2px}
+.snel{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.snel .toggle{padding:6px 10px;font-size:.9rem;border-width:2px}
 .stemkies{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .stemkies select{font:inherit;font-size:.95rem;font-weight:700;border:0;background:none;color:inherit;
   max-width:11rem;padding:2px 0}
@@ -104,20 +104,41 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
 @keyframes wobble{25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
 
 /* Tiles */
-.section-title{font-size:1.4rem;margin:26px 0 4px;color:var(--ink)}
-.section-sub{margin:0 0 12px;color:var(--muted);font-size:1rem}
+.section-title{font-size:1.4rem;margin:20px 0 2px;color:var(--ink)}
+.section-sub{margin:0 0 10px;color:var(--muted);font-size:1rem}
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
 .tile{text-align:left;background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);
   padding:14px;display:grid;gap:4px;box-shadow:4px 4px 0 var(--shadow);transition:transform .12s, box-shadow .12s}
 .tile:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--shadow)}
 .tile:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shadow)}
 .tile .icon{height:52px;display:flex;align-items:center;font-size:2rem;font-weight:700;color:var(--ink)}
+.tiles.kort .tile{padding:12px}
+.tiles.kort .tile .icon{height:34px;font-size:1.7rem}
+.tiles.kort .tile b{font-size:1.1rem}
 .tile .icon svg{height:48px;width:auto}
 .tile b{font-size:1.2rem}
 .tile .sub{color:var(--muted);font-size:.98rem}
 .stars{font-size:1.2rem;letter-spacing:2px;color:var(--sun);min-height:1.5em}
 .tilebar{height:7px;border-radius:99px;background:var(--grid);overflow:hidden;margin-top:2px}
 .tilebar i{display:block;height:100%;border-radius:99px;background:var(--green)}
+
+/* Vakken op het beginscherm: brede, lage rijen, zodat ze alle vijf
+   tegelijk op een telefoonscherm passen. */
+.cats{display:grid;gap:8px;margin:0 0 14px}
+.cattile{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;
+  text-align:left;background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);
+  padding:9px 12px;box-shadow:4px 4px 0 var(--shadow);transition:transform .12s, box-shadow .12s}
+.cattile:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--shadow)}
+.cattile:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shadow)}
+.catic{font-size:1.7rem;font-weight:700;color:var(--ink);min-width:2em;text-align:center;line-height:1}
+.cattext{display:grid;gap:1px;min-width:0}
+.cattext b{font-size:1.15rem}
+.cattext small{color:var(--muted);font-size:.9rem}
+.catbar{height:6px;border-radius:99px;background:var(--grid);overflow:hidden;margin-top:2px}
+.catbar i{display:block;height:100%;border-radius:99px;background:var(--sun)}
+.catster{color:var(--muted);font-size:.95rem;white-space:nowrap;font-weight:700}
+.instel-kop{font-size:1.05rem;color:var(--ink);margin:18px 0 8px}
+@media (min-width:620px){ .cats{grid-template-columns:1fr 1fr} }
 .tilebar.laag i{background:var(--sun)}
 .tilebar.zeerlaag i{background:var(--red)}
 .stars .off{color:var(--grid)}
@@ -349,28 +370,47 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
   <div class="snel">
     <button class="toggle" id="readToggle" aria-pressed="true">🔊 Voorlezen: <b id="readState">aan</b></button>
     <button class="toggle" id="soundToggle" aria-pressed="true">🎵 Geluidjes: <b id="soundState">aan</b></button>
-    <button class="toggle" id="testBtn">▶️ Test geluid</button>
-    <label class="toggle stemkies">🗣️ Stem <select id="stemKies" aria-label="Kies een stem"></select></label>
-    <button class="toggle" id="themaBtn">🌙 Donker</button>
+    <button class="toggle" id="instelBtn" title="Instellingen" aria-label="Instellingen">⚙️</button>
   </div>
-  <p class="geluidstatus" id="geluidStatus" hidden></p>
-  <p class="stemhint" id="stemHint" hidden></p>
-  <div id="groups"></div>
-
-  <div class="settings">
-    <button class="toggle" id="backupBtn">💾 Voortgang bewaren</button>
-    <button class="linkbtn" id="resetBtn">Voortgang wissen</button>
-  </div>
-  <p class="note">Elke oefening levert een sticker op. Dagdoel: 2 rondes per dag.</p>
+  <div id="vandaag" class="tiles kort"></div>
+  <h2 class="section-title">Kies een onderdeel</h2>
+  <p class="section-sub">Tik op een vak. Elke oefening levert een sticker op.</p>
+  <div id="cats" class="cats"></div>
   <p class="savestate" id="saveState">Opgeslagen ✓</p>
-  <p class="savestate">Versie <span id="versie"></span> · <a href="test.html" style="color:var(--muted)">geluidstest</a> · <a href="stemproef.html" style="color:var(--muted)">stemproef</a></p>
   <div class="iostip" id="iosTip" hidden>
     <span class="ic">📲</span>
     <div>
       <b>Zet Sterre op het beginscherm</b>
-      <p>In een gewoon browsertabblad kan de iPhone de sterren en stickers weggooien. Tik op het deelteken onderin en kies "Zet op beginscherm". Dan blijft alles staan en start Sterre als een echte app.</p>
+      <p>In een browsertabblad kan de iPhone de stickers weggooien. Tik onderin op het deelteken en kies "Zet op beginscherm".</p>
       <button class="btn" id="iosTipDicht">Begrepen</button>
     </div>
+  </div>
+</section>
+
+<!-- ONDERDEEL -->
+<section id="cat" hidden>
+  <div class="bar"><button class="btn back">← Terug</button><h2 id="catTitle"></h2></div>
+  <p class="section-sub" id="catSub"></p>
+  <div id="catExtra"></div>
+  <div id="catTiles" class="tiles"></div>
+</section>
+
+<!-- INSTELLINGEN -->
+<section id="instel" hidden>
+  <div class="bar"><button class="btn back">← Terug</button><h2>Instellingen</h2></div>
+  <h3 class="instel-kop">Geluid</h3>
+  <div class="snel">
+    <button class="toggle" id="testBtn">▶️ Test geluid</button>
+    <label class="toggle stemkies">🗣️ Stem <select id="stemKies" aria-label="Kies een stem"></select></label>
+  </div>
+  <p class="geluidstatus" id="geluidStatus" hidden></p>
+  <p class="stemhint" id="stemHint" hidden></p>
+  <h3 class="instel-kop">Weergave</h3>
+  <div class="snel"><button class="toggle" id="themaBtn">🌙 Donker</button></div>
+  <h3 class="instel-kop">Voortgang</h3>
+  <div class="settings">
+    <button class="toggle" id="backupBtn">💾 Voortgang bewaren</button>
+    <button class="linkbtn" id="resetBtn">Voortgang wissen</button>
   </div>
   <div class="backup" hidden id="backup">
     <h3>Voortgang bewaren</h3>
@@ -384,6 +424,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
     <input id="restoreCode" placeholder="plak hier je code" aria-label="Code om te herstellen">
     <button class="btn primary" id="restoreBtn">Herstel</button>
   </div>
+  <p class="savestate">Versie <span id="versie"></span> · <a href="test.html" style="color:var(--muted)">geluidstest</a> · <a href="stemproef.html" style="color:var(--muted)">stemproef</a></p>
 </section>
 
 <!-- GAME -->
@@ -486,7 +527,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
 <script>
 (function(){
 "use strict";
-const VERSIE = "2026-10-10m";
+const VERSIE = "2026-10-10n";
 const $ = id => document.getElementById(id);
 const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
 const pick = arr => arr[rnd(0,arr.length-1)];
@@ -1656,15 +1697,15 @@ function lastigeGen(){
 }
 
 const GROUPS = [
-  {id:"dag", title:"Uitdaging van de dag", sub:"elke dag één keer: tien gemengde vragen voor dubbele punten", acts:[
+  {id:"dag", title:"Uitdaging van de dag", thuis:true, sub:"elke dag één keer: tien gemengde vragen voor dubbele punten", acts:[
     {id:"daily", title:"Vandaag", sub:"rekenen en taal door elkaar", icon:"🏆", kind:"daily",
      gen:mixGen(REKEN20.concat(LASTIG, KLOKKEN, TAAL)), uitleg:"Tien vragen uit alles wat je kent. De eerste keer op een dag leveren ze dubbele punten op; daarna mag je zo vaak oefenen als je wilt."}
   ]},
-  {title:"Op maat", sub:"vragen uit de onderdelen die nog het lastigst zijn", acts:[
+  {id:"opmaat", title:"Op maat", thuis:true, sub:"vragen uit de onderdelen die nog het lastigst zijn", acts:[
     {id:"lastig", title:"Oefen wat lastig is", sub:"kiest zelf de juiste vragen", icon:"🎯", gen:lastigeGen,
      uitleg:"Deze ronde pakt vaker de onderdelen waar je nog fouten in maakt, en af en toe iets wat je nog nooit hebt gedaan."}
   ]},
-  {title:"Rekenen tot 20", sub:"de sommen waar je nu mee bezig bent", acts:[
+  {id:"reken20", title:"Rekenen tot 20", icon:"9+6", sub:"de sommen waar je nu mee bezig bent", acts:[
     {id:"plus20", title:"Plussommen", sub:"tot 20", icon:"9+6", gen:()=>genPlus(20),
      uitleg:"Maak eerst de tien vol. Bij 8 + 5 doe je eerst 8 + 2 = 10, en dan nog 3 erbij."},
     {id:"min20", title:"Minsommen", sub:"tot 20", icon:"15−7", gen:()=>genMin(20),
@@ -1678,7 +1719,7 @@ const GROUPS = [
     {id:"mix20", title:"Alles door elkaar", sub:"rekenen tot 20", icon:"🔀", gen:mixGen(REKEN20),
      uitleg:"Alle sommen van hierboven in willekeurige volgorde. Let goed op het teken."}
   ]},
-  {title:"Knap lastig", sub:"verder dan de methode: dubbelen, keersommen, tot 100, patronen en verhaaltjessommen", acts:[
+  {id:"knaplastig", title:"Knap lastig", icon:"🧗", sub:"verder dan de methode: dubbelen, keersommen, tot 100, patronen en verhaaltjessommen", acts:[
     {id:"dubbel", title:"Dubbel en helft", sub:"2× en ½", icon:"✌️", gen:genDubbel,
      uitleg:"Het dubbele is het getal twee keer. De helft is eerlijk delen in twee."},
     {id:"drie", title:"Drie getallen", sub:"slim combineren", icon:"➕", gen:genDrie,
@@ -1700,7 +1741,7 @@ const GROUPS = [
     {id:"mixlastig", title:"Alles door elkaar", sub:"knap lastig", icon:"🔀", gen:mixGen(LASTIG),
      uitleg:"Alle lastige soorten door elkaar. Lees elke vraag goed."}
   ]},
-  {title:"Klok", sub:"hele en halve uren, kwartieren, digitale tijd en tijdsduur", acts:[
+  {id:"klokgroep", title:"Klok", icon:"🕒", sub:"hele en halve uren, kwartieren, digitale tijd en tijdsduur", acts:[
     {id:"klok", title:"Hoe laat?", sub:"hele en halve uren", icon:"🕒", gen:genKlok,
      uitleg:"De grote wijzer zegt of het heel of half is, de kleine wijzer zegt welk uur."},
     {id:"uur", title:"Een uur erbij of eraf", sub:"later en eerder", icon:"⏪", gen:genUur,
@@ -1712,7 +1753,7 @@ const GROUPS = [
     {id:"mixklok", title:"Alles door elkaar", sub:"klokkijken", icon:"🔀", gen:mixGen(KLOKKEN),
      uitleg:"Alle kloksoorten door elkaar."}
   ]},
-  {id:"taal", title:"Taal", sub:"bij Lijn 3 — kies hieronder welke letters ze al kent", acts:[
+  {id:"taal", title:"Taal", icon:"🔤", sub:"bij Lijn 3 — kies hieronder welke letters ze al kent", acts:[
     {id:"woordplaat", title:"Woord zoeken", sub:"woord bij plaatje", icon:"🔤", gen:genWoordBijPlaat,
      uitleg:"Lees alle woorden helemaal, niet alleen de eerste letter."},
     {id:"klankmist", title:"Welke klank?", sub:"middelste klank", icon:"🎯", gen:genKlankMist,
@@ -1730,12 +1771,12 @@ const GROUPS = [
     {id:"mixtaal", title:"Alles door elkaar", sub:"taal", icon:"🔀", gen:mixGen(TAAL),
      uitleg:"Alle taaloefeningen door elkaar."}
   ]},
-  {id:"kbw", title:"Kinderboekenweek: Spot aan!", sub:"tot en met 11 oktober — zinnen lezen op het podium",
+  {id:"kbw", title:"Kinderboekenweek: Spot aan!", thuis:true, sub:"tot en met 11 oktober — zinnen lezen op het podium",
    tot:"2026-10-11", acts:[
     {id:"spot", title:"Spot aan!", sub:"lees de zin", icon:"🎭", gen:genSpot, count:8,
      uitleg:"Lees de zin hardop. Welk plaatje past er precies bij?"}
   ]},
-  {title:"Spelen", sub:"snelle spelletjes", acts:[
+  {id:"spelen", title:"Spelen", icon:"🎲", sub:"snelle spelletjes", acts:[
     {id:"regen", title:"Sterrenregen", sub:"vang het goede antwoord", icon:"🌠", kind:"regen",
      uitleg:"De sterren vallen. Tik op de ster met het goede antwoord voordat hij beneden is."},
     {id:"kleur", title:"Kleurplaat", sub:"kleur op som", icon:"🎨", kind:"kleur",
@@ -1782,29 +1823,70 @@ function goalRing(n){
 }
 const streakIcon = `<svg viewBox="0 0 30 30"><path d="M15 3 l3.2 6.6 7.3 1 -5.3 5.1 1.3 7.2 -6.5 -3.4 -6.5 3.4 1.3 -7.2 -5.3 -5.1 7.3 -1z" fill="var(--sun)" stroke="var(--sun-edge)" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
 
+/* Eén oefentegel. Staat zowel op het beginscherm (bij "vandaag") als op het
+   scherm van een onderdeel, zodat beide er precies hetzelfde uitzien. */
+function actTile(a){
+  const rec=(P.recordBy||{})[a.id];
+  const gedaan = a.kind==="daily" && P.dailyDone===today();
+  const extra = a.kind==="regen" ? (P.regenHigh?`record ${P.regenHigh} sterren`:"") : rec ? `snelste ${rec}s` : "";
+  const x=(P.statsBy||{})[a.id];
+  const pct = x && x.totaal ? Math.round(x.goed/x.totaal*100) : null;
+  const kleur = pct===null ? "" : pct>=80 ? "" : pct>=55 ? " laag" : " zeerlaag";
+  return `<button class="tile" data-id="${a.id}">
+    <span class="icon">${a.icon}</span><b>${a.title}</b><span class="sub">${gedaan?"vandaag al gedaan":a.sub}</span>
+    <span class="stars">${a.kind==="regen"?"":starHTML(P.best[a.id]||0)}${extra?`<small style="color:var(--muted);font-size:.85rem;letter-spacing:0"> ${extra}</small>`:""}</span>
+    ${pct===null?"":`<span class="tilebar${kleur}" title="${pct}% in één keer goed"><i style="width:${Math.max(4,pct)}%"></i></span>`}
+  </button>`;
+}
+const zichtbaar = g => !g.tot || today() <= g.tot;
+/* Eén vak op het beginscherm, dat een hele groep oefeningen opent. De balk
+   laat zien hoeveel sterren er in dat vak al verdiend zijn. */
+function catTile(g){
+  const sterren = g.acts.reduce((s,a)=>s+(P.best[a.id]||0),0);
+  const max = g.acts.length*3;
+  const gedaan = g.acts.filter(a=>(P.played||{})[a.id]).length;
+  const pct = max ? Math.round(sterren/max*100) : 0;
+  const aantal = `${g.acts.length} ${g.acts.length===1?"oefening":"oefeningen"}`;
+  return `<button class="cattile" data-cat="${g.id}">
+    <span class="catic">${g.icon||"⭐"}</span>
+    <span class="cattext">
+      <b>${g.title}</b>
+      <small>${aantal}${gedaan?` · ${gedaan} gedaan`:""}</small>
+      <span class="catbar"><i style="width:${Math.max(2,pct)}%"></i></span>
+    </span>
+    <span class="catster">${sterren}/${max}★</span>
+  </button>`;
+}
+let catNu = null;
+function openCat(id){
+  const g = GROUPS.find(x=>x.id===id); if(!g) return;
+  catNu = id;
+  $("catTitle").textContent = g.title;
+  $("catSub").textContent = g.sub;
+  $("catExtra").innerHTML = g.id==="taal"
+    ? `<div class="settings" id="taalLevel" style="margin:0 0 12px">${Object.keys(LEVELS).map(k=>
+        `<button class="toggle" data-lv="${k}" aria-pressed="${String(+k===P.taalLevel)}">${LEVELS[k].titel}</button>`).join("")}
+       <span class="sub" style="color:var(--muted);flex-basis:100%;font-size:.95rem">Nieuwe letters: ${LEVELS[P.taalLevel].letters}</span></div>`
+    : "";
+  $("catTiles").innerHTML = g.acts.map(actTile).join("");
+  show("cat");
+}
+/* Na een ronde terug naar het onderdeel waar de oefening in stond; dat is
+   dichterbij dan helemaal terug naar het begin. */
+function terugNaarLijst(){
+  try{speechSynthesis.cancel();}catch(e){} stopStem(); kleurBezig=false; st=null;
+  const g = catNu && GROUPS.find(x=>x.id===catNu);
+  if(g && zichtbaar(g)){ openCat(catNu); } else { goHome(); }
+}
 function renderHome(){
   const lv=levelInfo(P.xp), sk=liveStreak(), tc=todayCount();
   $("stats").innerHTML = `
     <div class="chip streak ${sk?"":"off"}">${streakIcon}<span>${sk}</span><small>op rij</small></div>
     <div class="chip level"><span class="lvl-badge">${lv.L}</span><span class="xpbar"><i style="width:${Math.round(lv.rest/lv.need*100)}%"></i></span><small>${lv.rest}/${lv.need}</small></div>
     <div class="chip">${goalRing(tc)}<small>${Math.min(tc,DAILY_GOAL)}/${DAILY_GOAL}</small></div>`;
-  $("groups").innerHTML = GROUPS.filter(g=>!g.tot || today() <= g.tot).map(g=>`
-    <h2 class="section-title">${g.title}</h2><p class="section-sub">${g.sub}</p>
-    ${g.id==="taal" ? `<div class="settings" id="taalLevel" style="margin:0 0 12px">${Object.keys(LEVELS).map(k=>
-      `<button class="toggle" data-lv="${k}" aria-pressed="${String(+k===P.taalLevel)}">${LEVELS[k].titel}</button>`).join("")}
-      <span class="sub" style="color:var(--muted);flex-basis:100%;font-size:.95rem">Nieuwe letters: ${LEVELS[P.taalLevel].letters}</span></div>` : ""}
-    <div class="tiles">${g.acts.map(a=>{
-      const rec=(P.recordBy||{})[a.id];
-      const gedaan = a.kind==="daily" && P.dailyDone===today();
-      const extra = a.kind==="regen" ? (P.regenHigh?`record ${P.regenHigh} sterren`:"") : rec ? `snelste ${rec}s` : "";
-      const x=(P.statsBy||{})[a.id];
-      const pct = x && x.totaal ? Math.round(x.goed/x.totaal*100) : null;
-      const kleur = pct===null ? "" : pct>=80 ? "" : pct>=55 ? " laag" : " zeerlaag";
-      return `<button class="tile" data-id="${a.id}">
-        <span class="icon">${a.icon}</span><b>${a.title}</b><span class="sub">${gedaan?"vandaag al gedaan":a.sub}</span>
-        <span class="stars">${a.kind==="regen"?"":starHTML(P.best[a.id]||0)}${extra?`<small style="color:var(--muted);font-size:.85rem;letter-spacing:0"> ${extra}</small>`:""}</span>
-        ${pct===null?"":`<span class="tilebar${kleur}" title="${pct}% in één keer goed"><i style="width:${Math.max(4,pct)}%"></i></span>`}
-      </button>`;}).join("")}</div>`).join("");
+  const open = GROUPS.filter(zichtbaar);
+  $("vandaag").innerHTML = open.filter(g=>g.thuis).flatMap(g=>g.acts).map(actTile).join("");
+  $("cats").innerHTML = open.filter(g=>!g.thuis).map(catTile).join("");
   $("albumSub").textContent = `${P.stickers.length}/${STICKERS.length}`;
   $("badgeSub").textContent = `${P.badges.length}/${BADGES.length}`;
   let msg = "Hoi! Spot aan, we beginnen!";
@@ -1843,8 +1925,9 @@ function renderStats(){
              `<td class="num">${x.rondes}</td><td class="num">${pct}%</td><td class="num">${(x.last||"").slice(5).replace("-","/")}</td></tr>`;
     }).join("");
 }
-function show(id){ ["home","game","result","album","badges","kleur","regen","overzicht"].forEach(s=>$(s).hidden = s!==id); if(id!=="regen") stopRegen(); window.scrollTo(0,0); }
-function goHome(){ try{speechSynthesis.cancel();}catch(e){} stopStem(); kleurBezig=false; st=null; renderHome(); show("home"); }
+const SCHERMEN = ["home","cat","instel","game","result","album","badges","kleur","regen","overzicht"];
+function show(id){ SCHERMEN.forEach(s=>$(s).hidden = s!==id); if(id!=="regen") stopRegen(); window.scrollTo(0,0); }
+function goHome(){ try{speechSynthesis.cancel();}catch(e){} stopStem(); kleurBezig=false; st=null; catNu=null; renderHome(); show("home"); }
 
 /* ---------- quiz ---------- */
 let st=null;
@@ -1852,6 +1935,9 @@ const praise=["Goed zo!","Knap!","Super!","Helemaal goed!","Top!","Wauw!"];
 function start(id){
   const act=findAct(id);
   lastAct = id;
+  // Onthouden in welk onderdeel deze oefening staat, voor de terugweg.
+  const bij = GROUPS.find(g=>!g.thuis && g.acts.some(x=>x.id===id));
+  catNu = bij ? bij.id : null;
   if(act.kind==="kleur") return startKleur();
   if(act.kind==="regen") return startRegen();
   curDiff = 1;
@@ -2251,23 +2337,30 @@ function confetti(n){
 }
 
 /* ---------- events ---------- */
-$("groups").addEventListener("click", e=>{
-  const lv=e.target.closest("[data-lv]");
-  if(lv){ P.taalLevel=+lv.dataset.lv; persist(); renderHome(); return; }
+$("cats").addEventListener("click", e=>{
+  const c=e.target.closest("[data-cat]"); if(c) openCat(c.dataset.cat);
+});
+$("vandaag").addEventListener("click", e=>{
   const t=e.target.closest(".tile"); if(t) start(t.dataset.id);
 });
+$("cat").addEventListener("click", e=>{
+  const lv=e.target.closest("[data-lv]");
+  if(lv){ P.taalLevel=+lv.dataset.lv; persist(); openCat(catNu); return; }
+  const t=e.target.closest(".tile"); if(t) start(t.dataset.id);
+});
+$("instelBtn").onclick = ()=>{ ontgrendel(); vulStemLijst(); show("instel"); };
 $("choices").addEventListener("click", e=>{ const b=e.target.closest(".choice"); if(!b) return; if(st&&st.q&&st.q.bouw) bouwKlik(b); else choose(b); });
 document.addEventListener("keydown", e=>{ if($("game").hidden) return; const n=parseInt(e.key,10); if(n>=1&&n<=4){ const b=$("choices").children[n-1]; if(b && !(st&&st.q&&st.q.bouw)) choose(b); } });
 $("speakBtn").onclick = ()=>{ if(st&&st.q){ ontgrendel(); say(st.q.speak); } };
-$("stopBtn").onclick = goHome;
-$("kleurStop").onclick = goHome;
+$("stopBtn").onclick = terugNaarLijst;
+$("kleurStop").onclick = terugNaarLijst;
 $("againBtn").onclick = ()=>{ if(lastAct) start(lastAct); };
-$("homeBtn").onclick = goHome;
+$("homeBtn").onclick = terugNaarLijst;
 $("lastigBtn").onclick = ()=>start("lastig");
 $("albumBtn").onclick = ()=>{ renderAlbum(); show("album"); };
 $("badgeBtn").onclick = ()=>{ renderBadges(); show("badges"); };
 $("statsBtn").onclick = ()=>{ renderStats(); show("overzicht"); };
-$("regenStop").onclick = ()=>{ if(rg&&rg.bezig&&rg.score>0){ eindeRegen(); } else { stopRegen(); goHome(); } };
+$("regenStop").onclick = ()=>{ if(rg&&rg.bezig&&rg.score>0){ eindeRegen(); } else { stopRegen(); terugNaarLijst(); } };
 $("veld").addEventListener("click", e=>{ const b=e.target.closest(".vster"); if(b) regenTik(b); });
 document.querySelectorAll(".back").forEach(b=>b.onclick=goHome);
 $("palette").addEventListener("click", e=>{
