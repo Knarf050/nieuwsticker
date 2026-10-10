@@ -53,24 +53,41 @@ button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--sun);outli
 [hidden]{display:none!important}
 
 /* Stats */
-.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
-.chip{display:flex;align-items:center;gap:8px;background:var(--tile);border:2.5px solid var(--ink);
-  border-radius:999px;padding:5px 12px 5px 8px;font-weight:700;box-shadow:2px 2px 0 var(--shadow)}
-.chip svg{width:30px;height:30px;flex:none}
-.chip small{font-weight:400;color:var(--muted);font-size:.9rem}
-.chip.level{flex:1 1 200px}
-.lvl-badge{width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:1rem;flex:none}
-.xpbar{flex:1;height:12px;border-radius:99px;background:var(--grid);overflow:hidden;min-width:60px}
+.stats{display:flex;gap:6px;align-items:stretch;margin-bottom:10px}
+.chip{display:flex;align-items:center;gap:5px;background:var(--tile);border:2.5px solid var(--ink);
+  border-radius:999px;padding:3px 10px 3px 4px;font-weight:700;box-shadow:2px 2px 0 var(--shadow);
+  font-size:.95rem;min-width:0}
+.chip svg{width:26px;height:26px;flex:none}
+.chip small{font-weight:400;color:var(--muted);font-size:.8rem;white-space:nowrap}
+.chip.level{flex:1 1 auto}
+.lvl-badge{width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:.9rem;flex:none}
+.xpbar{flex:1;height:10px;border-radius:99px;background:var(--grid);overflow:hidden;min-width:28px}
 .xpbar i{display:block;height:100%;background:var(--sun);border-radius:99px;transition:width .6s}
 .chip.streak.off{opacity:.6}
 
+/* Bovenbalk: stickerboek, medailles, overzicht */
+.topnav{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:2px 0 10px}
+.navtile{
+  background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);padding:8px 6px;
+  box-shadow:3px 3px 0 var(--shadow);display:grid;justify-items:center;gap:1px;line-height:1.15;
+  transition:transform .12s, box-shadow .12s}
+.navtile:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+.navtile .ic{font-size:1.5rem}
+.navtile b{font-size:.95rem}
+.navtile small{color:var(--muted);font-size:.8rem}
+
+/* Snelknoppen voor geluid */
+.snel{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.snel .toggle{padding:6px 12px;font-size:.95rem;border-width:2px}
+
 /* Hero / podium */
-.hero{margin:10px 0 4px;border:3px solid var(--ink);border-radius:var(--radius);overflow:hidden;box-shadow:5px 5px 0 var(--shadow);background:var(--tile)}
-.stage{position:relative;display:block;width:100%}
-.hero-text{padding:12px 16px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-h1{font-size:clamp(2.2rem,8vw,3.2rem);line-height:1;margin:0;color:var(--ink);letter-spacing:-.01em}
-.bubble{position:relative;background:var(--paper);border:2.5px solid var(--ink);border-radius:16px;padding:8px 14px;font-size:1.05rem;flex:1 1 220px}
-.lead{margin:0;color:var(--muted);font-size:1.05rem;flex-basis:100%}
+.hero{margin:0 0 12px;border:3px solid var(--ink);border-radius:var(--radius);overflow:hidden;box-shadow:4px 4px 0 var(--shadow);background:var(--tile);display:flex;align-items:stretch}
+.stage{display:block;width:118px;flex:none;align-self:stretch}
+.hero-text{padding:10px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0;flex:1}
+h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);letter-spacing:-.01em}
+.bubble{background:var(--paper);border:2.5px solid var(--ink);border-radius:14px;padding:6px 12px;font-size:.98rem}
+.lead{display:none}
+@media (max-width:360px){ .stage{width:92px} }
 
 /* Mascot */
 .m-body{fill:var(--sun);stroke:var(--sun-edge);stroke-width:3;stroke-linejoin:round}
@@ -96,9 +113,6 @@ h1{font-size:clamp(2.2rem,8vw,3.2rem);line-height:1;margin:0;color:var(--ink);le
 .tile .sub{color:var(--muted);font-size:.98rem}
 .stars{font-size:1.2rem;letter-spacing:2px;color:var(--sun);min-height:1.5em}
 .stars .off{color:var(--grid)}
-.collect{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
-.collect .tile{grid-template-columns:auto 1fr;align-items:center;column-gap:12px}
-.collect .tile .big{font-size:2.4rem;grid-row:span 2}
 
 .settings{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .toggle{border:2.5px solid var(--ink);background:var(--tile);border-radius:999px;padding:8px 16px;display:inline-flex;align-items:center;gap:8px}
@@ -285,7 +299,9 @@ h1{font-size:clamp(2.2rem,8vw,3.2rem);line-height:1;margin:0;color:var(--ink);le
 @media (max-width:420px){
   .tiles{grid-template-columns:1fr 1fr;gap:12px}
   .tile{padding:10px}
-  .collect{grid-template-columns:1fr}
+  .topnav{gap:8px}
+  .navtile{padding:8px 3px}
+  .navtile b{font-size:.85rem}
 }
 </style>
 </head>
@@ -296,26 +312,27 @@ h1{font-size:clamp(2.2rem,8vw,3.2rem);line-height:1;margin:0;color:var(--ink);le
 
 <!-- HOME -->
 <section id="home">
+  <div class="topnav">
+    <button class="navtile" id="albumBtn"><span class="ic">📒</span><b>Stickerboek</b><small id="albumSub"></small></button>
+    <button class="navtile" id="badgeBtn"><span class="ic">🏅</span><b>Medailles</b><small id="badgeSub"></small></button>
+    <button class="navtile" id="statsBtn"><span class="ic">📊</span><b>Overzicht</b><small>voor thuis</small></button>
+  </div>
   <div class="stats" id="stats"></div>
   <header class="hero">
-    <svg class="stage" id="stageSvg" viewBox="0 0 400 150" role="img" aria-label="Podium met spotlight"></svg>
+    <svg class="stage" id="stageSvg" viewBox="0 0 120 150" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Podium met spotlight"></svg>
     <div class="hero-text">
       <h1>Sterre</h1>
       <div class="bubble" id="homeBubble">Hoi! Spot aan, we beginnen!</div>
-      <p class="lead">Oefenen met rekenen en lezen in groep 3.</p>
     </div>
   </header>
+  <div class="snel">
+    <button class="toggle" id="readToggle" aria-pressed="false">🔊 Voorlezen</button>
+    <button class="toggle" id="soundToggle" aria-pressed="true">🎵 Geluidjes</button>
+    <button class="toggle" id="testBtn">▶️ Test geluid</button>
+  </div>
   <div id="groups"></div>
 
-  <div class="collect">
-    <button class="tile" id="albumBtn"><span class="big">📒</span><b>Stickerboek</b><span class="sub" id="albumSub"></span></button>
-    <button class="tile" id="badgeBtn"><span class="big">🏅</span><b>Medailles</b><span class="sub" id="badgeSub"></span></button>
-    <button class="tile" id="statsBtn"><span class="big">📊</span><b>Overzicht</b><span class="sub">voor papa en mama</span></button>
-  </div>
-
   <div class="settings">
-    <button class="toggle" id="readToggle" aria-pressed="false">🔊 Vragen voorlezen</button>
-    <button class="toggle" id="soundToggle" aria-pressed="true">🎵 Geluidjes</button>
     <button class="toggle" id="backupBtn">💾 Voortgang bewaren</button>
     <button class="linkbtn" id="resetBtn">Voortgang wissen</button>
   </div>
@@ -397,7 +414,7 @@ h1{font-size:clamp(2.2rem,8vw,3.2rem);line-height:1;margin:0;color:var(--ink);le
 </section>
 
 <!-- OUDEROVERZICHT -->
-<section id="stats" hidden>
+<section id="overzicht" hidden>
   <div class="bar"><button class="btn back">← Terug</button><h2>Overzicht</h2></div>
   <p class="counter" id="statsTop"></p>
   <div style="overflow-x:auto"><table class="stats-table" id="statsTable"></table></div>
@@ -583,17 +600,67 @@ const DAILY_GOAL = 2;
 const need = L => 100 + 50*(L-1);
 function levelInfo(xp){ let L=1, rest=xp; while(rest>=need(L)){ rest-=need(L); L++; } return {L, rest, need:need(L)}; }
 
-/* ---------- speech ---------- */
-let nlVoice=null;
-function pickVoice(){ try{ const vs=speechSynthesis.getVoices(); nlVoice=vs.find(v=>/^nl(-|_)NL/i.test(v.lang))||vs.find(v=>/^nl/i.test(v.lang))||null; }catch(e){} }
-try{ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }catch(e){}
-function say(t,rate){ try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="nl-NL"; u.rate=rate||.9; if(nlVoice)u.voice=nlVoice; speechSynthesis.speak(u); }catch(e){} }
-const sayMath = t => say(String(t).replace(/\u2212/g," min ").replace(/\+/g," plus ").replace(/=/g," is "));
+/* ---------- spraak ----------
+   iOS is kieskeurig: de eerste keer moet binnen een aanraking gebeuren, en
+   cancel() direct gevolgd door speak() laat de stem helemaal zwijgen. */
+let nlVoice=null, spraakKan=null;
+function pickVoice(){
+  try{
+    const vs=speechSynthesis.getVoices();
+    nlVoice = vs.find(v=>/^nl(-|_)NL/i.test(v.lang)) || vs.find(v=>/^nl/i.test(v.lang)) || null;
+  }catch(e){}
+}
+try{ pickVoice(); speechSynthesis.addEventListener("voiceschanged", pickVoice); }catch(e){}
+function say(t, rate){
+  if(!t) return;
+  const sp = window.speechSynthesis; if(!sp){ spraakKan=false; return; }
+  const spreken = ()=>{
+    try{
+      if(!nlVoice) pickVoice();
+      const u=new SpeechSynthesisUtterance(String(t));
+      u.lang="nl-NL"; u.rate=rate||.9;
+      if(nlVoice) u.voice=nlVoice;
+      u.onstart = ()=>{ spraakKan=true; };
+      sp.resume();
+      sp.speak(u);
+    }catch(e){ spraakKan=false; }
+  };
+  try{
+    if(sp.speaking || sp.pending){ sp.cancel(); setTimeout(spreken, 150); }
+    else spreken();
+  }catch(e){}
+}
+const sayMath = t => say(String(t).replace(/−/g," min ").replace(/\+/g," plus ").replace(/=/g," is "));
 
-/* ---------- sound ---------- */
-let actx=null;
-function audio(){ try{ if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==="suspended") actx.resume(); }catch(e){} return actx; }
-document.addEventListener("pointerdown", ()=>audio(), {once:false});
+/* ---------- geluid ----------
+   Op een iPhone of iPad gaat webgeluid standaard via het belkanaal en is het
+   dus stil als de zijschakelaar op stil staat. Met audioSession zetten we het
+   op het mediakanaal, net als een filmpje. */
+let actx=null, ontgrendeld=false;
+function audio(){
+  try{
+    if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==="suspended") actx.resume();
+  }catch(e){ return null; }
+  return actx;
+}
+function ontgrendel(){
+  if(ontgrendeld) return;
+  try{ if(navigator.audioSession) navigator.audioSession.type="playback"; }catch(e){}
+  const a=audio();
+  if(a){
+    try{ const b=a.createBuffer(1,1,22050), s=a.createBufferSource(); s.buffer=b; s.connect(a.destination); s.start(0); }catch(e){}
+    if(a.state==="running") ontgrendeld=true;
+  }
+  // De stem alvast wakker maken; dit moet binnen een aanraking gebeuren.
+  try{
+    const sp=window.speechSynthesis;
+    if(sp && !sp.speaking){ const u=new SpeechSynthesisUtterance(" "); u.volume=0; u.lang="nl-NL"; sp.speak(u); }
+  }catch(e){}
+}
+["pointerdown","touchend","click","keydown"].forEach(ev=>
+  document.addEventListener(ev, ontgrendel, {capture:true, passive:true}));
+
 function tone(f,start,dur,type,vol){
   try{ const a=audio(); if(!a) return;
     const t=a.currentTime+start, o=a.createOscillator(), g=a.createGain();
@@ -633,13 +700,14 @@ function setMascot(el,mood,anim){ el.innerHTML=mascot(mood); if(anim&&!reduceMot
 /* ---------- podium hero ---------- */
 function buildStage(){
   $("stageSvg").innerHTML = `
-    <rect x="0" y="0" width="400" height="150" fill="var(--ink)"/>
-    <path d="M200 -10 L120 150 L280 150 Z" fill="var(--sun)" opacity="0.28"/>
-    <g transform="translate(168,46)">${mascot("juich").replace("<svg ", '<svg width="64" height="64" ')}</g>
-    <rect x="0" y="126" width="400" height="24" fill="var(--curtain)" opacity=".55"/>
-    <path d="M0 0 h70 q-14 75 4 150 H0 Z" fill="var(--curtain)"/>
-    <path d="M400 0 h-70 q14 75 -4 150 H400 Z" fill="var(--curtain)"/>
-    <path d="M0 0 h400 v18 q-100 26 -200 4 Q100 4 0 22 Z" fill="var(--curtain)"/>`;
+    <rect x="0" y="0" width="120" height="150" fill="var(--ink)"/>
+    <path d="M60 0 L10 150 L110 150 Z" fill="#FFCF5C" opacity="0.62"/>
+    <ellipse cx="60" cy="126" rx="34" ry="7" fill="#FFE49B" opacity="0.8"/>
+    <g transform="translate(26,52)">${mascot("juich").replace("<svg ", '<svg width="68" height="68" ')}</g>
+    <rect x="0" y="132" width="120" height="18" fill="#8E1C2C"/>
+    <path d="M0 0 h22 q-7 78 2 150 H0 Z" fill="var(--curtain)"/>
+    <path d="M120 0 h-22 q7 78 -2 150 H120 Z" fill="var(--curtain)"/>
+    <path d="M0 0 h120 v12 q-30 20 -60 2 Q30 0 0 16 Z" fill="var(--curtain)"/>`;
 }
 
 /* ---------- getallenlijn met sprongen ---------- */
@@ -1393,9 +1461,9 @@ const streakIcon = `<svg viewBox="0 0 30 30"><path d="M15 3 l3.2 6.6 7.3 1 -5.3 
 function renderHome(){
   const lv=levelInfo(P.xp), sk=liveStreak(), tc=todayCount();
   $("stats").innerHTML = `
-    <div class="chip streak ${sk?"":"off"}">${streakIcon}<span>${sk}</span><small>${sk===1?"dag":"dagen"} op rij</small></div>
+    <div class="chip streak ${sk?"":"off"}">${streakIcon}<span>${sk}</span><small>op rij</small></div>
     <div class="chip level"><span class="lvl-badge">${lv.L}</span><span class="xpbar"><i style="width:${Math.round(lv.rest/lv.need*100)}%"></i></span><small>${lv.rest}/${lv.need}</small></div>
-    <div class="chip">${goalRing(tc)}<small>${Math.min(tc,DAILY_GOAL)}/${DAILY_GOAL} vandaag</small></div>`;
+    <div class="chip">${goalRing(tc)}<small>${Math.min(tc,DAILY_GOAL)}/${DAILY_GOAL}</small></div>`;
   $("groups").innerHTML = GROUPS.map(g=>`
     <h2 class="section-title">${g.title}</h2><p class="section-sub">${g.sub}</p>
     ${g.id==="taal" ? `<div class="settings" id="taalLevel" style="margin:0 0 12px">${Object.keys(LEVELS).map(k=>
@@ -1409,8 +1477,8 @@ function renderHome(){
         <span class="icon">${a.icon}</span><b>${a.title}</b><span class="sub">${gedaan?"vandaag al gedaan":a.sub}</span>
         <span class="stars">${a.kind==="regen"?"":starHTML(P.best[a.id]||0)}${extra?`<small style="color:var(--muted);font-size:.85rem;letter-spacing:0"> ${extra}</small>`:""}</span>
       </button>`;}).join("")}</div>`).join("");
-  $("albumSub").textContent = `${P.stickers.length} van ${STICKERS.length}`;
-  $("badgeSub").textContent = `${P.badges.length} van ${BADGES.length}`;
+  $("albumSub").textContent = `${P.stickers.length}/${STICKERS.length}`;
+  $("badgeSub").textContent = `${P.badges.length}/${BADGES.length}`;
   let msg = "Hoi! Spot aan, we beginnen!";
   if(tc>=DAILY_GOAL) msg = "Je dagdoel is gehaald! Wil je nog meer oefenen?";
   else if(tc===1) msg = "Nog 1 ronde voor je dagdoel!";
@@ -1438,7 +1506,7 @@ function renderStats(){
              `<td class="num">${x.rondes}</td><td class="num">${pct}%</td><td class="num">${(x.last||"").slice(5).replace("-","/")}</td></tr>`;
     }).join("");
 }
-function show(id){ ["home","game","result","album","badges","kleur","regen","stats"].forEach(s=>$(s).hidden = s!==id); if(id!=="regen") stopRegen(); window.scrollTo(0,0); }
+function show(id){ ["home","game","result","album","badges","kleur","regen","overzicht"].forEach(s=>$(s).hidden = s!==id); if(id!=="regen") stopRegen(); window.scrollTo(0,0); }
 function goHome(){ try{speechSynthesis.cancel();}catch(e){} renderHome(); show("home"); }
 
 /* ---------- quiz ---------- */
@@ -1804,7 +1872,7 @@ $("againBtn").onclick = ()=>{ if(lastAct) start(lastAct); };
 $("homeBtn").onclick = goHome;
 $("albumBtn").onclick = ()=>{ renderAlbum(); show("album"); };
 $("badgeBtn").onclick = ()=>{ renderBadges(); show("badges"); };
-$("statsBtn").onclick = ()=>{ renderStats(); show("stats"); };
+$("statsBtn").onclick = ()=>{ renderStats(); show("overzicht"); };
 $("regenStop").onclick = ()=>{ if(rg&&rg.bezig&&rg.score>0){ eindeRegen(); } else { stopRegen(); goHome(); } };
 $("veld").addEventListener("click", e=>{ const b=e.target.closest(".vster"); if(b) regenTik(b); });
 document.querySelectorAll(".back").forEach(b=>b.onclick=goHome);
@@ -1822,8 +1890,8 @@ $("vrijToggle").onclick = ()=>{ kl.vrij=!kl.vrij; $("vrijToggle").setAttribute("
 
 const rt=$("readToggle"), so=$("soundToggle");
 const syncToggles=()=>{ rt.setAttribute("aria-pressed",String(autoRead)); so.setAttribute("aria-pressed",String(soundOn)); };
-rt.onclick=()=>{ autoRead=!autoRead; save("rekenrek-read",autoRead); syncToggles(); if(autoRead) say("Ik lees de vragen voor."); };
-so.onclick=()=>{ soundOn=!soundOn; save("rekenrek-sound",soundOn); syncToggles(); if(soundOn) sfx.good(); };
+rt.onclick=()=>{ ontgrendel(); autoRead=!autoRead; save("rekenrek-read",autoRead); syncToggles(); if(autoRead) say("Ik lees de vragen voor."); };
+so.onclick=()=>{ ontgrendel(); soundOn=!soundOn; save("rekenrek-sound",soundOn); syncToggles(); if(soundOn) sfx.fanfare(); };
 $("backupBtn").onclick = ()=>{ const b=$("backup"); b.hidden=!b.hidden; if(!b.hidden){ $("backupCode").value=encodeP(P,true); b.scrollIntoView({block:"nearest"}); } };
 $("closeBackup").onclick = ()=>{ $("backup").hidden=true; };
 $("copyCode").onclick = async ()=>{
@@ -1837,6 +1905,18 @@ $("restoreBtn").onclick = ()=>{
   if(!H || typeof H.xp!=="number"){ toast("Die code klopt niet"); return; }
   P=H; persist(); renderHome(); $("backup").hidden=true; $("restoreCode").value="";
   toast("Voortgang hersteld");
+};
+$("testBtn").onclick = ()=>{
+  ontgrendel();
+  const aan = soundOn;
+  soundOn = true; sfx.fanfare(); soundOn = aan;
+  say("Hoor je mij? Dan werkt het geluid.");
+  setTimeout(()=>{
+    const stil = !actx || actx.state!=="running";
+    toonBewaard(stil
+      ? "Geen geluid? Tik nog een keer, of kijk of het toestel op stil staat."
+      : "Hoor je niets? Zet de zijschakelaar van stil af en draai het volume omhoog.", stil);
+  }, 1200);
 };
 let resetArmed=false;
 $("resetBtn").onclick=()=>{
