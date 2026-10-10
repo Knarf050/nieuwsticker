@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sterre — welke stem?</title>
+<style>
+:root{--paper:#FBFCFF;--ink:#1F3A93;--text:#1B2340;--muted:#56628C;--tile:#fff;--grid:#DCE7F6;
+  --sun:#FFC93C;--sun-edge:#C9931A;--green:#2E9E5B;--green-bg:#DDF3E5}
+@media (prefers-color-scheme:dark){:root{--paper:#121A2F;--ink:#A9C1FF;--text:#EAF0FF;--muted:#A7B3D6;
+  --tile:#18223D;--grid:#1D2946;--green:#4CC57F;--green-bg:#173A28}}
+*{box-sizing:border-box}
+body{margin:0;padding:18px;font-family:system-ui,-apple-system,sans-serif;background:var(--paper);
+  color:var(--text);line-height:1.45}
+.wrap{max-width:620px;margin:0 auto}
+h1{font-size:1.5rem;color:var(--ink);margin:0 0 4px}
+p.lead{margin:0 0 18px;color:var(--muted)}
+.kaart{background:var(--tile);border:3px solid var(--ink);border-radius:14px;padding:14px;
+  margin-bottom:14px;box-shadow:4px 4px 0 var(--ink)}
+.kaart h2{margin:0 0 2px;font-size:1.2rem;color:var(--ink)}
+.kaart .hz{color:var(--muted);font-size:.9rem;margin:0 0 10px}
+.knoppen{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;font-weight:700;border:2.5px solid var(--ink);background:var(--paper);
+  color:var(--text);border-radius:11px;padding:10px 14px;cursor:pointer}
+button:active{transform:translateY(2px)}
+button.speelt{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.alles{background:var(--ink);color:var(--paper)}
+.slot{margin-top:22px;padding:14px;border:3px dashed var(--sun-edge);border-radius:14px;background:var(--tile)}
+.slot b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Welke stem vind je het prettigst?</h1>
+  <p class="lead">Vier varianten van dezelfde stem. Luister en laat weten welke letter je kiest, dan bouw ik die in de app.</p>
+  <div id="lijst"></div>
+  <div class="slot">
+    <b>Geen van alle?</b> Zeg dat ook gerust. Dan is Ellen in Safari het enige echte alternatief,
+    of we houden het bij de stem die er nu in zit.
+  </div>
+</div>
+<script>
+(function(){
+"use strict";
+const VARIANTEN = [
+  {id:"a-man",   naam:"A — zoals nu",        bij:"de stem die nu in de app zit"},
+  {id:"b-licht", naam:"B — iets lichter",    bij:"een stukje hoger, nog vrij neutraal"},
+  {id:"c-vrouw", naam:"C — vrouwenstem",     bij:"duidelijk een vrouwenstem"},
+  {id:"d-hoog",  naam:"D — hoger nog",       bij:"het hoogst, richting een jonge stem"}
+];
+const ZINNEN = [
+  {id:"som", knop:"Een som"},
+  {id:"zin", knop:"Een leeszin"},
+  {id:"lof", knop:"Een compliment"}
+];
+let speler = null, actief = null;
+function speel(bron, knop){
+  if(speler){ speler.pause(); }
+  if(actief){ actief.classList.remove("speelt"); }
+  speler = new Audio(bron);
+  speler.playsInline = true; speler.setAttribute("playsinline","");
+  actief = knop; knop.classList.add("speelt");
+  speler.addEventListener("ended", ()=>knop.classList.remove("speelt"), {once:true});
+  const p = speler.play();
+  if(p && p.catch) p.catch(()=>{ knop.classList.remove("speelt"); knop.textContent = "lukt niet"; });
+}
+async function speelReeks(v, knop){
+  knop.classList.add("speelt");
+  for(const z of ZINNEN){
+    await new Promise(klaar=>{
+      const a = new Audio(`proef/${v.id}-${z.id}.mp3`);
+      a.playsInline = true; a.setAttribute("playsinline","");
+      a.addEventListener("ended", klaar, {once:true});
+      a.addEventListener("error", klaar, {once:true});
+      const p = a.play(); if(p && p.catch) p.catch(klaar);
+      setTimeout(klaar, 6000);
+    });
+    await new Promise(r=>setTimeout(r, 180));
+  }
+  knop.classList.remove("speelt");
+}
+$lijst();
+function $lijst(){
+  const doel = document.getElementById("lijst");
+  VARIANTEN.forEach(v=>{
+    const k = document.createElement("div");
+    k.className = "kaart";
+    k.innerHTML = `<h2>${v.naam}</h2><p class="hz">${v.bij}</p><div class="knoppen"></div>`;
+    const rij = k.querySelector(".knoppen");
+    const alles = document.createElement("button");
+    alles.className = "alles"; alles.textContent = "▶︎ Alle drie";
+    alles.onclick = ()=>speelReeks(v, alles);
+    rij.appendChild(alles);
+    ZINNEN.forEach(z=>{
+      const b = document.createElement("button");
+      b.textContent = z.knop;
+      b.onclick = ()=>speel(`proef/${v.id}-${z.id}.mp3`, b);
+      rij.appendChild(b);
+    });
+    doel.appendChild(k);
+  });
+}
+})();
+</script>
+</body>
+</html>
