@@ -481,7 +481,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
 <script>
 (function(){
 "use strict";
-const VERSIE = "2026-10-10d";
+const VERSIE = "2026-10-10e";
 const $ = id => document.getElementById(id);
 const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
 const pick = arr => arr[rnd(0,arr.length-1)];
@@ -644,12 +644,40 @@ function maakStemAudio(){
   }catch(e){ stemAudio=null; }
   return stemAudio;
 }
-function knipZin(t){
+function normaliseer(t){
   return String(t)
-    .replace(/−/g," min ").replace(/\+/g," plus ").replace(/×/g," keer ")
-    .replace(/=/g," is ").replace(/:/g," gedeeld door ").replace(/€/g," euro ")
-    .toLowerCase().match(/[0-9]+|[a-zà-ÿ]+/g) || [];
+    .replace(/\u2212/g," min ").replace(/\+/g," plus ").replace(/\u00d7/g," keer ")
+    .replace(/(\d{1,2}):00\b/g,"$1 uur")              // digitale tijd, niet delen
+    .replace(/(\d{1,2}):(\d{2})\b/g,"$1 uur $2")
+    .replace(/\s:\s/g," gedeeld door ")
+    .replace(/=/g," is ").replace(/\u20ac/g," euro ")
+    .toLowerCase()
+    .replace(/[^0-9a-z\u00e0-\u00ff\s]/g," ")
+    .replace(/\s+/g," ").trim();
 }
+let maxWoorden = 0;
+function bepaalMax(){
+  if(maxWoorden) return maxWoorden;
+  for(const k in stemIndex){ const n=k.split(" ").length; if(n>maxWoorden) maxWoorden=n; }
+  return maxWoorden = maxWoorden || 1;
+}
+/* Zoek steeds het langste stuk dat we in één keer kunnen uitspreken. Een heel
+   zinsdeel klinkt natuurlijk; losse woorden achter elkaar hakkelen. */
+function knipZin(t){
+  const woorden = normaliseer(t).split(" ").filter(Boolean);
+  const max = bepaalMax(), uit = [];
+  let i = 0;
+  while(i < woorden.length){
+    let gepakt = 0;
+    for(let n = Math.min(max, woorden.length - i); n >= 1; n--){
+      const kandidaat = woorden.slice(i, i+n).join(" ");
+      if(stemIndex[kandidaat]){ uit.push(kandidaat); gepakt = n; break; }
+    }
+    i += gepakt || 1;
+  }
+  return uit;
+}
+
 function wachtTot(a, gebeurtenis, test, max){
   return new Promise(res=>{
     if(test()) return res(true);
@@ -688,7 +716,7 @@ async function zegMetStem(t){
   for(const [start,duur] of stukken){
     if(beurt !== stemBeurt) return true;        // er is alweer iets nieuws gezegd
     await speelStuk(start, duur);
-    await new Promise(r=>setTimeout(r, 45));
+    await new Promise(r=>setTimeout(r, 30));
   }
   return true;
 }
