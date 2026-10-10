@@ -486,7 +486,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
 <script>
 (function(){
 "use strict";
-const VERSIE = "2026-10-10h";
+const VERSIE = "2026-10-10i";
 const $ = id => document.getElementById(id);
 const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
 const pick = arr => arr[rnd(0,arr.length-1)];
@@ -2305,10 +2305,17 @@ function vulStemLijst(){
   const opIOSnu = /iP(hone|ad|od)/.test(navigator.userAgent) ||
                   (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   let tekst = "";
-  if(kies.value === "app") tekst = "De stem uit de app werkt altijd, ook zonder internet.";
-  else if(/^nl-?BE/i.test((nlVoice&&nlVoice.lang)||"")) tekst = "Dit is een Vlaamse stem.";
-  if(opIOSnu && nl.length <= 3)
-    tekst += (tekst ? " " : "") + "Meer Nederlandse stemmen kun je ophalen bij Instellingen, Toegankelijkheid, Gesproken materiaal, Stemmen.";
+  if(!nl.length){
+    tekst = "Dit toestel geeft deze app geen stemmen door" +
+      (opIOSnu ? ". Dat gebeurt in een app op het beginscherm; in Safari lukt het meestal wel." : ".") +
+      " Zolang dat zo is leest de app zelf voor.";
+  } else {
+    if(kies.value === "app") tekst = "De stem uit de app werkt altijd, ook zonder internet.";
+    else if(/^nl-?BE/i.test((nlVoice&&nlVoice.lang)||"")) tekst = "Dit is een Vlaamse stem.";
+    if(opIOSnu && nl.length <= 3)
+      tekst += (tekst ? " " : "") + "Meer Nederlandse stemmen haal je op bij Instellingen, Toegankelijkheid, Gesproken materiaal, Stemmen.";
+    tekst += ` (${nl.length} ${nl.length===1?"stem":"stemmen"} gevonden)`;
+  }
   hint.textContent = tekst; hint.hidden = !tekst;
 }
 $("stemKies").onchange = ()=>{
@@ -2428,7 +2435,22 @@ $("resetBtn").onclick=()=>{
 
 $("versie").textContent = VERSIE;
 if(stemKeuze !== "toestel") haalStemIndex();
-[0, 400, 1500].forEach(ms=>setTimeout(()=>{ try{ controleerStemmen(); }catch(e){} }, ms));
+(function blijfZoeken(){
+  let pogingen = 0;
+  const kijk = ()=>{
+    pogingen++;
+    try{ controleerStemmen(); }catch(e){}
+    const gevonden = nlStemmen().length > 0;
+    if(gevonden || pogingen > 24) return;          // tot ongeveer twaalf seconden
+    setTimeout(kijk, 500);
+  };
+  kijk();
+  // Ook kijken zodra iemand terugkomt in de app of de lijst opent.
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) kijk(); });
+  window.addEventListener("focus", kijk);
+  const kies = $("stemKies");
+  if(kies){ kies.addEventListener("focus", ()=>{ try{ controleerStemmen(); }catch(e){} }); }
+})();
 buildStage(); zetThema(); renderHome(); syncToggles(); syncHash();
 })();
 </script>
