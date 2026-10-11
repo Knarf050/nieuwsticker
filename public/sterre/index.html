@@ -527,7 +527,7 @@ h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink);le
 <script>
 (function(){
 "use strict";
-const VERSIE = "2026-10-10n";
+const VERSIE = "2026-10-11a";
 const $ = id => document.getElementById(id);
 const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
 const pick = arr => arr[rnd(0,arr.length-1)];
@@ -769,13 +769,20 @@ async function zegMetStem(t, achteraan){
     if(!stemIndex || !maakStemAudio()){ stemWachtrij.length = 0; return false; }
     while(stemWachtrij.length){
       const mijn = stemBeurt;
+      // Eerst het beloningsdeuntje laten uitklinken. Zonder deze pauze begint
+      // "Goed zo!" tegelijk met het geluidje en is het niet te verstaan.
+      const wachten = Math.min(700, geluidTot - Date.now());
+      if(wachten > 0) await new Promise(r=>setTimeout(r, wachten));
+      if(mijn !== stemBeurt) continue;
       const stukken = knipZin(stemWachtrij.shift()).map(w=>stemIndex[w]).filter(Boolean);
       for(const [begin, duur] of stukken){
         if(mijn !== stemBeurt) break;     // er is alweer iets nieuws gezegd
         await speelStuk(begin, duur);
         await new Promise(r=>setTimeout(r, 30));
       }
-      if(mijn === stemBeurt && stemWachtrij.length) await new Promise(r=>setTimeout(r, 140));
+      // Een duidelijke adempauze tussen twee zinnen, zodat het complimentje
+      // niet aan de volgende vraag vastplakt.
+      if(mijn === stemBeurt && stemWachtrij.length) await new Promise(r=>setTimeout(r, 280));
     }
   } finally { stemLoopt = false; }
   return true;
@@ -914,6 +921,10 @@ const sayMath = t => say(String(t).replace(/−/g," min ").replace(/\+/g," plus 
    net zo goed uit hervatten, anders blijft alles stil. */
 let actx=null, ontgrendeld=false, tagsKlaar=false, laatsteWeg="";
 const BESTANDEN = {good:"goed", combo:"combo", bad:"fout", fanfare:"fanfare", pop:"pop", paint:"verf"};
+/* Hoe lang elk geluidje duurt. De stem wacht dit af, anders praat het
+   complimentje dwars door het beloningsdeuntje heen en versta je er niets van. */
+const GELUIDSDUUR = {good:400, combo:480, bad:460, fanfare:1200, pop:300, paint:180};
+let geluidTot = 0;
 const spelers = {};
 function maakSpelers(){
   if(Object.keys(spelers).length) return;
@@ -921,6 +932,7 @@ function maakSpelers(){
     for(const k in BESTANDEN){
       const a = new Audio(`geluid/${BESTANDEN[k]}.wav`);
       a.preload="auto"; a.playsInline=true; a.setAttribute("playsinline","");
+      a.volume=0.7;          // de stem moet er bovenuit kunnen komen
       spelers[k]=a;
     }
   }catch(e){}
@@ -993,6 +1005,7 @@ const TONEN = {
 };
 function speel(k){
   if(!soundOn) return;
+  geluidTot = Date.now() + (GELUIDSDUUR[k] || 300);
   if(!speelBestand(k) && TONEN[k]) TONEN[k]();
 }
 function tril(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
