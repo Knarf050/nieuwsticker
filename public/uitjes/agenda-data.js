@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zaterdag 10 oktober 2026',
-  updatedAt: '10-10-2026, 07:10',
+  dateLabel: 'Zondag 11 oktober 2026',
+  updatedAt: '11-10-2026, 07:11',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '19:00–00:00', title: 'Museumnacht Den Haag', loc: 'Lange Voorhout en Haagse musea', tag: 'Cultuur', highlight: true },
-        { time: '11:00–18:00', title: 'Home Made Market', loc: 'Lange Voorhout', tag: 'Markt' },
+        { time: '10:00–16:00', title: 'Kinderboekenfestijn: "Spot aan!"', loc: 'Centrale Bibliotheek — gratis', tag: 'Familie', highlight: true },
+        { time: '16:00–20:00', title: 'Coming Out Week-programma', loc: 'Diverse locaties', tag: 'Cultuur' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '18:00', title: 'Oktoberfest Rotterdam', loc: 'Van Nelle Fabriek', tag: 'Festival', highlight: true },
-        { time: '21:15', title: 'Nobu', loc: 'Rotown', tag: 'Muziek' },
+        { time: '11:00', title: 'Prepareerdemonstratie (gratis lezing)', loc: 'Natuurhistorisch Museum Rotterdam', tag: 'Familie', highlight: true },
+        { time: 'laatste dag (t/m 11 okt)', title: 'Dutch Sustainable Fashion Week', loc: 'Koopgoot en Zuidplein', tag: 'Cultuur' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '12:00–20:30 (10–11 okt)', title: 'Fantasy Fest — Twisted Trick or Treat', loc: 'Rijswijk', tag: 'Familie', highlight: true },
-        { time: '09:00–12:00', title: 'Oogst- en Streekmarkt', loc: 'Schoonhoven', tag: 'Markt' },
+        { time: '12:00–20:30 (laatste dag)', title: 'Fantasy Fest — Twisted Trick or Treat', loc: 'De Broodfabriek, Rijswijk', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Molens en rondvaarten', loc: 'Kinderdijk (UNESCO-werelderfgoed)', tag: 'Natuur' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Rotown — agenda', url: 'https://www.rotown.nl/' },
-    { label: 'uitzinnig.nl — evenementen Zuid-Holland', url: 'https://www.uitzinnig.nl/evenement/12/zuid-holland.aspx?arcp=1&m=10' },
+    { label: 'agendafeed.com — Rotterdam', url: 'https://www.agendafeed.com/rotterdam/' },
+    { label: 'uitzinnig.nl — evenementen Zuid-Holland', url: 'https://www.uitzinnig.nl/evenement/12/zuid-holland.aspx' },
   ],
 };
