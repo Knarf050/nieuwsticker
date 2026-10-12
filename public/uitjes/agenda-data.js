@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 11 oktober 2026',
-  updatedAt: '11-10-2026, 07:11',
+  dateLabel: 'Maandag 12 oktober 2026',
+  updatedAt: '12-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '10:00–16:00', title: 'Kinderboekenfestijn: "Spot aan!"', loc: 'Centrale Bibliotheek — gratis', tag: 'Familie', highlight: true },
-        { time: '16:00–20:00', title: 'Coming Out Week-programma', loc: 'Diverse locaties', tag: 'Cultuur' },
+        { time: 'opent vandaag (t/m 25 okt)', title: 'Japanse Tuin', loc: 'Landgoed Clingendael', tag: 'Natuur', highlight: true },
+        { time: 'opent vandaag (t/m 9 nov)', title: 'Happy Halloween', loc: 'Familypark Drievliet', tag: 'Familie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '11:00', title: 'Prepareerdemonstratie (gratis lezing)', loc: 'Natuurhistorisch Museum Rotterdam', tag: 'Familie', highlight: true },
-        { time: 'laatste dag (t/m 11 okt)', title: 'Dutch Sustainable Fashion Week', loc: 'Koopgoot en Zuidplein', tag: 'Cultuur' },
+        { time: '20:00', title: 'RUEL', loc: 'Annabel', tag: 'Muziek', highlight: true },
+        { time: '20:00 (uitverkocht)', title: 'Pete Murray — Solo Acoustic Tour', loc: 'LantarenVenster', tag: 'Muziek' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '12:00–20:30 (laatste dag)', title: 'Fantasy Fest — Twisted Trick or Treat', loc: 'De Broodfabriek, Rijswijk', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Molens en rondvaarten', loc: 'Kinderdijk (UNESCO-werelderfgoed)', tag: 'Natuur' },
+        { time: 'doorlopend (t/m 18 okt)', title: 'Leiden International Film Festival', loc: 'Leiden', tag: 'Film', highlight: true },
+        { time: 'doorlopend (t/m 13 dec)', title: '"Miniaturen en Meesterstukken"', loc: 'Zilvermuseum Schoonhoven', tag: 'Expositie' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'agendafeed.com — Rotterdam', url: 'https://www.agendafeed.com/rotterdam/' },
-    { label: 'uitzinnig.nl — evenementen Zuid-Holland', url: 'https://www.uitzinnig.nl/evenement/12/zuid-holland.aspx' },
+    { label: 'Rotown — agenda', url: 'https://www.rotown.nl/' },
+    { label: 'uitzinnig.nl — evenementen Zuid-Holland', url: 'https://www.uitzinnig.nl/evenement/12/zuid-holland.aspx?arcp=1&m=10' },
   ],
 };
