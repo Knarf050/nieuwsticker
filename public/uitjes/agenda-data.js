@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 12 oktober 2026',
-  updatedAt: '12-10-2026, 07:12',
+  dateLabel: 'Dinsdag 13 oktober 2026',
+  updatedAt: '13-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag (t/m 25 okt)', title: 'Japanse Tuin', loc: 'Landgoed Clingendael', tag: 'Natuur', highlight: true },
-        { time: 'opent vandaag (t/m 9 nov)', title: 'Happy Halloween', loc: 'Familypark Drievliet', tag: 'Familie' },
+        { time: 'vandaag', title: 'Eneco Tour — openingstijdrit', loc: 'Start/finish Den Haag', tag: 'Sport', highlight: true },
+        { time: '18:00', title: 'Los Cumbia Stars', loc: 'PAARD, Kleine Zaal', tag: 'Muziek' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '20:00', title: 'RUEL', loc: 'Annabel', tag: 'Muziek', highlight: true },
-        { time: '20:00 (uitverkocht)', title: 'Pete Murray — Solo Acoustic Tour', loc: 'LantarenVenster', tag: 'Muziek' },
+        { time: '20:30', title: 'Thijs Veldhuis', loc: 'Rotown, Nieuwe Binnenweg', tag: 'Muziek', highlight: true },
+        { time: '22:00', title: 'Club Coco', loc: 'Coconuts', tag: 'Nachtleven' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend (t/m 18 okt)', title: 'Leiden International Film Festival', loc: 'Leiden', tag: 'Film', highlight: true },
-        { time: 'doorlopend (t/m 13 dec)', title: '"Miniaturen en Meesterstukken"', loc: 'Zilvermuseum Schoonhoven', tag: 'Expositie' },
+        { time: 'herfstvakantieprogramma (t/m 25 okt)', title: 'Naturalis', loc: 'Leiden', tag: 'Familie', highlight: true },
+        { time: 'doorlopend (t/m 1 nov)', title: '"Galleria" — mini-exposities', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Expositie' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
     { label: 'Rotown — agenda', url: 'https://www.rotown.nl/' },
-    { label: 'uitzinnig.nl — evenementen Zuid-Holland', url: 'https://www.uitzinnig.nl/evenement/12/zuid-holland.aspx?arcp=1&m=10' },
+    { label: 'dagjeweg.nl — activiteiten 13 oktober', url: 'https://www.dagjeweg.nl/kalender/13-oktober-2026' },
   ],
 };
