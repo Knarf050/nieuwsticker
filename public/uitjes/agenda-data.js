@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Dinsdag 13 oktober 2026',
-  updatedAt: '13-10-2026, 07:12',
+  dateLabel: 'Woensdag 14 oktober 2026',
+  updatedAt: '14-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vandaag', title: 'Eneco Tour — openingstijdrit', loc: 'Start/finish Den Haag', tag: 'Sport', highlight: true },
-        { time: '18:00', title: 'Los Cumbia Stars', loc: 'PAARD, Kleine Zaal', tag: 'Muziek' },
+        { time: 'opent vandaag (t/m 25 okt)', title: 'Japanse Tuin', loc: 'Landgoed Clingendael', tag: 'Natuur', highlight: true },
+        { time: 'doorlopend (t/m 1 nov)', title: 'Grafiek en houtsneden', loc: 'Pulchri Studio', tag: 'Expositie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '20:30', title: 'Thijs Veldhuis', loc: 'Rotown, Nieuwe Binnenweg', tag: 'Muziek', highlight: true },
-        { time: '22:00', title: 'Club Coco', loc: 'Coconuts', tag: 'Nachtleven' },
+        { time: '20:30', title: 'Turin Brakes', loc: 'Rotown, Nieuwe Binnenweg', tag: 'Muziek', highlight: true },
+        { time: '19:00', title: 'Spelletjesavond', loc: 'Rotown', tag: 'Casual' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'herfstvakantieprogramma (t/m 25 okt)', title: 'Naturalis', loc: 'Leiden', tag: 'Familie', highlight: true },
-        { time: 'doorlopend (t/m 1 nov)', title: '"Galleria" — mini-exposities', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Expositie' },
+        { time: 'doorlopend', title: 'Museum Voorlinden', loc: 'Wassenaar — hedendaagse kunst en wandeltuin', tag: 'Expositie', highlight: true },
+        { time: 'doorlopend', title: 'Willem van Oranje — de musical', loc: 'Prinsentheater, Delft', tag: 'Theater' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
     { label: 'Rotown — agenda', url: 'https://www.rotown.nl/' },
-    { label: 'dagjeweg.nl — activiteiten 13 oktober', url: 'https://www.dagjeweg.nl/kalender/13-oktober-2026' },
+    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
   ],
 };
