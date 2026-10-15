@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 14 oktober 2026',
-  updatedAt: '14-10-2026, 07:12',
+  dateLabel: 'Donderdag 15 oktober 2026',
+  updatedAt: '15-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag (t/m 25 okt)', title: 'Japanse Tuin', loc: 'Landgoed Clingendael', tag: 'Natuur', highlight: true },
-        { time: 'doorlopend (t/m 1 nov)', title: 'Grafiek en houtsneden', loc: 'Pulchri Studio', tag: 'Expositie' },
+        { time: 'opent vandaag (14:00–20:00, t/m 18 okt)', title: 'Art The Hague', loc: 'Fokker Terminal', tag: 'Kunst', highlight: true },
+        { time: '12:00–13:30', title: 'Tijdreis door het Haagse Bos', loc: 'Ingang Haagse Bos — gidswandeling', tag: 'Natuur' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '20:30', title: 'Turin Brakes', loc: 'Rotown, Nieuwe Binnenweg', tag: 'Muziek', highlight: true },
-        { time: '19:00', title: 'Spelletjesavond', loc: 'Rotown', tag: 'Casual' },
+        { time: '19:30', title: 'Myles Sanko (Bird x Venster)', loc: 'LantarenVenster', tag: 'Muziek', highlight: true },
+        { time: '22:00', title: 'Club Coco', loc: 'Coconuts', tag: 'Nachtleven' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Museum Voorlinden', loc: 'Wassenaar — hedendaagse kunst en wandeltuin', tag: 'Expositie', highlight: true },
-        { time: 'doorlopend', title: 'Willem van Oranje — de musical', loc: 'Prinsentheater, Delft', tag: 'Theater' },
+        { time: '09:00–17:30 (t/m 1 nov)', title: 'Kinderdijk', loc: 'Molens en rondvaarten — UNESCO-werelderfgoed', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Duinrell', loc: 'Wassenaar — attractiepark', tag: 'Familie' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Rotown — agenda', url: 'https://www.rotown.nl/' },
-    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
+    { label: 'djguide.nl — Rotterdam', url: 'https://www.djguide.nl/events.p?city=rotterdam&language=en' },
+    { label: 'dagjeweg.nl — Zuid-Holland herfstvakantie', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/herfstvakantie' },
   ],
 };
