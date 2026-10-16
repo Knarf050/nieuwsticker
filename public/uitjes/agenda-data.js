@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Donderdag 15 oktober 2026',
-  updatedAt: '15-10-2026, 07:12',
+  dateLabel: 'Vrijdag 16 oktober 2026',
+  updatedAt: '16-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag (14:00–20:00, t/m 18 okt)', title: 'Art The Hague', loc: 'Fokker Terminal', tag: 'Kunst', highlight: true },
-        { time: '12:00–13:30', title: 'Tijdreis door het Haagse Bos', loc: 'Ingang Haagse Bos — gidswandeling', tag: 'Natuur' },
+        { time: 'opent vandaag (t/m 25 okt)', title: 'Herfstcircus Chapito', loc: 'Zuiderpark', tag: 'Familie', highlight: true },
+        { time: 'laatste dagen (14:00–20:00, t/m 18 okt)', title: 'Art The Hague', loc: 'Fokker Terminal', tag: 'Kunst' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '19:30', title: 'Myles Sanko (Bird x Venster)', loc: 'LantarenVenster', tag: 'Muziek', highlight: true },
-        { time: '22:00', title: 'Club Coco', loc: 'Coconuts', tag: 'Nachtleven' },
+        { time: 'opent vandaag (t/m 25 okt)', title: 'Najaarskermis', loc: 'Lloyd Multiplein', tag: 'Familie', highlight: true },
+        { time: 'avond', title: 'Sophie Hutchings', loc: 'LantarenVenster', tag: 'Muziek' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '09:00–17:30 (t/m 1 nov)', title: 'Kinderdijk', loc: 'Molens en rondvaarten — UNESCO-werelderfgoed', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Duinrell', loc: 'Wassenaar — attractiepark', tag: 'Familie' },
+        { time: 'doorlopend', title: 'Archeon', loc: 'Alphen aan den Rijn — archeologisch themapark', tag: 'Familie', highlight: true },
+        { time: 'doorlopend (t/m 29 nov)', title: '"Miniaturen en Meesterstukken"', loc: 'Zilvermuseum Schoonhoven', tag: 'Expositie' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'djguide.nl — Rotterdam', url: 'https://www.djguide.nl/events.p?city=rotterdam&language=en' },
+    { label: 'dagjeweg.nl — Rotterdam evenementen', url: 'https://www.dagjeweg.nl/kalender/rotterdam/evenementen' },
     { label: 'dagjeweg.nl — Zuid-Holland herfstvakantie', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/herfstvakantie' },
   ],
 };
