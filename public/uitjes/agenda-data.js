@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 18 oktober 2026',
-  updatedAt: '18-10-2026, 07:12',
+  dateLabel: 'Maandag 19 oktober 2026',
+  updatedAt: '19-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '10:00–16:00', title: 'Kunstfestival De Betovering (laatste dag)', loc: 'Koorenhuis, Muzee Scheveningen, Bibliotheek e.a.', tag: 'Familie', highlight: true },
-        { time: 'laatste dag', title: 'Haagse Musicaldagen', loc: 'Grote Markt', tag: 'Theater' },
+        { time: '15:00–16:00', title: 'Festival De Betovering: "Pan" (8+)', loc: 'Theater aan het Spui, Zaal 1', tag: 'Familie', highlight: true },
+        { time: '12:30', title: 'Lunchconcert Prinses Christina Concours — Trio Cugnon', loc: 'Nieuwe Kerk aan het Spui', tag: 'Muziek' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '11:30–17:30', title: 'Portlantis Experience + fossielenexpeditie', loc: 'Maasvlakte', tag: 'Familie', highlight: true },
-        { time: 'laatste dag', title: 'Magic Circus BOLA', loc: 'Diergaarde Blijdorp', tag: 'Familie' },
+        { time: '09:25', title: 'WK Turnen 2026', loc: 'Rotterdam Ahoy, Hal 1–6', tag: 'Sport', highlight: true },
+        { time: '20:30', title: 'ABBA Gold the Concert Show', loc: 'De Doelen, Grote Zaal', tag: 'Muziek' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '10:00–17:00 (laatste dag)', title: 'Smeedweekend — vuursteen tot metaal', loc: 'Archeon, Alphen aan den Rijn', tag: 'Familie', highlight: true },
-        { time: 'laatste dag', title: 'Leiden International Film Festival', loc: 'Diverse locaties, Leiden', tag: 'Film' },
+        { time: 'herfstvakantieprogramma (t/m 25 okt)', title: 'Kinderactiviteiten', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie', highlight: true },
+        { time: '09:00–17:30 (t/m 1 nov)', title: 'Kinderdijk', loc: 'Molens en rondvaarten — UNESCO-werelderfgoed', tag: 'Natuur' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'dagjeweg.nl — activiteiten 18 oktober', url: 'https://www.dagjeweg.nl/kalender/18-oktober-2026' },
+    { label: 'Ahoy — agenda', url: 'https://www.ahoy.nl/en/events' },
+    { label: 'dagjeweg.nl — Zuid-Holland herfstvakantie', url: 'https://www.dagjeweg.nl/zuid-holland/herfstvakantie' },
   ],
 };
