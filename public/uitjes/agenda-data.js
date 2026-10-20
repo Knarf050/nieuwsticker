@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 19 oktober 2026',
-  updatedAt: '19-10-2026, 07:12',
+  dateLabel: 'Dinsdag 20 oktober 2026',
+  updatedAt: '20-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '15:00–16:00', title: 'Festival De Betovering: "Pan" (8+)', loc: 'Theater aan het Spui, Zaal 1', tag: 'Familie', highlight: true },
-        { time: '12:30', title: 'Lunchconcert Prinses Christina Concours — Trio Cugnon', loc: 'Nieuwe Kerk aan het Spui', tag: 'Muziek' },
+        { time: '12:30–15:50 (t/m 21 okt)', title: 'Festival De Betovering: "FLY" (6+)', loc: 'Theater aan het Spui, Spui Studio', tag: 'Familie', highlight: true },
+        { time: '14:00', title: 'Wonder — kindervoorstelling', loc: 'Laaktheater', tag: 'Familie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '09:25', title: 'WK Turnen 2026', loc: 'Rotterdam Ahoy, Hal 1–6', tag: 'Sport', highlight: true },
-        { time: '20:30', title: 'ABBA Gold the Concert Show', loc: 'De Doelen, Grote Zaal', tag: 'Muziek' },
+        { time: '19:30', title: 'WK Turnen 2026 — avondsessie', loc: 'Rotterdam Ahoy, Hal 1–6', tag: 'Sport', highlight: true },
+        { time: 'opent vandaag, 16:00–17:45 (t/m 25 okt)', title: 'Magic Circus BOLA', loc: 'Nesselande', tag: 'Familie' },
       ],
     },
     {
@@ -32,8 +32,8 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'herfstvakantieprogramma (t/m 25 okt)', title: 'Kinderactiviteiten', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie', highlight: true },
-        { time: '09:00–17:30 (t/m 1 nov)', title: 'Kinderdijk', loc: 'Molens en rondvaarten — UNESCO-werelderfgoed', tag: 'Natuur' },
+        { time: 'doorlopend (t/m 1 nov)', title: '"Monsters en mythische wezens"', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie', highlight: true },
+        { time: 'doorlopend (t/m 1 nov)', title: 'Expositie "Urban Blue"', loc: 'Royal Delft Museum, Delft', tag: 'Expositie' },
       ],
     },
   ],
