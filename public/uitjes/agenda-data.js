@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Vrijdag 23 oktober 2026',
-  updatedAt: '23-10-2026, 07:12',
+  dateLabel: 'Zaterdag 24 oktober 2026',
+  updatedAt: '24-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag (t/m 24 okt)', title: 'Résonances Boréales — Northern Lights Experience', loc: 'Museon-Omniversum', tag: 'Familie', highlight: true },
-        { time: '11:00', title: 'BoomBOOMwhakalaa', loc: 'Theater De Vaillant', tag: 'Familie' },
+        { time: '12:30 & 15:30', title: 'Festival De Betovering: "Double You" (6+)', loc: 'Theater aan het Spui, Zaal 1', tag: 'Familie', highlight: true },
+        { time: 'laatste dag (t/m 25 okt)', title: 'Herfstcircus Chapito', loc: 'Zuiderpark', tag: 'Familie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'doorlopend (t/m 24 okt)', title: 'Left of the Dial', loc: 'Diverse locaties, centrum', tag: 'Muziek', highlight: true },
-        { time: '19:30', title: 'WK Turnen 2026 — avondsessie', loc: 'Rotterdam Ahoy, Hal 1–6', tag: 'Sport' },
+        { time: '12:00–16:00, gratis', title: 'Left of the Dial — Closing Party & festival', loc: 'Rotown en centrum', tag: 'Muziek', highlight: true },
+        { time: '11:30 & 14:00', title: 'Aladdin De Musical', loc: 'Theater Zuidplein', tag: 'Familie' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Vogelpark Avifauna', loc: 'Alphen aan den Rijn', tag: 'Familie', highlight: true },
-        { time: '09:00–17:30 (t/m 1 nov)', title: 'Kinderdijk', loc: 'Molens en rondvaarten — UNESCO-werelderfgoed', tag: 'Natuur' },
+        { time: 'opent vandaag (herfstvakantie)', title: 'AquaZoo Leerdam', loc: 'Leerdam — onderwaterwereld', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Bounce Valley', loc: 'Zoetermeer, Delft en Rotterdam', tag: 'Familie' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Ahoy — agenda', url: 'https://www.ahoy.nl/en/events' },
+    { label: 'Rotown — agenda', url: 'https://www.rotown.nl/' },
     { label: 'dagjeweg.nl — Zuid-Holland herfstvakantie', url: 'https://www.dagjeweg.nl/zuid-holland/herfstvakantie' },
   ],
 };
