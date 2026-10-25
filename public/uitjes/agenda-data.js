@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zaterdag 24 oktober 2026',
-  updatedAt: '24-10-2026, 07:12',
+  dateLabel: 'Zondag 25 oktober 2026',
+  updatedAt: '25-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '12:30 & 15:30', title: 'Festival De Betovering: "Double You" (6+)', loc: 'Theater aan het Spui, Zaal 1', tag: 'Familie', highlight: true },
-        { time: 'laatste dag (t/m 25 okt)', title: 'Herfstcircus Chapito', loc: 'Zuiderpark', tag: 'Familie' },
+        { time: 'opent vandaag', title: 'Happy Halloween at Drievliet', loc: 'Familypark Drievliet', tag: 'Familie', highlight: true },
+        { time: '17:00', title: 'Verhalen uit de Magische Tuin', loc: 'Museon-Omniversum', tag: 'Familie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '12:00–16:00, gratis', title: 'Left of the Dial — Closing Party & festival', loc: 'Rotown en centrum', tag: 'Muziek', highlight: true },
-        { time: '11:30 & 14:00', title: 'Aladdin De Musical', loc: 'Theater Zuidplein', tag: 'Familie' },
+        { time: '14:00, laatste dag', title: 'WK Turnen 2026', loc: 'Rotterdam Ahoy', tag: 'Sport', highlight: true },
+        { time: 'vanaf 16:00', title: 'Oktober vintage-markt', loc: 'OASE', tag: 'Markt' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'opent vandaag (herfstvakantie)', title: 'AquaZoo Leerdam', loc: 'Leerdam — onderwaterwereld', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Bounce Valley', loc: 'Zoetermeer, Delft en Rotterdam', tag: 'Familie' },
+        { time: '10:00–17:00, laatste dag', title: 'Marit Törnqvist — "Verborgen verhalen"', loc: 'Dordrechts Museum, Dordrecht', tag: 'Expositie', highlight: true },
+        { time: '09:00–17:30 (t/m 1 nov)', title: 'Kinderdijk', loc: 'Molens en rondvaarten — UNESCO-werelderfgoed', tag: 'Natuur' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Rotown — agenda', url: 'https://www.rotown.nl/' },
+    { label: 'Ahoy — agenda', url: 'https://www.ahoy.nl/en/events' },
     { label: 'dagjeweg.nl — Zuid-Holland herfstvakantie', url: 'https://www.dagjeweg.nl/zuid-holland/herfstvakantie' },
   ],
 };
