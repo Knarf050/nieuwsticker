@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 25 oktober 2026',
-  updatedAt: '25-10-2026, 07:12',
+  dateLabel: 'Maandag 26 oktober 2026',
+  updatedAt: '26-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag', title: 'Happy Halloween at Drievliet', loc: 'Familypark Drievliet', tag: 'Familie', highlight: true },
-        { time: '17:00', title: 'Verhalen uit de Magische Tuin', loc: 'Museon-Omniversum', tag: 'Familie' },
+        { time: 'opent vandaag (t/m 12 dec)', title: 'Time Machine (HNTjong & Theater Utrecht)', loc: 'Het Nationale Theater', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Madurodam', loc: 'Scheveningen — miniatuurstad', tag: 'Familie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '14:00, laatste dag', title: 'WK Turnen 2026', loc: 'Rotterdam Ahoy', tag: 'Sport', highlight: true },
-        { time: 'vanaf 16:00', title: 'Oktober vintage-markt', loc: 'OASE', tag: 'Markt' },
+        { time: 'doorlopend (2–6 jaar)', title: 'Creatieve workshops', loc: 'Kindermuseum Villa Zebra', tag: 'Familie', highlight: true },
+        { time: 'doorlopend (t/m 29 mrt 2027)', title: 'Marisol — expositie', loc: 'Depot Boijmans Van Beuningen', tag: 'Expositie' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '10:00–17:00, laatste dag', title: 'Marit Törnqvist — "Verborgen verhalen"', loc: 'Dordrechts Museum, Dordrecht', tag: 'Expositie', highlight: true },
-        { time: '09:00–17:30 (t/m 1 nov)', title: 'Kinderdijk', loc: 'Molens en rondvaarten — UNESCO-werelderfgoed', tag: 'Natuur' },
+        { time: 'doorlopend', title: 'Archeon — prehistorie, Romeinen, zwaardvechten', loc: 'Alphen aan den Rijn', tag: 'Familie', highlight: true },
+        { time: 'doorlopend (t/m 1 nov)', title: 'Expositie "Urban Blue"', loc: 'Royal Delft Museum, Delft', tag: 'Expositie' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Ahoy — agenda', url: 'https://www.ahoy.nl/en/events' },
+    { label: 'Grote Kerk Den Haag — agenda', url: 'https://grote-kerk.nl/agenda/' },
     { label: 'dagjeweg.nl — Zuid-Holland herfstvakantie', url: 'https://www.dagjeweg.nl/zuid-holland/herfstvakantie' },
   ],
 };
