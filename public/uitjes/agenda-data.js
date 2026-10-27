@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 26 oktober 2026',
-  updatedAt: '26-10-2026, 07:12',
+  dateLabel: 'Dinsdag 27 oktober 2026',
+  updatedAt: '27-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag (t/m 12 dec)', title: 'Time Machine (HNTjong & Theater Utrecht)', loc: 'Het Nationale Theater', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Madurodam', loc: 'Scheveningen — miniatuurstad', tag: 'Familie' },
+        { time: 'vandaag', title: 'EU Tech Fest', loc: 'The Hague Tech', tag: 'Tech', highlight: true },
+        { time: 'doorlopend (t/m 3 jan 2027)', title: 'Reflections on Fashion', loc: 'Kunstmuseum Den Haag', tag: 'Expositie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'doorlopend (2–6 jaar)', title: 'Creatieve workshops', loc: 'Kindermuseum Villa Zebra', tag: 'Familie', highlight: true },
-        { time: 'doorlopend (t/m 29 mrt 2027)', title: 'Marisol — expositie', loc: 'Depot Boijmans Van Beuningen', tag: 'Expositie' },
+        { time: '16:00–18:00, gratis', title: 'Code Tour Rotterdam', loc: 'Centrum — voor kinderen', tag: 'Familie', highlight: true },
+        { time: '20:00', title: 'An Orchestral Tribute to Tim Burton & Dark Fantasy by Moonlight', loc: 'De Doelen, Grote Zaal', tag: 'Muziek' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Archeon — prehistorie, Romeinen, zwaardvechten', loc: 'Alphen aan den Rijn', tag: 'Familie', highlight: true },
-        { time: 'doorlopend (t/m 1 nov)', title: 'Expositie "Urban Blue"', loc: 'Royal Delft Museum, Delft', tag: 'Expositie' },
+        { time: 'doorlopend (t/m 29 nov)', title: '"Miniaturen en Meesterstukken"', loc: 'Zilvermuseum Schoonhoven', tag: 'Expositie', highlight: true },
+        { time: 'doorlopend', title: 'SnowWorld', loc: 'Zoetermeer — indoor skiën en snowboarden', tag: 'Familie' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Grote Kerk Den Haag — agenda', url: 'https://grote-kerk.nl/agenda/' },
+    { label: 'agendafeed.com — Rotterdam', url: 'https://www.agendafeed.com/rotterdam/' },
     { label: 'dagjeweg.nl — Zuid-Holland herfstvakantie', url: 'https://www.dagjeweg.nl/zuid-holland/herfstvakantie' },
   ],
 };
