@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 28 oktober 2026',
-  updatedAt: '28-10-2026, 07:12',
+  dateLabel: 'Donderdag 29 oktober 2026',
+  updatedAt: '29-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'laatste dagen (t/m 31 okt)', title: 'Jan van Goyen — Gezicht op Den Haag', loc: 'Haags Historisch Museum', tag: 'Expositie', highlight: true },
-        { time: 'doorlopend', title: 'Museon-Omniversum', loc: 'Familiemuseum met films en experimenten', tag: 'Familie' },
+        { time: 'vanaf 10:00, gratis', title: 'NXTGEN Conference — keynote André Kuipers', loc: 'Fokker Terminal', tag: 'Tech', highlight: true },
+        { time: 'opent vandaag (t/m 13 nov)', title: '"Momenten waarop het kantelde" (Schuldenlab070)', loc: 'Atrium City Hall', tag: 'Expositie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '15:00–17:00', title: 'Nature Journaling — kinderworkshop', loc: 'Dokhuis', tag: 'Familie', highlight: true },
-        { time: '20:00/20:30', title: 'Kabeaushé', loc: 'Rotown, Nieuwe Binnenweg', tag: 'Muziek' },
+        { time: 'avond', title: 'Cola Competition', loc: 'Rotown, Nieuwe Binnenweg', tag: 'Muziek', highlight: true },
+        { time: 'Maand van de Geschiedenis', title: 'Lezing', loc: 'Museum Rotterdam Het Steiger', tag: 'Cultuur' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'CORPUS', loc: 'Oegstgeest — interactieve reis door het menselijk lichaam', tag: 'Familie', highlight: true },
-        { time: '09:00–17:30 (t/m 1 nov)', title: 'Kinderdijk', loc: 'Molens en rondvaarten — UNESCO-werelderfgoed', tag: 'Natuur' },
+        { time: 'opent vandaag (t/m 31 okt)', title: 'Gouds Wijnfestival', loc: 'Binnenstad Gouda', tag: 'Festival', highlight: true },
+        { time: 'doorlopend (t/m 1 nov)', title: '"Monsters en mythische wezens"', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie' },
       ],
     },
   ],
   sources: [
-    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'dehavenloods.nl — agenda', url: 'https://www.dehavenloods.nl/agenda' },
-    { label: 'dagjeweg.nl — Zuid-Holland herfstvakantie', url: 'https://www.dagjeweg.nl/zuid-holland/herfstvakantie' },
+    { label: 'beethovenzuidholland.nl — NXTGEN Conference', url: 'https://beethovenzuidholland.nl/agenda/nxt-gen-conference/' },
+    { label: 'Rotown — agenda', url: 'https://www.rotown.nl/' },
+    { label: 'dagjeweg.nl — Halloween Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/halloween' },
   ],
 };
