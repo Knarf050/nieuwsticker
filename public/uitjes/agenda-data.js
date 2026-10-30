@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Donderdag 29 oktober 2026',
-  updatedAt: '29-10-2026, 07:12',
+  dateLabel: 'Vrijdag 30 oktober 2026',
+  updatedAt: '30-10-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vanaf 10:00, gratis', title: 'NXTGEN Conference — keynote André Kuipers', loc: 'Fokker Terminal', tag: 'Tech', highlight: true },
-        { time: 'opent vandaag (t/m 13 nov)', title: '"Momenten waarop het kantelde" (Schuldenlab070)', loc: 'Atrium City Hall', tag: 'Expositie' },
+        { time: 'doorlopend', title: 'Brick or Treat Halloween', loc: 'LEGOLAND Discovery Centre, Scheveningen', tag: 'Familie', highlight: true },
+        { time: 'opent vandaag (t/m 9 nov)', title: 'Happy Halloween at Drievliet', loc: 'Familypark Drievliet', tag: 'Familie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'avond', title: 'Cola Competition', loc: 'Rotown, Nieuwe Binnenweg', tag: 'Muziek', highlight: true },
-        { time: 'Maand van de Geschiedenis', title: 'Lezing', loc: 'Museum Rotterdam Het Steiger', tag: 'Cultuur' },
+        { time: '19:00–22:00', title: 'Halloween Night', loc: 'Jump 010 — trampolinepark', tag: 'Familie', highlight: true },
+        { time: '30–31 okt, 16:00–19:00', title: 'De Vloek van de Maas — Halloween-avontuur', loc: 'Novotel Rotterdam Brainpark', tag: 'Familie' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'opent vandaag (t/m 31 okt)', title: 'Gouds Wijnfestival', loc: 'Binnenstad Gouda', tag: 'Festival', highlight: true },
-        { time: 'doorlopend (t/m 1 nov)', title: '"Monsters en mythische wezens"', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie' },
+        { time: '18:30–21:00, gratis', title: 'Halloweenwalk — trick or treat', loc: 'Stadshart Zoetermeer', tag: 'Familie', highlight: true },
+        { time: 'spookhuis (6+)', title: 'De Vervloekte Lantaarn', loc: 'Halloweenstad Zoetermeer', tag: 'Familie' },
       ],
     },
   ],
   sources: [
-    { label: 'beethovenzuidholland.nl — NXTGEN Conference', url: 'https://beethovenzuidholland.nl/agenda/nxt-gen-conference/' },
-    { label: 'Rotown — agenda', url: 'https://www.rotown.nl/' },
-    { label: 'dagjeweg.nl — Halloween Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/halloween' },
+    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
+    { label: 'go-kids.nl — Halloween Rotterdam', url: 'https://go-kids.nl/rotterdam/blog/halloween-in-rotterdam-en-omstreken' },
+    { label: 'Halloweenstad Zoetermeer', url: 'https://www.halloweenstad.nl/' },
   ],
 };
