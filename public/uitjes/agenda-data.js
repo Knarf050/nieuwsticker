@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 1 november 2026',
-  updatedAt: '01-11-2026, 07:12',
+  dateLabel: 'Maandag 2 november 2026',
+  updatedAt: '02-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'doorlopend (t/m 7 nov)', title: 'Holland Gnawa Festival', loc: 'Diverse locaties', tag: 'Muziek', highlight: true },
-        { time: 'koopzondag, 12:00–17:00', title: 'Winkels open', loc: 'Binnenstad', tag: 'Markt' },
+        { time: '20:45 (t/m 6 nov)', title: 'Star Party', loc: 'Atrium City Hall', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Escher in Het Paleis', loc: 'Paleis Lange Voorhout', tag: 'Expositie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'opent vandaag (t/m 1 mrt)', title: 'Winterwijck', loc: 'Rotterdam', tag: 'Familie', highlight: true },
-        { time: '17:00–20:00', title: 'RotiCruise — dinner cruise', loc: 'Vanaf de haven', tag: 'Culinair' },
+        { time: 'opent vandaag (t/m 8 nov)', title: 'Wildlife Film Festival', loc: 'Cinerama en LantarenVenster', tag: 'Film', highlight: true },
+        { time: 'doorlopend', title: 'Klimpark met tubingbaan', loc: 'Hoogste tubingbaan van Nederland', tag: 'Familie' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '09:00–17:30, laatste dag', title: 'Kinderdijk', loc: 'Molens en rondvaarten — UNESCO-werelderfgoed', tag: 'Natuur', highlight: true },
-        { time: '10:00–17:00, laatste dag', title: 'Neuzelbeurs', loc: 'De Broodfabriek, Rijswijk', tag: 'Markt' },
+        { time: 'doorlopend (t/m 31 dec)', title: 'Mini Expo: The Trophy Collection', loc: 'Royal Delft Museum, Delft', tag: 'Expositie', highlight: true },
+        { time: 'doorlopend, gratis', title: 'Singelpark-stadswandeling', loc: 'Historische binnenstad, Leiden', tag: 'Actief' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'dagjeweg.nl — Rotterdam', url: 'https://www.dagjeweg.nl/kalender/rotterdam/evenementen' },
+    { label: 'Rotterdam Festivals — evenementenkalender', url: 'https://www.rotterdamfestivals.nl/media/bphdv1sm/evenementenkalender-2026.pdf' },
     { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
   ],
 };
