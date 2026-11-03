@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 2 november 2026',
-  updatedAt: '02-11-2026, 07:12',
+  dateLabel: 'Dinsdag 3 november 2026',
+  updatedAt: '03-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '20:45 (t/m 6 nov)', title: 'Star Party', loc: 'Atrium City Hall', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Escher in Het Paleis', loc: 'Paleis Lange Voorhout', tag: 'Expositie' },
+        { time: 'opent vandaag (t/m 8 nov)', title: 'Crossing Border Festival', loc: 'Koninklijke Schouwburg, Grote zaal', tag: 'Festival', highlight: true },
+        { time: '18:00, gratis', title: 'Flowcasters — vrije inloop', loc: 'Amare, Kunstenplein', tag: 'Muziek' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'opent vandaag (t/m 8 nov)', title: 'Wildlife Film Festival', loc: 'Cinerama en LantarenVenster', tag: 'Film', highlight: true },
-        { time: 'doorlopend', title: 'Klimpark met tubingbaan', loc: 'Hoogste tubingbaan van Nederland', tag: 'Familie' },
+        { time: 'opent vandaag, 16:00–17:45', title: 'Magic Circus', loc: 'Noordplein, Oude Noorden', tag: 'Familie', highlight: true },
+        { time: '16:00–18:00, gratis', title: 'Code Tour Rotterdam', loc: 'Diverse locaties — voor kinderen', tag: 'Familie' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend (t/m 31 dec)', title: 'Mini Expo: The Trophy Collection', loc: 'Royal Delft Museum, Delft', tag: 'Expositie', highlight: true },
-        { time: 'doorlopend, gratis', title: 'Singelpark-stadswandeling', loc: 'Historische binnenstad, Leiden', tag: 'Actief' },
+        { time: 'doorlopend, gratis', title: 'Stadswandeling', loc: 'Historische binnenstad, Dordrecht', tag: 'Actief', highlight: true },
+        { time: 'doorlopend', title: 'CORPUS', loc: 'Oegstgeest — interactieve reis door het menselijk lichaam', tag: 'Familie' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Rotterdam Festivals — evenementenkalender', url: 'https://www.rotterdamfestivals.nl/media/bphdv1sm/evenementenkalender-2026.pdf' },
+    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
     { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
   ],
 };
