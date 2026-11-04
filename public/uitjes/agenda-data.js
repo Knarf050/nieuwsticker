@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Dinsdag 3 november 2026',
-  updatedAt: '03-11-2026, 07:12',
+  dateLabel: 'Woensdag 4 november 2026',
+  updatedAt: '04-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag (t/m 8 nov)', title: 'Crossing Border Festival', loc: 'Koninklijke Schouwburg, Grote zaal', tag: 'Festival', highlight: true },
-        { time: '18:00, gratis', title: 'Flowcasters — vrije inloop', loc: 'Amare, Kunstenplein', tag: 'Muziek' },
+        { time: 'opent vandaag (t/m 8 nov)', title: 'Eastern Neighbours Film Festival', loc: 'Filmhuis Den Haag', tag: 'Film', highlight: true },
+        { time: 'doorlopend (t/m 8 nov)', title: 'Crossing Border Festival', loc: 'Koninklijke Schouwburg', tag: 'Festival' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'opent vandaag, 16:00–17:45', title: 'Magic Circus', loc: 'Noordplein, Oude Noorden', tag: 'Familie', highlight: true },
-        { time: '16:00–18:00, gratis', title: 'Code Tour Rotterdam', loc: 'Diverse locaties — voor kinderen', tag: 'Familie' },
+        { time: '10:00–12:00, gratis', title: 'Stadsnatuur-activiteit', loc: 'Bij Centraal Station', tag: 'Familie', highlight: true },
+        { time: 'laatste dag, 16:00–17:45', title: 'Magic Circus', loc: 'Noordplein, Oude Noorden', tag: 'Familie' },
       ],
     },
     {
@@ -32,8 +32,8 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend, gratis', title: 'Stadswandeling', loc: 'Historische binnenstad, Dordrecht', tag: 'Actief', highlight: true },
-        { time: 'doorlopend', title: 'CORPUS', loc: 'Oegstgeest — interactieve reis door het menselijk lichaam', tag: 'Familie' },
+        { time: 'doorlopend', title: 'Mummies en farao\'s', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Hendrick Hamel Museum', loc: 'Gorinchem', tag: 'Expositie' },
       ],
     },
   ],
