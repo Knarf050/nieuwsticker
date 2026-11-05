@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 4 november 2026',
-  updatedAt: '04-11-2026, 07:12',
+  dateLabel: 'Donderdag 5 november 2026',
+  updatedAt: '05-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,7 +14,7 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag (t/m 8 nov)', title: 'Eastern Neighbours Film Festival', loc: 'Filmhuis Den Haag', tag: 'Film', highlight: true },
+        { time: 'avond', title: 'Star Party', loc: 'Museon-Omniversum', tag: 'Familie', highlight: true },
         { time: 'doorlopend (t/m 8 nov)', title: 'Crossing Border Festival', loc: 'Koninklijke Schouwburg', tag: 'Festival' },
       ],
     },
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '10:00–12:00, gratis', title: 'Stadsnatuur-activiteit', loc: 'Bij Centraal Station', tag: 'Familie', highlight: true },
-        { time: 'laatste dag, 16:00–17:45', title: 'Magic Circus', loc: 'Noordplein, Oude Noorden', tag: 'Familie' },
+        { time: '20:00', title: 'The Analogues — Beatles-tribute', loc: 'Oude Luxor Theater', tag: 'Muziek', highlight: true },
+        { time: '20:15', title: 'Rotterdams Philharmonisch Orkest — "Fire in my mouth"', loc: 'De Doelen, Grote Zaal', tag: 'Muziek' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Mummies en farao\'s', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Hendrick Hamel Museum', loc: 'Gorinchem', tag: 'Expositie' },
+        { time: 'opent vandaag (t/m 7 nov)', title: 'Pasar Malam', loc: 'De Broodfabriek, Rijswijk', tag: 'Familie', highlight: true },
+        { time: 'vandaag', title: 'Food La Route', loc: 'Katwijk', tag: 'Culinair' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Uitagenda Rotterdam', url: 'https://www.uitagendarotterdam.nl/' },
-    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
+    { label: 'rotterdamstyle.com — Live Music Calendar', url: 'https://rotterdamstyle.com/live-music-calendar' },
+    { label: 'wattedoenin.nl — Uitagenda Zuid-Holland', url: 'https://www.wattedoenin.nl/uitagenda/zuid-holland/' },
   ],
 };
