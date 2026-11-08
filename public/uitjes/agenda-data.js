@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zaterdag 7 november 2026',
-  updatedAt: '07-11-2026, 07:12',
+  dateLabel: 'Zondag 8 november 2026',
+  updatedAt: '08-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '10:00–17:00, gratis', title: 'IamExpat Fair The Hague 2026', loc: 'Grote Kerk', tag: 'Festival', highlight: true },
-        { time: '7–8 nov', title: 'Le Marie Marché', loc: 'Lange Vijverberg', tag: 'Markt' },
+        { time: '12:00–16:00', title: 'Eerlijk Voedsel Festival', loc: 'Diverse locaties', tag: 'Familie', highlight: true },
+        { time: 'laatste dag', title: 'Le Marie Marché', loc: 'Lange Vijverberg', tag: 'Markt' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vandaag', title: 'Popronde 2026', loc: 'Kram, MAHA en De Doelen', tag: 'Muziek', highlight: true },
-        { time: '7–8 nov', title: 'Old but Gold Festival', loc: 'Maassilo', tag: 'Festival' },
+        { time: '09:00–14:30', title: 'Maastunnelloop — 10 km en 1 km kidsrun', loc: 'Start Parkkade', tag: 'Sport', highlight: true },
+        { time: 'laatste dag, 16:00–17:45', title: 'Magic Circus BOLA', loc: 'Prinsenland', tag: 'Familie' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'vandaag', title: 'Brocante', loc: 'Grote Kerk, Dordrecht', tag: 'Markt', highlight: true },
-        { time: '20:15–22:15', title: 'Leids Barok Ensemble met Ton Koopman', loc: 'Leiden', tag: 'Muziek' },
+        { time: 'Sint-Maarten', title: 'Archeon', loc: 'Alphen aan den Rijn', tag: 'Familie', highlight: true },
+        { time: 'speurtocht', title: 'Beestjesspeurtocht — twaalf metersgrote beestjes', loc: 'Hortus botanicus, Leiden', tag: 'Familie' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'uitzuidholland.com — dit weekend', url: 'https://uitzuidholland.com/' },
-    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/zuid-holland' },
+    { label: 'epicruns.nl — Maastunnelloop', url: 'https://www.epicruns.nl/maastunnelloop/' },
+    { label: 'kidsproof.nl — Leiden', url: 'https://www.kidsproof.nl/leiden/uitjes/uitagenda/' },
   ],
 };
