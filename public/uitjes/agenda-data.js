@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 8 november 2026',
-  updatedAt: '08-11-2026, 07:12',
+  dateLabel: 'Maandag 9 november 2026',
+  updatedAt: '09-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '12:00–16:00', title: 'Eerlijk Voedsel Festival', loc: 'Diverse locaties', tag: 'Familie', highlight: true },
-        { time: 'laatste dag', title: 'Le Marie Marché', loc: 'Lange Vijverberg', tag: 'Markt' },
+        { time: '10:45–19:00, laatste dag', title: 'Eastern Neighbours Film Festival', loc: 'Filmhuis Den Haag', tag: 'Film', highlight: true },
+        { time: 'opent vandaag (t/m 12 dec)', title: 'Time Machine (HNTjong)', loc: 'Theater aan het Spui', tag: 'Familie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '09:00–14:30', title: 'Maastunnelloop — 10 km en 1 km kidsrun', loc: 'Start Parkkade', tag: 'Sport', highlight: true },
-        { time: 'laatste dag, 16:00–17:45', title: 'Magic Circus BOLA', loc: 'Prinsenland', tag: 'Familie' },
+        { time: '20:30', title: 'Blok3 — Live Arena Tour 2026/27', loc: 'Rotterdam Ahoy', tag: 'Muziek', highlight: true },
+        { time: 'doorlopend', title: 'Adventure City — klimparcours', loc: 'Rotterdam', tag: 'Familie' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'Sint-Maarten', title: 'Archeon', loc: 'Alphen aan den Rijn', tag: 'Familie', highlight: true },
-        { time: 'speurtocht', title: 'Beestjesspeurtocht — twaalf metersgrote beestjes', loc: 'Hortus botanicus, Leiden', tag: 'Familie' },
+        { time: 'doorlopend', title: 'TU Delft Science Centre', loc: 'Delft — techniekstudio\'s voor kinderen', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'GPS-tour langs kust en polder', loc: 'Noordwijk aan Zee', tag: 'Actief' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'epicruns.nl — Maastunnelloop', url: 'https://www.epicruns.nl/maastunnelloop/' },
-    { label: 'kidsproof.nl — Leiden', url: 'https://www.kidsproof.nl/leiden/uitjes/uitagenda/' },
+    { label: 'Rotterdam Ahoy — agenda', url: 'https://www.ahoy.nl/en/events' },
+    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
   ],
 };
