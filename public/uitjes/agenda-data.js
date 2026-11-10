@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 9 november 2026',
-  updatedAt: '09-11-2026, 07:12',
+  dateLabel: 'Dinsdag 10 november 2026',
+  updatedAt: '10-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '10:45–19:00, laatste dag', title: 'Eastern Neighbours Film Festival', loc: 'Filmhuis Den Haag', tag: 'Film', highlight: true },
-        { time: 'opent vandaag (t/m 12 dec)', title: 'Time Machine (HNTjong)', loc: 'Theater aan het Spui', tag: 'Familie' },
+        { time: 'laatste dagen (t/m 13 nov)', title: '"Momenten waarop het kantelde" (Schuldenlab070)', loc: 'Atrium City Hall', tag: 'Expositie', highlight: true },
+        { time: 'opent vandaag (t/m 31 dec)', title: 'Wijkmarkt', loc: 'Leyweg', tag: 'Markt' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '20:30', title: 'Blok3 — Live Arena Tour 2026/27', loc: 'Rotterdam Ahoy', tag: 'Muziek', highlight: true },
-        { time: 'doorlopend', title: 'Adventure City — klimparcours', loc: 'Rotterdam', tag: 'Familie' },
+        { time: '20:00', title: 'CKay', loc: 'Maassilo', tag: 'Muziek', highlight: true },
+        { time: '10:00–12:00, gratis', title: 'Ecoprinting-workshop', loc: 'Dokhuis', tag: 'Familie' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'TU Delft Science Centre', loc: 'Delft — techniekstudio\'s voor kinderen', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'GPS-tour langs kust en polder', loc: 'Noordwijk aan Zee', tag: 'Actief' },
+        { time: '14:00–16:00, laatste dagen (t/m 12 nov)', title: 'Archeologietentoonstelling', loc: 'Hellevoetsluis', tag: 'Expositie', highlight: true },
+        { time: 'doorlopend', title: 'Rijksmuseum van Oudheden', loc: 'Leiden', tag: 'Familie' },
       ],
     },
   ],
   sources: [
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'Rotterdam Ahoy — agenda', url: 'https://www.ahoy.nl/en/events' },
+    { label: 'dehavenloods.nl — agenda', url: 'https://www.dehavenloods.nl/agenda' },
     { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
   ],
 };
