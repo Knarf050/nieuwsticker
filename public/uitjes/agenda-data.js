@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Dinsdag 10 november 2026',
-  updatedAt: '10-11-2026, 07:12',
+  dateLabel: 'Woensdag 11 november 2026',
+  updatedAt: '11-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'laatste dagen (t/m 13 nov)', title: '"Momenten waarop het kantelde" (Schuldenlab070)', loc: 'Atrium City Hall', tag: 'Expositie', highlight: true },
-        { time: 'opent vandaag (t/m 31 dec)', title: 'Wijkmarkt', loc: 'Leyweg', tag: 'Markt' },
+        { time: '17:30', title: 'Sint Maarten — lampionnenoptocht', loc: 'Vruchtenbuurt', tag: 'Familie', highlight: true },
+        { time: 'doorlopend (t/m 31 dec)', title: '800 jaar eten en drinken', loc: 'Binnenhof', tag: 'Expositie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '20:00', title: 'CKay', loc: 'Maassilo', tag: 'Muziek', highlight: true },
-        { time: '10:00–12:00, gratis', title: 'Ecoprinting-workshop', loc: 'Dokhuis', tag: 'Familie' },
+        { time: '12:00–00:00', title: 'TEDxRotterdam', loc: 'nieuwe Luxor Theater', tag: 'Festival', highlight: true },
+        { time: '19:00–23:00', title: 'Papa Roach', loc: 'Rotterdam Ahoy', tag: 'Muziek' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '14:00–16:00, laatste dagen (t/m 12 nov)', title: 'Archeologietentoonstelling', loc: 'Hellevoetsluis', tag: 'Expositie', highlight: true },
-        { time: 'doorlopend', title: 'Rijksmuseum van Oudheden', loc: 'Leiden', tag: 'Familie' },
+        { time: '19:00', title: 'Sint Maarten — lampionnenoptocht', loc: 'Berkel en Rodenrijs', tag: 'Familie', highlight: true },
+        { time: 'doorlopend (t/m 31 dec)', title: 'Mini Expo: The Trophy Collection', loc: 'Royal Delft Museum, Delft', tag: 'Expositie' },
       ],
     },
   ],
   sources: [
+    { label: 'optochtenkalender.nl — Zuid-Holland', url: 'https://www.optochtenkalender.nl/nederland/zuid-holland.html' },
+    { label: 'uitagendarotterdam.nl — TEDxRotterdam', url: 'https://www.uitagendarotterdam.nl/agenda/tedx-rotterdam/' },
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'dehavenloods.nl — agenda', url: 'https://www.dehavenloods.nl/agenda' },
-    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
   ],
 };
