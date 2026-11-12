@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 11 november 2026',
-  updatedAt: '11-11-2026, 07:12',
+  dateLabel: 'Donderdag 12 november 2026',
+  updatedAt: '12-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '17:30', title: 'Sint Maarten — lampionnenoptocht', loc: 'Vruchtenbuurt', tag: 'Familie', highlight: true },
-        { time: 'doorlopend (t/m 31 dec)', title: '800 jaar eten en drinken', loc: 'Binnenhof', tag: 'Expositie' },
+        { time: '20:00', title: 'Macy Gray — The Trouble With The Truth Tour', loc: 'PAARD', tag: 'Muziek', highlight: true },
+        { time: 'laatste dag (5–12 nov)', title: '125 jaar jeugdgezondheidszorg', loc: 'Atrium City Hall', tag: 'Expositie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '12:00–00:00', title: 'TEDxRotterdam', loc: 'nieuwe Luxor Theater', tag: 'Festival', highlight: true },
-        { time: '19:00–23:00', title: 'Papa Roach', loc: 'Rotterdam Ahoy', tag: 'Muziek' },
+        { time: 'opent vandaag (t/m 22 nov)', title: 'Noorse Kerstmarkt', loc: 'Rotterdam', tag: 'Markt', highlight: true },
+        { time: 'opent vandaag (t/m 15 nov)', title: 'Trompenburg by Night', loc: 'Trompenburg Tuinen', tag: 'Familie' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '19:00', title: 'Sint Maarten — lampionnenoptocht', loc: 'Berkel en Rodenrijs', tag: 'Familie', highlight: true },
-        { time: 'doorlopend (t/m 31 dec)', title: 'Mini Expo: The Trophy Collection', loc: 'Royal Delft Museum, Delft', tag: 'Expositie' },
+        { time: 'laatste dag', title: 'Archeologietentoonstelling', loc: 'Vesting Hellevoetsluis', tag: 'Expositie', highlight: true },
+        { time: 'doorlopend', title: 'CORPUS', loc: 'Oegstgeest — interactieve reis door het menselijk lichaam', tag: 'Familie' },
       ],
     },
   ],
   sources: [
-    { label: 'optochtenkalender.nl — Zuid-Holland', url: 'https://www.optochtenkalender.nl/nederland/zuid-holland.html' },
-    { label: 'uitagendarotterdam.nl — TEDxRotterdam', url: 'https://www.uitagendarotterdam.nl/agenda/tedx-rotterdam/' },
     { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
+    { label: 'waarwat.nl — evenementen november 2026', url: 'https://waarwat.nl/evenementen/november-2026' },
+    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland' },
   ],
 };
