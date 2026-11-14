@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Vrijdag 13 november 2026',
-  updatedAt: '13-11-2026, 07:12',
+  dateLabel: 'Zaterdag 14 november 2026',
+  updatedAt: '14-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag (t/m 15 nov)', title: 'International Film Festival The Hague', loc: 'Diverse locaties', tag: 'Film', highlight: true },
-        { time: 'opent vandaag (t/m 15 nov)', title: 'International Whisky Festival', loc: 'Grote Kerk', tag: 'Festival' },
+        { time: '10:00–12:30', title: 'Sinterklaasintocht', loc: 'Tweede Haven, Scheveningen', tag: 'Familie', highlight: true },
+        { time: '08:30–14:30, gratis', title: 'Rommelmarkt', loc: 'Den Haag', tag: 'Markt' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vanavond (t/m 21 nov)', title: 'DI-RECT', loc: 'Rotterdam Ahoy', tag: 'Muziek', highlight: true },
-        { time: 'doorlopend (t/m 22 nov)', title: 'Noorse Kerstmarkt', loc: 'Rotterdam', tag: 'Markt' },
+        { time: '13:00', title: 'Sinterklaasintocht', loc: 'Vanaf Willemsplein naar Grotekerkplein', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Shaun the Sheep — voorstelling', loc: 'Diverse locaties', tag: 'Familie' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'opent vandaag, 11:00–20:00 (t/m 15 nov)', title: 'Archeon Kerstmarkt', loc: 'Museumpark Archeon, Alphen aan den Rijn', tag: 'Familie', highlight: true },
-        { time: 'doorlopend (t/m 31 dec)', title: 'Mini Expo: The Trophy Collection', loc: 'Royal Delft Museum, Delft', tag: 'Expositie' },
+        { time: '11:00–20:00 (t/m 15 nov)', title: 'Archeon Kerstmarkt', loc: 'Museumpark Archeon, Alphen aan den Rijn', tag: 'Familie', highlight: true },
+        { time: 't/m 15 nov', title: 'Titanique — musical comedy', loc: 'Spijkenisse', tag: 'Theater' },
       ],
     },
   ],
   sources: [
-    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'waarwat.nl — evenementen november 2026', url: 'https://waarwat.nl/evenementen/november-2026' },
+    { label: 'sinterklaas.nl — intocht Den Haag', url: 'https://sinterklaas.nl/intocht/den-haag/' },
+    { label: 'rotterdam.nl — intocht Sinterklaas', url: 'https://www.rotterdam.nl/intocht-sinterklaas-2026-dit-is-de-route-door-rotterdam' },
     { label: 'archeon.nl — evenementen', url: 'https://www.archeon.nl/nl/evenementen.html' },
   ],
 };
