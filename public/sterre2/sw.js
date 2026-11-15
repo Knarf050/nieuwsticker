@@ -1,6 +1,6 @@
 /* Sterre 2 service worker (gehost onder /sterre2/) — installeerbaar + offline.
    Verhoog CACHE bij elke wijziging om een verse versie uit te rollen. */
-const CACHE = 'sterre2-v1';
+const CACHE = 'sterre2-v2';
 const SHELL = [
   '/sterre2/', '/sterre2/index.html', '/sterre2/manifest.webmanifest',
   '/sterre2/icon-192.png', '/sterre2/icon-512.png', '/sterre2/icon-maskable-512.png', '/sterre2/apple-touch-icon.png',

@@ -270,7 +270,68 @@ h1 sup{font-size:.55em;background:var(--sun);color:#1E1A3A;border:2px solid var(
   z-index:20;transition:transform .4s cubic-bezier(.3,1.4,.5,1);box-shadow:4px 4px 0 var(--sun);max-width:92vw;text-align:center}
 .toast.show{transform:translate(-50%,0)}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:15;width:100%;height:100%}
-@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea{-webkit-user-select:text;user-select:text}
+.choice.mini{font-size:1.05rem;min-height:54px;padding:6px 2px}
+.hintbtn{margin:-4px 0 6px}
+.reis{background:var(--tile);border:2.5px solid var(--ink);border-radius:12px;padding:6px 12px 5px;margin:0 0 10px}
+.reisrij{display:flex;align-items:center;gap:8px;font-size:1.35rem}
+.reisbaan{flex:1;height:6px;border-radius:99px;background:var(--grid);position:relative}
+.reisbaan i{position:absolute;top:50%;transform:translate(-30%,-55%) rotate(45deg);font-style:normal;font-size:1.25rem;transition:left .8s}
+.reisvoet{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--muted);flex-wrap:wrap}
+.week{display:flex;gap:3px}
+.wd{font-size:.68rem;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--soft);color:var(--muted)}
+.wd.aan{background:var(--sun);border-color:var(--sun-edge);color:#1E1A3A;font-weight:700}
+.wd.nu{outline:2px solid var(--ink);outline-offset:1px}
+.boodschap{background:var(--tile);border:2.5px dashed var(--ink);border-radius:12px;padding:6px 10px 8px;margin:10px 0 0;color:var(--muted)}
+.letters{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+.lt{width:19px;height:24px;border-bottom:2.5px solid var(--soft);display:grid;place-items:center;font-weight:700;color:var(--ink);font-size:1rem;text-transform:uppercase}
+.lt.open{border-color:var(--sun-edge)}
+.gat{width:9px}
+.reward.goud{border-color:var(--sun-edge);background:linear-gradient(90deg,rgba(255,201,60,.28),transparent)}
+button.reward.mop{width:100%;text-align:left;font:inherit;color:inherit}
+.reward.mop.open small{color:var(--ink);font-weight:700;font-size:1.05rem}
+.album.vol .slot{border-color:var(--sun-edge);box-shadow:0 0 0 2px var(--sun),2px 2px 0 var(--sun-edge)}
+.racelijst li{position:relative;border-radius:8px}
+.racelijst li.mis{background:var(--wrong-bg);color:var(--red);text-decoration:underline wavy}
+.racelijst:not(.dicht) li.spook::before{content:"👻";position:absolute;left:6%;font-size:.8em}
+.racemee{color:var(--muted);font-size:.9rem;margin:0}
+.baan{display:flex;align-items:center;gap:8px;font-size:1.6rem;margin-bottom:8px}
+.spoor{flex:1;height:18px;border-radius:99px;background:var(--tile);border:2.5px solid var(--ink);overflow:hidden}
+.spoor i{display:block;height:100%;width:0;background:var(--sun);transition:width .25s linear}
+.spoor.robot i{background:var(--soft)}
+.mem{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.memkaart{aspect-ratio:1/0.82;border:3px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--shadow);font-weight:700;font-size:clamp(1.15rem,5vw,1.6rem);
+  background:repeating-linear-gradient(45deg,var(--ink) 0 10px,var(--soft) 10px 20px);padding:2px}
+.memkaart span{visibility:hidden}
+.memkaart.open{background:var(--paper)} .memkaart.open span{visibility:visible}
+.memkaart.paar{background:var(--green-bg);border-color:var(--green);color:var(--green);box-shadow:none}
+.regenbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;font-size:1.15rem}
+.lucht{position:relative;height:min(58vh,460px);height:min(58dvh,460px);border:3px solid var(--ink);border-radius:var(--radius);overflow:hidden;
+  background:linear-gradient(#bfe6ff,#eaf6ff);box-shadow:5px 5px 0 var(--shadow)}
+.ballon{position:absolute;bottom:-90px;width:70px;height:84px;border-radius:50% 50% 48% 48%;border:2.5px solid #1E1A3A;color:#1E1A3A;font-weight:700;font-size:1.5rem;
+  animation:stijg 6.5s linear forwards}
+.ballon::after{content:"";position:absolute;left:50%;top:100%;width:2px;height:26px;background:#1E1A3A}
+.ballon.knal{transform:scale(1.5);opacity:0;transition:transform .2s,opacity .2s;animation-play-state:paused}
+@keyframes stijg{to{bottom:110%}}
+.plaat{position:relative;aspect-ratio:4/3;border:3px solid var(--ink);border-radius:var(--radius);overflow:hidden;box-shadow:5px 5px 0 var(--shadow);margin-bottom:10px;touch-action:manipulation}
+.plaat span{position:absolute;transform:translate(-50%,-50%);line-height:1;pointer-events:none}
+.stickerrij{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px}
+.stickerrij .slot{flex:0 0 52px;height:52px;aspect-ratio:auto;font-size:1.7rem}
+.stickerrij .slot.gekozen{outline:4px solid var(--sun);outline-offset:1px}
+.kleurkeus{display:flex;gap:10px;margin:0 0 6px}
+.kleurknop{width:42px;height:42px;border-radius:50%;border:3px solid var(--tile);box-shadow:0 0 0 2px var(--soft)}
+.kleurknop[aria-pressed="true"]{box-shadow:0 0 0 4px var(--sun)}
+.naamveld{font:inherit;padding:8px 12px;border:2.5px solid var(--ink);border-radius:12px;background:var(--tile);color:var(--text);width:min(100%,260px)}
+.dipkaart{background:var(--tile);border:6px double var(--sun-edge);border-radius:18px;padding:18px 14px;text-align:center;margin-bottom:14px}
+.dipkaart h2{font-size:2.3rem;margin:0;color:var(--ink);letter-spacing:.04em}
+.dipkaart p{margin:6px 0}
+.dipster svg{width:96px;height:96px;margin-top:14px}
+.dipnaam{font-size:1.9rem;font-weight:700;color:var(--ink);border-bottom:2.5px solid var(--sun-edge);display:inline-block;padding:0 18px 2px}
+.dipcijfers{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:12px 0}
+.dipcijfers div{display:grid} .dipcijfers b{font-size:1.6rem;color:var(--ink)} .dipcijfers small,.dipdatum{color:var(--muted);font-size:.85rem}
+@media print{ body{background:none} .bar,.row,.toast,#confetti{display:none!important} .wrap{padding:0} .dipkaart{border-width:8px;margin:10mm} }
+@media (prefers-reduced-motion: reduce){*:not(.ballon){transition:none!important;animation:none!important}}
 @media (max-width:360px){ .stage{width:92px} .album{grid-template-columns:repeat(5,1fr)} }
 </style>
 </head>
@@ -295,16 +356,19 @@ h1 sup{font-size:.55em;background:var(--sun);color:#1E1A3A;border:2px solid var(
       <div class="bubble" id="bubble">Klaar voor de start?</div>
     </div>
   </div>
+  <div class="reis" id="reis"></div>
   <div class="topnav">
     <button class="navtile" id="albumBtn"><span>📒</span><b>Stickerboek</b><small id="albumSub"></small></button>
     <button class="navtile" id="overzichtBtn"><span>📊</span><b>Overzicht</b></button>
   </div>
   <div id="vandaag" class="tiles" style="margin-top:10px"></div>
+  <div class="boodschap" id="boodschap"></div>
   <h2 class="section-title">Kies een vak</h2>
   <div id="cats" class="cats"></div>
   <div class="snel">
     <button class="toggle" id="soundToggle" aria-pressed="true">🎵 Geluidjes: <b id="soundState">aan</b></button>
-    <button class="toggle" id="instelBtn" aria-label="Instellingen">⚙️ Instellingen</button>
+    <button class="toggle" id="verrasBtn">🎲 Verras me</button>
+    <button class="toggle" id="instelBtn" aria-label="Instellingen">⚙️</button>
   </div>
   <p class="savestate" id="saveState">Opgeslagen ✓</p>
   <p class="savestate"><a href="/sterre/">← naar de eerste Sterre</a></p>
@@ -324,6 +388,7 @@ h1 sup{font-size:.55em;background:var(--sun);color:#1E1A3A;border:2px solid var(
     <span class="combo" id="combo"></span>
     <p class="prompt" id="prompt"></p>
     <div class="visual" id="visual"></div>
+    <button class="linkbtn hintbtn" id="hintBtn">💡 geef een hint</button>
     <div class="choices" id="choices"></div>
     <div class="tip" id="tip" hidden></div>
     <div class="fb-row"><span id="fbMascot"></span><span class="feedback" id="feedback"></span></div>
@@ -336,6 +401,11 @@ h1 sup{font-size:.55em;background:var(--sun);color:#1E1A3A;border:2px solid var(
     <div class="uitlegblok">
       <p><b>Zo werkt het.</b> Kies een rij. Tik op Start en lees de woorden hardop, van boven naar beneden. Tik op Klaar als je bij het laatste woord bent.</p>
       <p>Lees dezelfde rij daarna nog een keer. Lukt het sneller?</p>
+      <p><b>Leest er iemand mee?</b> Tik tijdens het lezen op een woord dat niet goed ging. Die woorden komen terug bij Flitswoord.</p>
+    </div>
+    <div class="snel">
+      <button class="toggle" id="klokToggle" aria-pressed="true">⏱️ Klok in beeld: <b>aan</b></button>
+      <button class="toggle" id="spookToggle" aria-pressed="true">👻 Race tegen je record: <b>aan</b></button>
     </div>
     <div class="rijkeus" id="rijKeus"></div>
   </div>
@@ -343,6 +413,7 @@ h1 sup{font-size:.55em;background:var(--sun);color:#1E1A3A;border:2px solid var(
     <p class="prompt" id="raceKop"></p>
     <div class="tijd" id="raceTijd">0,0 s</div>
     <ol class="racelijst dicht" id="raceLijst"></ol>
+    <p class="racemee" id="raceMee" hidden>meelezer: tik op een woord dat niet goed ging</p>
     <div class="row">
       <button class="btn primary groot" id="raceStart">▶ Start</button>
       <button class="btn primary groot" id="raceKlaar" hidden>🏁 Klaar!</button>
@@ -389,8 +460,24 @@ h1 sup{font-size:.55em;background:var(--sun);color:#1E1A3A;border:2px solid var(
   <div id="ovInhoud"></div>
 </section>
 
+<section id="spel" hidden>
+  <div class="bar"><button class="btn back">← Terug</button><h2 id="spelTitel"></h2></div>
+  <div id="spelVeld"></div>
+</section>
+
+<section id="diploma" hidden>
+  <div class="bar"><button class="btn back">← Terug</button><h2>Diploma</h2></div>
+  <div class="dipkaart" id="dipKaart"></div>
+  <div class="row"><button class="btn primary" id="dipPrint">🖨️ Printen</button></div>
+  <p class="section-sub" style="text-align:center;margin-top:10px">Lukt printen niet? Maak dan een schermfoto.</p>
+</section>
+
 <section id="instel" hidden>
   <div class="bar"><button class="btn back">← Terug</button><h2>Instellingen</h2></div>
+  <h3 class="instel-kop">Hoe heet je?</h3>
+  <input class="naamveld" id="naamIn" maxlength="14" placeholder="je voornaam" autocomplete="off" aria-label="Je voornaam">
+  <h3 class="instel-kop">Kleur</h3>
+  <div class="kleurkeus" id="kleurKeus"></div>
   <h3 class="instel-kop">Weergave</h3>
   <div class="snel"><button class="toggle" id="themaBtn">🌙 Donker</button></div>
   <h3 class="instel-kop">Voortgang</h3>
