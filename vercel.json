@@ -27,6 +27,10 @@
     "api/sterre.js": {
       "memory": 512,
       "maxDuration": 10
+    },
+    "api/sterre2.js": {
+      "memory": 512,
+      "maxDuration": 10
     }
   },
   "crons": [

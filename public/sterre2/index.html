@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="/sterre2/manifest.webmanifest">
+<meta name="theme-color" content="#3B2A8C">
+<link rel="icon" href="/sterre2/icon-192.png">
+<link rel="apple-touch-icon" href="/sterre2/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sterre 2">
+<meta name="description" content="Racelezen, driesterrensommen en breinbrekers.">
+<title>Sterre 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBFAFF; --grid:#E4DFF6; --ink:#3B2A8C; --text:#1E1A3A; --muted:#5F5A86;
+  --red:#E23B3B; --sun:#FFC93C; --sun-edge:#C9931A; --sky:#241a55;
+  --green:#2E9E5B; --green-bg:#DDF3E5; --wrong-bg:#FBE3E3; --tile:#FFFFFF; --soft:#B3A6E8; --shadow:#3B2A8C;
+  --radius:14px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#15122B; --grid:#221D42; --ink:#C3B4FF; --text:#EEEAFF; --muted:#ADA6D6;
+    --red:#FF6B6B; --sun:#FFD25E; --sun-edge:#B8861A; --sky:#0d0a24;
+    --green:#4CC57F; --green-bg:#173A28; --wrong-bg:#40202A; --tile:#1D1838; --soft:#6558A8; --shadow:#07051A;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#15122B; --grid:#221D42; --ink:#C3B4FF; --text:#EEEAFF; --muted:#ADA6D6;
+  --red:#FF6B6B; --sun:#FFD25E; --sun-edge:#B8861A; --sky:#0d0a24;
+  --green:#4CC57F; --green-bg:#173A28; --wrong-bg:#40202A; --tile:#1D1838; --soft:#6558A8; --shadow:#07051A;
+}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0; min-height:100vh; min-height:100dvh; color:var(--text); background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+  font-family:"Andika","Comic Neue","Trebuchet MS",system-ui,sans-serif;
+  font-size:1.125rem; line-height:1.45;
+}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
+.wrap{max-width:720px;margin:0 auto;padding:14px 16px 40px}
+[hidden]{display:none!important}
+
+.stats{display:flex;gap:6px;align-items:stretch;margin-bottom:10px}
+.chip{display:flex;align-items:center;gap:5px;background:var(--tile);border:2.5px solid var(--ink);
+  border-radius:999px;padding:3px 10px 3px 4px;font-weight:700;box-shadow:2px 2px 0 var(--shadow);font-size:.95rem;min-width:0}
+.chip small{font-weight:400;color:var(--muted);font-size:.8rem;white-space:nowrap}
+.chip.level{flex:1 1 auto}
+.chip .em{font-size:1.2rem;line-height:1;padding-left:4px}
+.lvl-badge{width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:.9rem;flex:none}
+.xpbar{flex:1;height:10px;border-radius:99px;background:var(--grid);overflow:hidden;min-width:28px}
+.xpbar i{display:block;height:100%;background:var(--sun);border-radius:99px;transition:width .6s}
+.chip.off{opacity:.6}
+
+.hero{margin:0 0 12px;border:3px solid var(--ink);border-radius:var(--radius);overflow:hidden;box-shadow:4px 4px 0 var(--shadow);background:var(--tile);display:flex;align-items:stretch}
+.stage{display:block;width:118px;flex:none;align-self:stretch}
+.hero-text{padding:10px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0;flex:1}
+h1{font-size:clamp(1.7rem,6vw,2.2rem);line-height:1;margin:0;color:var(--ink)}
+h1 sup{font-size:.55em;background:var(--sun);color:#1E1A3A;border:2px solid var(--ink);border-radius:8px;padding:0 6px;margin-left:4px;vertical-align:top}
+.bubble{background:var(--paper);border:2.5px solid var(--ink);border-radius:14px;padding:6px 12px;font-size:.98rem}
+.m-body{fill:var(--sun);stroke:var(--sun-edge);stroke-width:3;stroke-linejoin:round}
+.m-eye{fill:#1E1A3A}
+.m-mouth{fill:none;stroke:#1E1A3A;stroke-width:3.5;stroke-linecap:round}
+.m-cheek{fill:#FF9C9C;opacity:.75}
+
+.snel{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.toggle{border:2px solid var(--ink);background:var(--tile);border-radius:999px;padding:6px 12px;display:inline-flex;align-items:center;gap:8px;font-size:.92rem}
+.toggle[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+
+.section-title{font-size:1.3rem;margin:16px 0 2px;color:var(--ink)}
+.section-sub{margin:0 0 10px;color:var(--muted);font-size:1rem}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{text-align:left;background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);
+  padding:11px;display:grid;gap:3px;box-shadow:4px 4px 0 var(--shadow);transition:transform .12s, box-shadow .12s;align-content:start}
+.tile:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shadow)}
+.tile .icon{height:40px;display:flex;align-items:center;font-size:1.8rem;font-weight:700;color:var(--ink)}
+.tile b{font-size:1.1rem;line-height:1.2}
+.tile .sub{color:var(--muted);font-size:.92rem;line-height:1.25}
+.tile .onder{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:2px}
+.stars{font-size:1.1rem;letter-spacing:2px;color:var(--sun)}
+.stars .off{color:var(--grid)}
+.nv{font-size:.78rem;color:var(--muted);border:1.5px solid var(--soft);border-radius:99px;padding:0 7px;white-space:nowrap}
+.tile.breed{grid-column:1/-1;grid-template-columns:auto 1fr;column-gap:12px;align-items:center}
+.tile.breed .icon{grid-row:1/3;height:auto;font-size:2.2rem}
+.tile.klaar{opacity:.65}
+
+.cats{display:grid;gap:9px;margin:0 0 14px}
+.cattile{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;
+  text-align:left;background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);
+  padding:11px 12px;box-shadow:4px 4px 0 var(--shadow);transition:transform .12s, box-shadow .12s}
+.cattile:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shadow)}
+.catic{font-size:2rem;min-width:1.6em;text-align:center;line-height:1}
+.cattext{display:grid;gap:1px;min-width:0}
+.cattext b{font-size:1.2rem}
+.cattext small{color:var(--muted);font-size:.9rem;line-height:1.25}
+.catbar{height:6px;border-radius:99px;background:var(--grid);overflow:hidden;margin-top:3px}
+.catbar i{display:block;height:100%;border-radius:99px;background:var(--sun)}
+.catster{color:var(--muted);font-size:.95rem;white-space:nowrap;font-weight:700}
+.topnav{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 6px}
+.navtile{background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);padding:7px 6px;
+  box-shadow:3px 3px 0 var(--shadow);display:flex;justify-content:center;align-items:center;gap:8px;line-height:1.1}
+.navtile:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+.navtile small{color:var(--muted);font-size:.8rem}
+.savestate{color:var(--muted);font-size:.85rem;margin:10px 0 0}
+.savestate.fout{color:var(--red);font-weight:700}
+.savestate a{color:var(--muted)}
+
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.bar h2{flex:1;min-width:0;margin:0;font-size:1.15rem;color:var(--ink);line-height:1.2}
+.btn{border:3px solid var(--ink);background:var(--tile);border-radius:12px;padding:8px 14px;box-shadow:3px 3px 0 var(--shadow);font-weight:700}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.groot{font-size:1.35rem;padding:12px 26px}
+.bar .btn{flex:none;white-space:nowrap}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;padding:8px;font-size:.95rem}
+.progress{display:flex;gap:6px;justify-content:center;margin:2px 0 12px;flex-wrap:wrap}
+.pdot{width:20px;height:20px;border-radius:50%;border:2.5px dashed var(--soft)}
+.pdot.first{background:var(--sun);border:2.5px solid var(--sun-edge)}
+.pdot.retry{background:var(--soft);border:2.5px solid var(--soft)}
+.pdot.now{border-style:solid;border-color:var(--ink)}
+.meta{display:flex;gap:8px;justify-content:center;margin:-4px 0 10px;color:var(--muted);font-size:.9rem}
+.pill{border:2px solid var(--soft);border-radius:999px;padding:1px 10px}
+
+.card{position:relative;background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);
+  padding:18px 14px 18px;box-shadow:5px 5px 0 var(--shadow);text-align:center}
+.combo{position:absolute;top:-16px;right:14px;background:var(--sun);color:#1E1A3A;border:2.5px solid var(--ink);
+  border-radius:999px;padding:2px 12px;font-weight:700;font-size:1rem;transform:scale(0);transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.combo.show{transform:scale(1)}
+.prompt{font-size:clamp(1.25rem,4.8vw,1.7rem);margin:0 0 10px;font-weight:700;line-height:1.3}
+.visual{margin:6px 0 12px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.visual svg{max-width:100%;height:auto}
+.sum{font-size:clamp(2.6rem,12vw,4.4rem);font-weight:700;line-height:1.1;color:var(--ink)}
+.sum .q{color:var(--red)}
+.leesregel{font-size:clamp(1.5rem,6.2vw,2.1rem);font-weight:700;color:var(--ink);line-height:1.35;max-width:22em}
+.verhaal{font-size:clamp(1.2rem,4.8vw,1.5rem);line-height:1.5;text-align:left;max-width:26em}
+.verhaal p{margin:0 0 4px}
+.flits{font-size:clamp(2.4rem,11vw,3.8rem);font-weight:700;color:var(--ink);min-height:1.5em;letter-spacing:.03em;
+  display:grid;place-items:center;border:3px dashed var(--soft);border-radius:14px;padding:6px 18px;min-width:70%}
+.flits.zin{font-size:clamp(1.5rem,6.2vw,2.1rem);letter-spacing:0;line-height:1.3;min-height:3.2em}
+.flits.weg{color:var(--soft);letter-spacing:.2em}
+.weegregel{font-size:clamp(1.7rem,7.5vw,2.4rem);font-weight:700;line-height:1.5}
+.weegregel .q{color:var(--red)}
+
+.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:8px}
+.choices.c1{grid-template-columns:1fr}
+.choices.c3{grid-template-columns:repeat(3,1fr)}
+.choice{border:3px solid var(--ink);background:var(--paper);border-radius:14px;
+  font-size:clamp(1.9rem,7.5vw,2.6rem);font-weight:700;padding:10px 6px;min-height:72px;box-shadow:4px 4px 0 var(--shadow);line-height:1.15}
+.choice.klein{font-size:clamp(1.25rem,5.2vw,1.6rem);min-height:62px}
+.choice:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shadow)}
+.choice.kies{background:var(--sun);color:#1E1A3A}
+.choice.goed{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.choice.fout{background:var(--wrong-bg);opacity:.55;animation:shake .35s}
+.choice.schud{animation:shake .35s}
+.choice.wijs{border-color:var(--green);animation:wijs 1s ease-in-out infinite}
+.choice:disabled{cursor:default}
+@keyframes wijs{50%{box-shadow:0 0 0 6px var(--sun),4px 4px 0 var(--shadow)}}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+.fb-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;min-height:52px;position:relative}
+.fb-row svg{width:48px;height:48px;flex:none}
+.feedback{font-weight:700;font-size:1.15rem;text-align:left}
+.feedback.ok{color:var(--green)} .feedback.no{color:var(--red)}
+.xp-pop{position:absolute;right:8%;top:0;font-weight:700;color:var(--sun-edge);font-size:1.3rem;animation:pop 1s ease forwards;pointer-events:none}
+@keyframes pop{0%{opacity:0;transform:translateY(10px) scale(.6)}20%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-30px)}}
+.tip{margin:10px auto 0;max-width:520px;text-align:left;background:var(--paper);border:2.5px solid var(--sun-edge);
+  border-left-width:8px;border-radius:12px;padding:8px 12px;font-size:1.05rem}
+.kijkweer{margin-top:4px}
+
+/* Puzzels */
+.muur{display:grid;gap:5px;justify-items:center}
+.muur .rij{display:flex;gap:5px}
+.steen{min-width:58px;height:50px;padding:0 6px;display:grid;place-items:center;font-weight:700;font-size:1.45rem;
+  background:var(--paper);border:3px solid var(--ink);border-radius:8px}
+.steen.q{color:var(--red);border-color:var(--red);background:var(--wrong-bg)}
+.steen.leeg{background:var(--grid)}
+.raster{display:grid;gap:0;border:3px solid var(--ink);border-radius:8px;overflow:hidden}
+.raster.g3{grid-template-columns:repeat(3,62px)}
+.raster.g4{grid-template-columns:repeat(4,54px)}
+.cel{height:56px;display:grid;place-items:center;font-weight:700;font-size:1.5rem;border:1.5px solid var(--soft);background:var(--paper)}
+.raster.g4 .cel:nth-child(4n+2){border-right:3px solid var(--ink)}
+.raster.g4 .cel:nth-child(n+5):nth-child(-n+8){border-bottom:3px solid var(--ink)}
+.cel.q{color:var(--red);background:var(--wrong-bg)}
+.cel.leeg{background:var(--tile)}
+.bij{color:var(--muted);font-size:1rem}
+.clock-face{fill:var(--tile);stroke:var(--ink);stroke-width:6}
+.clock-num{fill:var(--text);font-size:17px;font-weight:700;font-family:inherit}
+.tick{stroke:var(--muted);stroke-width:2}
+.hand-h{stroke:var(--ink);stroke-width:8;stroke-linecap:round}
+.hand-m{stroke:var(--red);stroke-width:5;stroke-linecap:round}
+.line-axis{stroke:var(--ink);stroke-width:3}
+.line-lab{fill:var(--text);font-size:15px;font-weight:700;font-family:inherit}
+.arrow{fill:var(--red)}
+.geld{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;max-width:340px}
+.munt{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:1.05rem;
+  background:var(--sun);border:3px solid var(--sun-edge);color:#1E1A3A}
+.munt.zilver{background:#D9DEE8;border-color:#8E97AB;width:46px;height:46px;font-size:.95rem}
+.brief{width:86px;height:50px;border-radius:8px;display:grid;place-items:center;font-weight:700;font-size:1.2rem;
+  background:#BFE3C8;border:3px solid var(--green);color:#1E1A3A}
+.brief.tien{background:#F6C0C0;border-color:var(--red)}
+.brief.twintig{background:#BCD3F5;border-color:#3D6FC4}
+
+/* Woordrace */
+.rijkeus{display:grid;gap:8px;margin:0 0 12px}
+.rijkeus .toggle{justify-content:space-between;border-radius:12px;padding:9px 12px;font-size:1rem}
+.racelijst{list-style:none;margin:10px 0 14px;padding:0;display:grid;gap:2px}
+.racelijst li{font-size:clamp(1.7rem,7.5vw,2.3rem);font-weight:700;color:var(--ink);line-height:1.5}
+.racelijst.dicht li{color:transparent;background:var(--grid);border-radius:8px;width:60%;margin:0 auto;user-select:none}
+.tijd{font-variant-numeric:tabular-nums;font-size:1.4rem;font-weight:700;color:var(--muted)}
+.uitslag{font-size:1.3rem;font-weight:700;margin:6px 0}
+.uitslag small{display:block;font-weight:400;color:var(--muted);font-size:1rem}
+
+.result{text-align:center}
+.result svg.mascot{width:100px;height:100px}
+.big-stars{font-size:3rem;letter-spacing:8px;margin:2px 0;color:var(--sun)}
+.big-stars .off{color:var(--grid)}
+.big-stars span.pop-in{display:inline-block;animation:starin .5s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes starin{from{transform:scale(0) rotate(-90deg)}to{transform:scale(1)}}
+.result h2{font-size:1.8rem;margin:4px 0;color:var(--ink)}
+.result p{font-size:1.1rem;margin:4px 0 12px}
+.rewards{display:grid;gap:8px;margin:12px auto 16px;max-width:420px;text-align:left}
+.reward{display:flex;align-items:center;gap:12px;background:var(--paper);border:2.5px solid var(--ink);border-radius:12px;padding:7px 12px}
+.reward .ic{font-size:1.6rem;width:36px;text-align:center}
+.reward b{display:block}
+.reward small{color:var(--muted)}
+.row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.sticker-pack{width:140px;height:160px;margin:6px auto 4px;perspective:600px;border:0;background:none;padding:0}
+.sp-inner{position:relative;width:100%;height:100%;transition:transform .7s;transform-style:preserve-3d}
+.sticker-pack.open .sp-inner{transform:rotateY(180deg)}
+.sp-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;border:3px solid var(--ink);display:grid;place-items:center;box-shadow:4px 4px 0 var(--shadow)}
+.sp-front{background:repeating-linear-gradient(45deg,#3B2A8C 0 14px,#5E4BC2 14px 28px);color:#fff;font-size:3.2rem;font-weight:700}
+.sp-back{background:var(--tile);transform:rotateY(180deg);font-size:4.6rem}
+.sp-label{color:var(--muted);font-size:1rem;margin:4px 0 10px}
+
+.albumkop{font-size:1.1rem;color:var(--ink);margin:16px 0 8px}
+.album{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.slot{aspect-ratio:1;border-radius:12px;border:2.5px dashed var(--soft);display:grid;place-items:center;font-size:1.9rem;background:var(--tile)}
+.slot.have{border:3px solid var(--ink);box-shadow:2px 2px 0 var(--shadow)}
+.slot.empty{color:var(--soft);font-size:1rem;font-weight:700}
+.badges{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.badge{background:var(--tile);border:3px solid var(--ink);border-radius:14px;padding:10px;text-align:center;box-shadow:3px 3px 0 var(--shadow)}
+.badge .ic{font-size:2.1rem}
+.badge b{display:block}
+.badge small{color:var(--muted);font-size:.88rem;line-height:1.3;display:block}
+.badge.locked{border-style:dashed;box-shadow:none;opacity:.55}
+.badge.locked .ic{filter:grayscale(1);opacity:.4}
+.stats-table{width:100%;border-collapse:collapse;font-size:.98rem;background:var(--tile)}
+.stats-table th,.stats-table td{text-align:left;padding:7px 6px;border-bottom:2px solid var(--grid)}
+.stats-table th{color:var(--muted);font-weight:400;font-size:.88rem}
+.stats-table td.num{text-align:right;font-weight:700;white-space:nowrap}
+.uitlegblok{background:var(--tile);border:2.5px solid var(--soft);border-radius:12px;padding:10px 14px;font-size:1rem;margin:0 0 14px}
+.uitlegblok p{margin:0 0 6px}
+.backup{margin-top:12px;background:var(--tile);border:3px solid var(--ink);border-radius:var(--radius);padding:14px}
+.backup textarea,.backup input{width:100%;font-family:ui-monospace,Menlo,monospace;font-size:.85rem;padding:8px;border:2.5px solid var(--ink);
+  border-radius:10px;background:var(--paper);color:var(--text);margin-bottom:8px}
+.backup textarea{height:72px}
+.instel-kop{font-size:1.05rem;color:var(--ink);margin:18px 0 8px}
+
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translate(-50%,-220%);
+  background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:14px;font-weight:700;font-size:1.1rem;
+  z-index:20;transition:transform .4s cubic-bezier(.3,1.4,.5,1);box-shadow:4px 4px 0 var(--sun);max-width:92vw;text-align:center}
+.toast.show{transform:translate(-50%,0)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:15;width:100%;height:100%}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:360px){ .stage{width:92px} .album{grid-template-columns:repeat(5,1fr)} }
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="toast" id="toast" role="status"></div>
+<div class="wrap">
+
+<section id="home">
+  <div class="stats" id="stats"></div>
+  <div class="hero">
+    <svg class="stage" viewBox="0 0 118 130" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="118" height="130" fill="var(--sky)"/>
+      <g fill="#fff"><circle cx="14" cy="18" r="1.6"/><circle cx="98" cy="12" r="1.3"/><circle cx="104" cy="58" r="1.6"/><circle cx="10" cy="76" r="1.2"/><circle cx="60" cy="10" r="1"/><circle cx="26" cy="112" r="1.4"/><circle cx="92" cy="104" r="1.1"/></g>
+      <ellipse cx="92" cy="30" rx="16" ry="4.5" fill="none" stroke="#F3A6C8" stroke-width="2.5" transform="rotate(-18 92 30)"/>
+      <circle cx="92" cy="30" r="9" fill="#F27CA9"/>
+      <path d="M22 122 q14 -26 36 -34" fill="none" stroke="#FFC93C" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 9" opacity=".7"/>
+      <g transform="translate(26 34) scale(.66)" id="heroSter"></g>
+    </svg>
+    <div class="hero-text">
+      <h1>Sterre<sup>2</sup></h1>
+      <div class="bubble" id="bubble">Klaar voor de start?</div>
+    </div>
+  </div>
+  <div class="topnav">
+    <button class="navtile" id="albumBtn"><span>📒</span><b>Stickerboek</b><small id="albumSub"></small></button>
+    <button class="navtile" id="overzichtBtn"><span>📊</span><b>Overzicht</b></button>
+  </div>
+  <div id="vandaag" class="tiles" style="margin-top:10px"></div>
+  <h2 class="section-title">Kies een vak</h2>
+  <div id="cats" class="cats"></div>
+  <div class="snel">
+    <button class="toggle" id="soundToggle" aria-pressed="true">🎵 Geluidjes: <b id="soundState">aan</b></button>
+    <button class="toggle" id="instelBtn" aria-label="Instellingen">⚙️ Instellingen</button>
+  </div>
+  <p class="savestate" id="saveState">Opgeslagen ✓</p>
+  <p class="savestate"><a href="/sterre/">← naar de eerste Sterre</a></p>
+</section>
+
+<section id="cat" hidden>
+  <div class="bar"><button class="btn back">← Terug</button><h2 id="catTitle"></h2></div>
+  <p class="section-sub" id="catSub"></p>
+  <div id="catTiles" class="tiles"></div>
+</section>
+
+<section id="game" hidden>
+  <div class="bar"><button class="btn" id="stopBtn">← Stoppen</button><h2 id="gameTitle"></h2></div>
+  <div class="progress" id="progress"></div>
+  <div class="meta"><span class="pill" id="lvlPill"></span></div>
+  <div class="card">
+    <span class="combo" id="combo"></span>
+    <p class="prompt" id="prompt"></p>
+    <div class="visual" id="visual"></div>
+    <div class="choices" id="choices"></div>
+    <div class="tip" id="tip" hidden></div>
+    <div class="fb-row"><span id="fbMascot"></span><span class="feedback" id="feedback"></span></div>
+  </div>
+</section>
+
+<section id="race" hidden>
+  <div class="bar"><button class="btn back">← Terug</button><h2>Woordrace</h2></div>
+  <div id="raceKies">
+    <div class="uitlegblok">
+      <p><b>Zo werkt het.</b> Kies een rij. Tik op Start en lees de woorden hardop, van boven naar beneden. Tik op Klaar als je bij het laatste woord bent.</p>
+      <p>Lees dezelfde rij daarna nog een keer. Lukt het sneller?</p>
+    </div>
+    <div class="rijkeus" id="rijKeus"></div>
+  </div>
+  <div class="card" id="raceKaart" hidden>
+    <p class="prompt" id="raceKop"></p>
+    <div class="tijd" id="raceTijd">0,0 s</div>
+    <ol class="racelijst dicht" id="raceLijst"></ol>
+    <div class="row">
+      <button class="btn primary groot" id="raceStart">▶ Start</button>
+      <button class="btn primary groot" id="raceKlaar" hidden>🏁 Klaar!</button>
+    </div>
+    <div id="raceUit" hidden>
+      <div class="uitslag" id="raceUitslag"></div>
+      <div class="row">
+        <button class="btn primary" id="raceWeer">🔁 Zelfde rij nog eens</button>
+        <button class="btn" id="raceNieuw">Nieuwe rij</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="result" hidden>
+  <div class="card result">
+    <div id="resMascot"></div>
+    <div class="big-stars" id="resStars"></div>
+    <h2 id="resTitle"></h2>
+    <p id="resText"></p>
+    <div id="packBox" hidden>
+      <button class="sticker-pack" id="pack" aria-label="Maak het stickerpakje open">
+        <span class="sp-inner"><span class="sp-face sp-front">?</span><span class="sp-face sp-back" id="packBack"></span></span>
+      </button>
+      <p class="sp-label" id="packLabel">Tik op het pakje!</p>
+    </div>
+    <div class="rewards" id="rewards"></div>
+    <div class="row">
+      <button class="btn primary" id="againBtn">Nog een keer</button>
+      <button class="btn" id="homeBtn">Andere oefening</button>
+    </div>
+  </div>
+</section>
+
+<section id="album" hidden>
+  <div class="bar"><button class="btn back">← Terug</button><h2>Stickerboek</h2></div>
+  <div id="albumPages"></div>
+  <h3 class="albumkop">Medailles</h3>
+  <div class="badges" id="badgeGrid"></div>
+</section>
+
+<section id="overzicht" hidden>
+  <div class="bar"><button class="btn back">← Terug</button><h2>Overzicht voor ouders</h2></div>
+  <div id="ovInhoud"></div>
+</section>
+
+<section id="instel" hidden>
+  <div class="bar"><button class="btn back">← Terug</button><h2>Instellingen</h2></div>
+  <h3 class="instel-kop">Weergave</h3>
+  <div class="snel"><button class="toggle" id="themaBtn">🌙 Donker</button></div>
+  <h3 class="instel-kop">Voortgang</h3>
+  <div class="snel">
+    <button class="toggle" id="backupBtn">💾 Voortgang bewaren</button>
+    <button class="linkbtn" id="resetBtn">Voortgang wissen</button>
+  </div>
+  <div class="backup" hidden id="backup">
+    <p>De voortgang wordt vanzelf opgeslagen. Wil je hem meenemen naar een ander apparaat? Kopieer deze code en plak hem daar bij Herstel.</p>
+    <textarea id="backupCode" readonly aria-label="Je bewaarcode"></textarea>
+    <button class="btn" id="copyCode">Kopieer code</button>
+    <p style="margin:14px 0 6px">Een code terugzetten:</p>
+    <input id="restoreCode" placeholder="plak hier je code" aria-label="Code om te herstellen">
+    <button class="btn primary" id="restoreBtn">Herstel</button>
+  </div>
+  <p class="savestate">Versie <span id="versie"></span></p>
+</section>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
