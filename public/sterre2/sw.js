@@ -1,6 +1,6 @@
 /* Sterre 2 service worker (gehost onder /sterre2/) — installeerbaar + offline.
    Verhoog CACHE bij elke wijziging om een verse versie uit te rollen. */
-const CACHE = 'sterre2-v2';
+const CACHE = 'sterre2-v3';
 const SHELL = [
   '/sterre2/', '/sterre2/index.html', '/sterre2/manifest.webmanifest',
   '/sterre2/icon-192.png', '/sterre2/icon-512.png', '/sterre2/icon-maskable-512.png', '/sterre2/apple-touch-icon.png',
@@ -41,6 +41,8 @@ self.addEventListener('fetch', (e) => {
         caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
       }
       return res;
-    }).catch(() => caches.match(req).then((c) => c || caches.match('/sterre2/')))
+    // Alleen een hele pagina mag terugvallen op de startpagina; een script of
+    // plaatje dat ontbreekt moet gewoon mislukken, anders krijgt het HTML terug.
+    }).catch(() => caches.match(req).then((c) => c || (req.mode === 'navigate' ? caches.match('/sterre2/') : Response.error())))
   );
 });

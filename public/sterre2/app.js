@@ -2,7 +2,7 @@
    Bovenaan staat alle inhoud (woorden, zinnen, opgavenmakers); die deel
    heeft geen scherm nodig en is daardoor los te testen. Onderaan de app zelf. */
 "use strict";
-const VERSIE = "2026-11-15b";
+const VERSIE = "2026-11-15c";
 
 /* ---------- hulpjes ---------- */
 const rnd = (a,b)=>a+Math.floor(Math.random()*(b-a+1));
@@ -639,7 +639,7 @@ let soundOn = load("sterre2-geluid", true);
 const spelers={};
 function maakSpelers(){
   if(spelers.goed) return;
-  ["goed","combo","fout","fanfare","pop"].forEach(k=>{ try{ const a=new Audio("geluid/"+k+".wav"); a.preload="auto"; a.volume=0.7; spelers[k]=a; }catch(e){} });
+  ["goed","combo","fout","fanfare","pop"].forEach(k=>{ try{ const a=new Audio("/sterre2/geluid/"+k+".wav"); a.preload="auto"; a.volume=0.7; spelers[k]=a; }catch(e){} });
 }
 function speel(k){ if(!soundOn) return; maakSpelers(); const a=spelers[k]; if(!a) return; try{ a.currentTime=0; const p=a.play(); if(p&&p.catch) p.catch(()=>{}); }catch(e){} }
 document.addEventListener("pointerdown", maakSpelers, {once:true});
