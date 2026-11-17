@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 16 november 2026',
-  updatedAt: '16-11-2026, 07:12',
+  dateLabel: 'Dinsdag 17 november 2026',
+  updatedAt: '17-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag (t/m 20 nov)', title: 'The Hague Justice Week', loc: 'Diverse locaties', tag: 'Festival', highlight: true },
-        { time: 'doorlopend (t/m eind feb)', title: 'Cool Event Scheveningen — schaatsen', loc: 'Kurhausplein', tag: 'Familie' },
+        { time: '20:00–23:00', title: 'Electric Six', loc: 'PAARD', tag: 'Muziek', highlight: true },
+        { time: 'doorlopend (t/m 20 nov)', title: 'The Hague Justice Week', loc: 'Diverse locaties', tag: 'Festival' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vandaag', title: 'Een avond met Yotam Ottolenghi', loc: 'Rotterdam', tag: 'Culinair', highlight: true },
-        { time: 'doorlopend', title: 'Klimpark met netten', loc: 'Rotterdam — tot 15 meter hoog', tag: 'Familie' },
+        { time: '20:00', title: 'Soweto Gospel Choir', loc: 'Oude Luxor Theater', tag: 'Muziek', highlight: true },
+        { time: 'opent vandaag, 12:00', title: 'Connecting Cultures Festival 2026', loc: 'Rotterdam', tag: 'Festival' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend (t/m 4 jan 2027)', title: 'Expositie over kunst en twijfel', loc: 'Rijksmuseum Boerhaave, Leiden', tag: 'Expositie', highlight: true },
-        { time: 'doorlopend (t/m 3 jan 2027)', title: 'Willem van Oranje — de musical', loc: 'Prinsentheater, Delft', tag: 'Theater' },
+        { time: 'doorlopend', title: 'Mummies — oog in oog', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie', highlight: true },
+        { time: 'doorlopend (t/m 31 dec)', title: 'Mini Expo: The Trophy Collection', loc: 'Royal Delft Museum, Delft', tag: 'Expositie' },
       ],
     },
   ],
   sources: [
-    { label: 'thehague.com — Business evenementen', url: 'https://thehague.com/newsroom/en/events' },
+    { label: 'uitdenhaag.net — agenda', url: 'https://uitdenhaag.net/' },
+    { label: 'dehavenloods.nl — agenda', url: 'https://www.dehavenloods.nl/agenda' },
     { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/uit' },
-    { label: 'dagjeweg.nl — concerten', url: 'https://www.dagjeweg.nl/kalender/november-2026' },
   ],
 };
