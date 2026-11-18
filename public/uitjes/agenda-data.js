@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Dinsdag 17 november 2026',
-  updatedAt: '17-11-2026, 07:12',
+  dateLabel: 'Woensdag 18 november 2026',
+  updatedAt: '18-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '20:00–23:00', title: 'Electric Six', loc: 'PAARD', tag: 'Muziek', highlight: true },
-        { time: 'doorlopend (t/m 20 nov)', title: 'The Hague Justice Week', loc: 'Diverse locaties', tag: 'Festival' },
+        { time: 'opent vandaag (t/m 29 nov)', title: '"Dag Poes" (4+)', loc: 'Theater aan het Spui', tag: 'Familie', highlight: true },
+        { time: '20:00–22:00', title: 'Mefisto — try-out', loc: 'Koninklijke Schouwburg', tag: 'Theater' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '20:00', title: 'Soweto Gospel Choir', loc: 'Oude Luxor Theater', tag: 'Muziek', highlight: true },
-        { time: 'opent vandaag, 12:00', title: 'Connecting Cultures Festival 2026', loc: 'Rotterdam', tag: 'Festival' },
+        { time: '19:30', title: 'Harry Potter and the Chamber of Secrets — filmconcert', loc: 'De Doelen', tag: 'Familie', highlight: true },
+        { time: 'opent vandaag, 20:30', title: 'Cameretten Festival (60e editie)', loc: 'Kantine Walhalla', tag: 'Festival' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Mummies — oog in oog', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie', highlight: true },
-        { time: 'doorlopend (t/m 31 dec)', title: 'Mini Expo: The Trophy Collection', loc: 'Royal Delft Museum, Delft', tag: 'Expositie' },
+        { time: 'opent vandaag (t/m 22 nov)', title: 'Suikerzoet Filmfestival', loc: 'Diverse locaties, Schiedam', tag: 'Film', highlight: true },
+        { time: '17:00–20:00', title: 'Start kerstseizoen', loc: 'Westfield Mall of the Netherlands, Leidschendam', tag: 'Markt' },
       ],
     },
   ],
   sources: [
-    { label: 'uitdenhaag.net — agenda', url: 'https://uitdenhaag.net/' },
-    { label: 'dehavenloods.nl — agenda', url: 'https://www.dehavenloods.nl/agenda' },
-    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/uit' },
+    { label: 'hnt.nl — agenda', url: 'https://www.hnt.nl/nl/voorstellingen' },
+    { label: 'dedoelen.nl — agenda', url: 'https://www.dedoelen.nl/' },
+    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/uitgaan' },
   ],
 };
