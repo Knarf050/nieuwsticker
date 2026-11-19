@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Woensdag 18 november 2026',
-  updatedAt: '18-11-2026, 07:12',
+  dateLabel: 'Donderdag 19 november 2026',
+  updatedAt: '19-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag (t/m 29 nov)', title: '"Dag Poes" (4+)', loc: 'Theater aan het Spui', tag: 'Familie', highlight: true },
-        { time: '20:00–22:00', title: 'Mefisto — try-out', loc: 'Koninklijke Schouwburg', tag: 'Theater' },
+        { time: 'laatste dagen (t/m 20 nov)', title: '#DemocracyDrinks — The Hague Justice Week', loc: 'Diverse locaties', tag: 'Festival', highlight: true },
+        { time: 'doorlopend', title: '"Dag Poes" (4+)', loc: 'Theater aan het Spui', tag: 'Familie' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '19:30', title: 'Harry Potter and the Chamber of Secrets — filmconcert', loc: 'De Doelen', tag: 'Familie', highlight: true },
-        { time: 'opent vandaag, 20:30', title: 'Cameretten Festival (60e editie)', loc: 'Kantine Walhalla', tag: 'Festival' },
+        { time: '20:00', title: 'Gotu Jim', loc: 'Maassilo', tag: 'Muziek', highlight: true },
+        { time: '20:30', title: 'Joshua Idehen', loc: 'Rotown', tag: 'Muziek' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'opent vandaag (t/m 22 nov)', title: 'Suikerzoet Filmfestival', loc: 'Diverse locaties, Schiedam', tag: 'Film', highlight: true },
-        { time: '17:00–20:00', title: 'Start kerstseizoen', loc: 'Westfield Mall of the Netherlands, Leidschendam', tag: 'Markt' },
+        { time: 'gratis, t/m 22 nov', title: 'Suikerzoet Filmfestival', loc: 'Wenneker Cinema, Schiedam', tag: 'Film', highlight: true },
+        { time: '09:00–13:00', title: 'Kabouters zoeken', loc: 'Bentwoud-West, Benthuizen', tag: 'Familie' },
       ],
     },
   ],
   sources: [
-    { label: 'hnt.nl — agenda', url: 'https://www.hnt.nl/nl/voorstellingen' },
-    { label: 'dedoelen.nl — agenda', url: 'https://www.dedoelen.nl/' },
-    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/uitgaan' },
+    { label: 'rotown.nl — agenda', url: 'https://www.rotown.nl/' },
+    { label: 'rightsforum.org — agenda', url: 'https://rightsforum.org/agenda/' },
+    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/19-november-2026' },
   ],
 };
