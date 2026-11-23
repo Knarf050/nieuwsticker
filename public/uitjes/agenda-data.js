@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Zondag 22 november 2026',
-  updatedAt: '22-11-2026, 07:12',
+  dateLabel: 'Maandag 23 november 2026',
+  updatedAt: '23-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'laatste dag', title: '5-jarig bestaan Amare', loc: 'Amare', tag: 'Festival', highlight: true },
-        { time: 'vandaag', title: 'Bollywood Explosie', loc: 'Theater Dakota', tag: 'Theater' },
+        { time: 'vandaag', title: 'Kaaskop & Van Vleuten — "Breekbare Mensen"', loc: 'Diligentia', tag: 'Theater', highlight: true },
+        { time: 'vandaag', title: 'SPEAR / Moral Law', loc: 'Musicon', tag: 'Muziek' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '10:00–17:00, laatste dag', title: 'Noorse Kerstmarkt (NKHR, 102e editie)', loc: 'Westzeedijk 300', tag: 'Markt', highlight: true },
-        { time: '11:00–17:00, laatste dag', title: 'Deense Kerstmarkt', loc: 'Coolhaven 1', tag: 'Markt' },
+        { time: 'doorlopend', title: 'Marisol — overzichtstentoonstelling', loc: 'Depot Boijmans Van Beuningen', tag: 'Expositie', highlight: true },
+        { time: '19:00', title: 'Game Nights: Dox & Dragons', loc: 'Café Dox', tag: 'Casual' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '10:00–16:30, laatste dag', title: 'Christmas and Vintage Fair', loc: 'Kasteel Daelenbroeck, Dordrecht', tag: 'Markt', highlight: true },
-        { time: '10:00–17:00', title: 'Neuzelbeurs', loc: 'De Broodfabriek, Rijswijk', tag: 'Markt' },
+        { time: 'doorlopend', title: 'Mummies en farao\'s', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie', highlight: true },
+        { time: 'vandaag', title: 'Studium Generale — lezing TU Delft', loc: 'Theater de Veste, Delft', tag: 'Lezing' },
       ],
     },
   ],
   sources: [
-    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
-    { label: 'bos-rotterdam.nl — kerstmarkt', url: 'https://bos-rotterdam.nl/overige-activiteiten/kerstmarkt_2026' },
-    { label: 'dagjeweg.nl — Zuid-Holland markten', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/markten' },
+    { label: 'muziekladder.nl — Den Haag', url: 'https://muziekladder.nl/muziek/5-Den%20Haag/' },
+    { label: 'agendafeed.com — Rotterdam', url: 'https://www.agendafeed.com/rotterdam/' },
+    { label: 'muziekladder.nl — Zuid-Holland', url: 'https://muziekladder.nl/en/muziek/regio-south-holland_netherlands/' },
   ],
 };
