@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Maandag 23 november 2026',
-  updatedAt: '23-11-2026, 07:12',
+  dateLabel: 'Dinsdag 24 november 2026',
+  updatedAt: '24-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'vandaag', title: 'Kaaskop & Van Vleuten — "Breekbare Mensen"', loc: 'Diligentia', tag: 'Theater', highlight: true },
-        { time: 'vandaag', title: 'SPEAR / Moral Law', loc: 'Musicon', tag: 'Muziek' },
+        { time: '20:15', title: 'Ika Schwander & Lizzy Deacon — "Stuntwoman!"', loc: 'Theater aan het Spui', tag: 'Theater', highlight: true },
+        { time: '20:00', title: 'Theatercollege: Trumps Amerika', loc: 'Koninklijke Schouwburg', tag: 'Theater' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'doorlopend', title: 'Marisol — overzichtstentoonstelling', loc: 'Depot Boijmans Van Beuningen', tag: 'Expositie', highlight: true },
-        { time: '19:00', title: 'Game Nights: Dox & Dragons', loc: 'Café Dox', tag: 'Casual' },
+        { time: 'vandaag', title: 'Gospelkoor — "Brel to Bennett"', loc: 'De Doelen', tag: 'Muziek', highlight: true },
+        { time: 'vandaag', title: 'Adrenaline — breakdanceshow', loc: 'Theater Zuidplein', tag: 'Theater' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Mummies en farao\'s', loc: 'Rijksmuseum van Oudheden, Leiden', tag: 'Familie', highlight: true },
-        { time: 'vandaag', title: 'Studium Generale — lezing TU Delft', loc: 'Theater de Veste, Delft', tag: 'Lezing' },
+        { time: 'koopavond, kerstsfeer', title: 'Brocantewinkel Rustikke', loc: 'Zoetermeer', tag: 'Markt', highlight: true },
+        { time: 'doorlopend (t/m 31 dec)', title: 'Mini Expo: The Trophy Collection', loc: 'Royal Delft Museum, Delft', tag: 'Expositie' },
       ],
     },
   ],
   sources: [
-    { label: 'muziekladder.nl — Den Haag', url: 'https://muziekladder.nl/muziek/5-Den%20Haag/' },
-    { label: 'agendafeed.com — Rotterdam', url: 'https://www.agendafeed.com/rotterdam/' },
+    { label: 'hnt.nl — agenda', url: 'https://www.hnt.nl/nl/voorstellingen' },
+    { label: 'rotterdam.info — events', url: 'https://www.rotterdam.info/en/visit/finder-events?not-found=true' },
     { label: 'muziekladder.nl — Zuid-Holland', url: 'https://muziekladder.nl/en/muziek/regio-south-holland_netherlands/' },
   ],
 };
