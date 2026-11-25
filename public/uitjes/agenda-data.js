@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Dinsdag 24 november 2026',
-  updatedAt: '24-11-2026, 07:12',
+  dateLabel: 'Woensdag 25 november 2026',
+  updatedAt: '25-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: '20:15', title: 'Ika Schwander & Lizzy Deacon — "Stuntwoman!"', loc: 'Theater aan het Spui', tag: 'Theater', highlight: true },
-        { time: '20:00', title: 'Theatercollege: Trumps Amerika', loc: 'Koninklijke Schouwburg', tag: 'Theater' },
+        { time: 'opent vandaag (t/m 13 dec)', title: 'Siebrand Weitenberg — expositie', loc: 'Pulchri Studio', tag: 'Expositie', highlight: true },
+        { time: '20:00–22:00', title: 'Oersoep NITE | K.O.Brass', loc: 'Koninklijke Schouwburg', tag: 'Muziek' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'vandaag', title: 'Gospelkoor — "Brel to Bennett"', loc: 'De Doelen', tag: 'Muziek', highlight: true },
-        { time: 'vandaag', title: 'Adrenaline — breakdanceshow', loc: 'Theater Zuidplein', tag: 'Theater' },
+        { time: '20:30', title: 'Shirma Rouse & Orkest Koninklijke Luchtmacht — "Celebrating Gospel"', loc: 'De Doelen, Grote Zaal', tag: 'Muziek', highlight: true },
+        { time: '20:30, uitverkocht', title: 'Genesis Owusu', loc: 'Rotown', tag: 'Muziek' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'koopavond, kerstsfeer', title: 'Brocantewinkel Rustikke', loc: 'Zoetermeer', tag: 'Markt', highlight: true },
-        { time: 'doorlopend (t/m 31 dec)', title: 'Mini Expo: The Trophy Collection', loc: 'Royal Delft Museum, Delft', tag: 'Expositie' },
+        { time: 'laatste dag (23–25 nov)', title: 'Pakjesboot van Sinterklaas', loc: 'Gouda', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Museum Prinsenhof — verhaal van Willem van Oranje', loc: 'Delft', tag: 'Expositie' },
       ],
     },
   ],
   sources: [
-    { label: 'hnt.nl — agenda', url: 'https://www.hnt.nl/nl/voorstellingen' },
-    { label: 'rotterdam.info — events', url: 'https://www.rotterdam.info/en/visit/finder-events?not-found=true' },
-    { label: 'muziekladder.nl — Zuid-Holland', url: 'https://muziekladder.nl/en/muziek/regio-south-holland_netherlands/' },
+    { label: 'denhaag.com — agenda', url: 'https://denhaag.com/en/calendar' },
+    { label: 'dedoelen.nl — agenda', url: 'https://www.dedoelen.nl/nl/agenda' },
+    { label: 'uitzuidholland.com — agenda', url: 'https://uitzuidholland.com/' },
   ],
 };
