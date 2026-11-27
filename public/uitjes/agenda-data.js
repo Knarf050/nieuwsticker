@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Donderdag 26 november 2026',
-  updatedAt: '26-11-2026, 07:12',
+  dateLabel: 'Vrijdag 27 november 2026',
+  updatedAt: '27-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag', title: 'Pink Christmas — pop-up', loc: 'And Concept Store', tag: 'Markt', highlight: true },
-        { time: 'vandaag', title: 'Latin Night — Zuid-Amerikaanse, Caribische en Antilliaanse DansEvent', loc: 'Musicon', tag: 'Dans' },
+        { time: 'opent vandaag, 18:30 gratis (t/m 28 nov)', title: 'No Limits Festival', loc: 'Theater aan het Spui', tag: 'Festival', highlight: true },
+        { time: 'opent vandaag (t/m 28 nov)', title: 'Rootz Winter Beer Festival', loc: 'Den Haag', tag: 'Festival' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: '20:00–22:30', title: 'BLØF & Vrienden', loc: 'Rotterdam Ahoy', tag: 'Muziek', highlight: true },
-        { time: 'vandaag', title: 'Rotterdams Philharmonisch Orkest — Mozart en Dvořák', loc: 'De Doelen', tag: 'Muziek' },
+        { time: 'opent vandaag (t/m 28 nov)', title: 'Zweedse Kerstmarkt', loc: 'Schotse Kerk, Schiedamsesingel 2', tag: 'Markt', highlight: true },
+        { time: 'doorlopend (t/m 27 feb)', title: 'Schaatsbaan Rotterdam', loc: 'Rotterdam', tag: 'Familie' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: 'doorlopend', title: 'Museum Prinsenhof — verhaal van Willem van Oranje', loc: 'Delft', tag: 'Expositie', highlight: true },
-        { time: 'doorlopend', title: 'CORPUS', loc: 'Oegstgeest — interactieve reis door het menselijk lichaam', tag: 'Familie' },
+        { time: '16:00–21:00', title: 'Winterfair Lekkerkerk — 70+ kramen en schaatsbaan', loc: 'De Amicitia en Raadhuisplein, Lekkerkerk', tag: 'Familie', highlight: true },
+        { time: 'doorlopend', title: 'Museum Prinsenhof — verhaal van Willem van Oranje', loc: 'Delft', tag: 'Expositie' },
       ],
     },
   ],
   sources: [
-    { label: 'thehagueonline.com — calendar', url: 'https://thehagueonline.com/2026-calendar/' },
-    { label: 'ahoy.nl — agenda', url: 'https://www.ahoy.nl/en/events' },
-    { label: 'dagjeweg.nl — Zuid-Holland', url: 'https://www.dagjeweg.nl/kalender/zuid-holland/markten' },
+    { label: 'nolimitsfestival.com — programma', url: 'https://nolimitsfestival.com/en' },
+    { label: 'winterevenementen.nu — Zweedse kerstmarkt', url: 'https://winterevenementen.nu/evenement/472/rotterdam/zweedse-kerstmarkt-rotterdam/' },
+    { label: 'winterfairlekkerkerk.nl', url: 'https://winterfairlekkerkerk.nl/' },
   ],
 };
