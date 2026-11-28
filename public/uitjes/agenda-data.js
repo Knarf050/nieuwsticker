@@ -5,8 +5,8 @@
  * leest dit bestand uit en rendert het bord.
  */
 window.AGENDA_DATA = {
-  dateLabel: 'Vrijdag 27 november 2026',
-  updatedAt: '27-11-2026, 07:12',
+  dateLabel: 'Zaterdag 28 november 2026',
+  updatedAt: '28-11-2026, 07:12',
   nextUpdate: 'morgen 07:00',
   sections: [
     {
@@ -14,8 +14,8 @@ window.AGENDA_DATA = {
       name: 'Den Haag',
       accent: 'dh',
       items: [
-        { time: 'opent vandaag, 18:30 gratis (t/m 28 nov)', title: 'No Limits Festival', loc: 'Theater aan het Spui', tag: 'Festival', highlight: true },
-        { time: 'opent vandaag (t/m 28 nov)', title: 'Rootz Winter Beer Festival', loc: 'Den Haag', tag: 'Festival' },
+        { time: '10:00–18:00 (t/m 29 nov)', title: 'Smaak van de Winter — Italiaanse markt', loc: 'Grote Kerk', tag: 'Markt', highlight: true },
+        { time: '11:00–17:00 (t/m 29 nov)', title: 'Pop-up kerstmarkt', loc: 'Hotel De Plesman', tag: 'Markt' },
       ],
     },
     {
@@ -23,8 +23,8 @@ window.AGENDA_DATA = {
       name: 'Rotterdam',
       accent: 'rt',
       items: [
-        { time: 'opent vandaag (t/m 28 nov)', title: 'Zweedse Kerstmarkt', loc: 'Schotse Kerk, Schiedamsesingel 2', tag: 'Markt', highlight: true },
-        { time: 'doorlopend (t/m 27 feb)', title: 'Schaatsbaan Rotterdam', loc: 'Rotterdam', tag: 'Familie' },
+        { time: '10:00–16:00', title: 'Traditionele Duitse Kerstmarkt', loc: 'Duitse Kerk', tag: 'Markt', highlight: true },
+        { time: 'vandaag', title: 'BLØF', loc: 'Rotterdam Ahoy', tag: 'Muziek' },
       ],
     },
     {
@@ -32,14 +32,14 @@ window.AGENDA_DATA = {
       name: 'Rest van Zuid-Holland',
       accent: 'nl',
       items: [
-        { time: '16:00–21:00', title: 'Winterfair Lekkerkerk — 70+ kramen en schaatsbaan', loc: 'De Amicitia en Raadhuisplein, Lekkerkerk', tag: 'Familie', highlight: true },
-        { time: 'doorlopend', title: 'Museum Prinsenhof — verhaal van Willem van Oranje', loc: 'Delft', tag: 'Expositie' },
+        { time: 'vandaag', title: 'Katwijkse Winterfair', loc: 'Katwijk', tag: 'Markt', highlight: true },
+        { time: 'vandaag', title: 'Wintermarkt', loc: 'Krimpen aan de Lek', tag: 'Markt' },
       ],
     },
   ],
   sources: [
-    { label: 'nolimitsfestival.com — programma', url: 'https://nolimitsfestival.com/en' },
-    { label: 'winterevenementen.nu — Zweedse kerstmarkt', url: 'https://winterevenementen.nu/evenement/472/rotterdam/zweedse-kerstmarkt-rotterdam/' },
-    { label: 'winterfairlekkerkerk.nl', url: 'https://winterfairlekkerkerk.nl/' },
+    { label: 'smaakvandewinter.nl', url: 'https://www.smaakvandewinter.nl/expo/' },
+    { label: 'dehavenloods.nl — agenda', url: 'https://www.dehavenloods.nl/agenda/evenement' },
+    { label: 'marktenmeer.nl — kerstmarkten Zuid-Holland', url: 'https://marktenmeer.nl/kerstmarkten-in-zuid-holland/' },
   ],
 };
